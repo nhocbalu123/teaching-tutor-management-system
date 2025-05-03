@@ -12,7 +12,7 @@ import {
     getApplicationsByCourse,
     searchApplications,
     TutorApplication,
-} from "./tutorUtils";
+} from "../../utils/tutorUtils";
 
 // Mock localStorage
 const localStorageMock = (() => {

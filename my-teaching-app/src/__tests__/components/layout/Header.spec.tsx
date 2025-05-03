@@ -1,6 +1,6 @@
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import Header from "./Header";
+import { render, screen, fireEvent } from "@testing-library/react";
+import Header from "../../../components/layout/Header";
 import { useRouter } from "next/router";
 
 // Mock next/router
@@ -11,13 +11,13 @@ jest.mock("next/router", () => ({
 // Mock next/image
 jest.mock("next/image", () => ({
     __esModule: true,
-    default: (props: any) => {
+    default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
         return <img {...props} />;
     },
 }));
 
 // Mock UserDropdown component
-jest.mock("./UserDropdown", () => {
+jest.mock("../../../components/layout/UserDropdown", () => {
     return function MockUserDropdown() {
         return <div data-testid="user-dropdown" />;
     };
@@ -53,28 +53,18 @@ describe("Header Component", () => {
             writable: true,
         });
 
-        // Mock document.documentElement.classList
-        const originalClassList = document.documentElement.classList;
-        document.documentElement.classList = {
+        // Mock document.documentElement.classList - simplified approach
+        const classListMock = {
             add: jest.fn(),
             remove: jest.fn(),
             contains: jest.fn(),
             toggle: jest.fn(),
-            item: jest.fn(),
-            toString: jest.fn().mockReturnValue(""),
-            value: "",
-            length: 0,
-            replace: jest.fn(),
-            entries: jest.fn(),
-            forEach: jest.fn(),
-            keys: jest.fn(),
-            values: jest.fn(),
-            [Symbol.iterator]: jest.fn(),
-        } as unknown as DOMTokenList;
-
-        return () => {
-            document.documentElement.classList = originalClassList;
         };
+
+        jest.spyOn(document.documentElement.classList, "add").mockImplementation(classListMock.add);
+        jest.spyOn(document.documentElement.classList, "remove").mockImplementation(classListMock.remove);
+        jest.spyOn(document.documentElement.classList, "contains").mockImplementation(classListMock.contains);
+        jest.spyOn(document.documentElement.classList, "toggle").mockImplementation(classListMock.toggle);
     });
 
     // Test 1: Header renders logo
@@ -96,18 +86,10 @@ describe("Header Component", () => {
         render(<Header />);
 
         expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /tutor/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /lecturer/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /sign in/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /sign up/i })
-        ).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /tutor/i })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /lecturer/i })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /sign up/i })).toBeInTheDocument();
     });
 
     // Test 3: Header shows Sign In / Sign Up buttons when not logged in
@@ -144,12 +126,8 @@ describe("Header Component", () => {
         render(<Header />);
 
         expect(screen.getByTestId("user-dropdown")).toBeInTheDocument();
-        expect(
-            screen.queryByRole("link", { name: /sign in/i })
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByRole("link", { name: /sign up/i })
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: /sign in/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: /sign up/i })).not.toBeInTheDocument();
     });
 
     // Test 5: Header toggles dark mode
@@ -158,8 +136,7 @@ describe("Header Component", () => {
         mockLocalStorage.getItem.mockReturnValueOnce("false"); // Dark mode off
 
         // Create a spy specifically for classList.add
-        const addSpy = jest.fn();
-        document.documentElement.classList.add = addSpy;
+        const addSpy = jest.spyOn(document.documentElement.classList, "add");
 
         render(<Header />);
 
@@ -168,10 +145,7 @@ describe("Header Component", () => {
         });
         fireEvent.click(darkModeButton);
 
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-            "darkMode",
-            "true"
-        );
+        expect(mockLocalStorage.setItem).toHaveBeenCalledWith("darkMode", "true");
         expect(addSpy).toHaveBeenCalled();
     });
 
@@ -209,12 +183,8 @@ describe("Header Component", () => {
 
         // Lecturer should see Home and Lecturer links but not Tutor
         expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /lecturer/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.queryByRole("link", { name: /tutor/i })
-        ).not.toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /lecturer/i })).toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: /tutor/i })).not.toBeInTheDocument();
 
         // Unmount and reset mocks for the next render
         unmount();
@@ -239,11 +209,7 @@ describe("Header Component", () => {
 
         // Tutor should see Home and Tutor links but not Lecturer
         expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
-        expect(
-            screen.getByRole("link", { name: /tutor/i })
-        ).toBeInTheDocument();
-        expect(
-            screen.queryByRole("link", { name: /lecturer/i })
-        ).not.toBeInTheDocument();
+        expect(screen.getByRole("link", { name: /tutor/i })).toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: /lecturer/i })).not.toBeInTheDocument();
     });
 });

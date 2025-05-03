@@ -1,15 +1,15 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Layout from "./Layout";
+import Layout from "../../../components/layout/Layout";
 
 // Mock the Header and Footer components
-jest.mock("./Header", () => {
+jest.mock("../../../components/layout/Header", () => {
     return function MockHeader() {
         return <div data-testid="mock-header">Header Component</div>;
     };
 });
 
-jest.mock("./Footer", () => {
+jest.mock("../../../components/layout/Footer", () => {
     return function MockFooter() {
         return <div data-testid="mock-footer">Footer Component</div>;
     };
@@ -39,9 +39,7 @@ describe("Layout Component", () => {
 
         const mainElement = screen.getByRole("main");
         expect(mainElement).toBeInTheDocument();
-        expect(mainElement).toContainElement(
-            screen.getByTestId("child-content")
-        );
+        expect(mainElement).toContainElement(screen.getByTestId("child-content"));
     });
 
     // Test 3: Main content has flex-grow class
@@ -65,9 +63,7 @@ describe("Layout Component", () => {
         );
 
         // Find the outermost div which should have min-h-screen class
-        const container = screen
-            .getByText("Content")
-            .closest("div.min-h-screen");
+        const container = screen.getByText("Content").closest("div.min-h-screen");
         expect(container).toBeInTheDocument();
         expect(container).toHaveClass("min-h-screen");
     });

@@ -5,8 +5,7 @@ import {
     getCoursesWithDetails,
     getCourseByCode,
     searchCourses,
-    CourseWithDetails,
-} from "./coursesUtils";
+} from "../../utils/coursesUtils";
 
 describe("Course Utilities", () => {
     // Test 1: Confirm availableCourses contains the expected data

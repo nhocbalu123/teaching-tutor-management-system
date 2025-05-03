@@ -1,31 +1,38 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import UserDropdown from "./UserDropdown";
+import UserDropdown from "../../../components/layout/UserDropdown";
 
 // Mock next/image
 jest.mock("next/image", () => ({
     __esModule: true,
-    default: (props: any) => {
+    default: function MockImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
         return <img {...props} />;
     },
 }));
 
 // Mock framer-motion
 jest.mock("framer-motion", () => {
-    const mockReact = require("react");
+    const React = jest.requireActual<typeof import("react")>("react");
+
+    const MotionDiv = React.forwardRef<
+        HTMLDivElement,
+        React.HTMLProps<HTMLDivElement> & { variants?: unknown; initial?: string; animate?: string; exit?: string; transition?: unknown }
+    >(({ children, ...props }, ref) => (
+        <div ref={ref} {...props}>
+            {children}
+        </div>
+    ));
+    MotionDiv.displayName = "MotionDiv";
+
+    const AnimatePresence = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+    AnimatePresence.displayName = "AnimatePresence";
+
     return {
         motion: {
-            div: mockReact.forwardRef(
-                ({ children, ...props }: any, ref: any) => (
-                    <div ref={ref} {...props}>
-                        {children}
-                    </div>
-                )
-            ),
+            div: MotionDiv,
         },
-        AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-            <>{children}</>
-        ),
+        AnimatePresence,
     };
 });
 
@@ -46,34 +53,18 @@ describe("UserDropdown Component", () => {
 
     // Test 1: Component renders with user info
     test("renders with user information", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Avatar should be rendered
         expect(screen.getByAltText("John Doe")).toBeInTheDocument();
 
         // Dropdown is closed by default, so we shouldn't see user details yet
-        expect(
-            screen.queryByText("john.doe@tutor.edu.au")
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText("john.doe@tutor.edu.au")).not.toBeInTheDocument();
     });
 
     // Test 2: Opens dropdown when avatar is clicked
     test("opens dropdown when avatar is clicked", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Click on avatar to open dropdown
         fireEvent.click(screen.getByAltText("John Doe"));
@@ -87,14 +78,7 @@ describe("UserDropdown Component", () => {
 
     // Test 3: Closes dropdown when close button is clicked
     test("closes dropdown when close button is clicked", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Open dropdown
         fireEvent.click(screen.getByAltText("John Doe"));
@@ -104,21 +88,12 @@ describe("UserDropdown Component", () => {
         fireEvent.click(screen.getByLabelText("Close dropdown"));
 
         // Dropdown should be closed, email shouldn't be visible
-        expect(
-            screen.queryByText("john.doe@tutor.edu.au")
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText("john.doe@tutor.edu.au")).not.toBeInTheDocument();
     });
 
     // Test 4: Calls onSignOut when sign out button is clicked
     test("calls onSignOut when sign out button is clicked", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Open dropdown
         fireEvent.click(screen.getByAltText("John Doe"));
@@ -132,14 +107,7 @@ describe("UserDropdown Component", () => {
 
     // Test 5: Calls onToggleDarkMode when theme toggle is clicked
     test("calls onToggleDarkMode when theme toggle is clicked", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Open dropdown
         fireEvent.click(screen.getByAltText("John Doe"));
@@ -154,14 +122,7 @@ describe("UserDropdown Component", () => {
 
     // Test 6: Shows active class on theme toggle when in dark mode
     test("shows active class on theme toggle when in dark mode", () => {
-        render(
-            <UserDropdown
-                user={mockUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={true}
-            />
-        );
+        render(<UserDropdown user={mockUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={true} />);
 
         // Open dropdown
         fireEvent.click(screen.getByAltText("John Doe"));
@@ -179,14 +140,7 @@ describe("UserDropdown Component", () => {
             role: "tutor",
         };
 
-        render(
-            <UserDropdown
-                user={singleNameUser}
-                onSignOut={mockOnSignOut}
-                onToggleDarkMode={mockOnToggleDarkMode}
-                isDarkMode={false}
-            />
-        );
+        render(<UserDropdown user={singleNameUser} onSignOut={mockOnSignOut} onToggleDarkMode={mockOnToggleDarkMode} isDarkMode={false} />);
 
         // Open dropdown
         fireEvent.click(screen.getByAltText("Madonna"));

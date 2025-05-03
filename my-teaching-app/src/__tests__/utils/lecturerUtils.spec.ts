@@ -5,8 +5,7 @@ import {
     saveLecturerSelection,
     formatLecturerExpertise,
     getLecturerCourses,
-    lecturers,
-} from "./lecturerUtils";
+} from "../../utils/lecturerUtils";
 
 // Mock localStorage
 const localStorageMock = (() => {

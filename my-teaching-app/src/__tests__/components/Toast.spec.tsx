@@ -1,20 +1,18 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import Toast from "./Toast";
+import Toast from "../../components/Toast";
 
 // Mock framer-motion to prevent animation issues
 jest.mock("framer-motion", () => {
     return {
         motion: {
-            div: ({ children, className, ...props }: any) => (
+            div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
                 <div className={className} {...props}>
                     {children}
                 </div>
             ),
         },
-        AnimatePresence: ({ children }: { children: React.ReactNode }) => (
-            <>{children}</>
-        ),
+        AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     };
 });
 
@@ -23,14 +21,7 @@ describe("Toast Component", () => {
     test("renders with the provided message", () => {
         const mockOnClose = jest.fn();
 
-        render(
-            <Toast
-                message="Test message"
-                visible={true}
-                type="success"
-                onClose={mockOnClose}
-            />
-        );
+        render(<Toast message="Test message" visible={true} type="success" onClose={mockOnClose} />);
 
         expect(screen.getByText("Test message")).toBeInTheDocument();
     });
@@ -39,36 +30,15 @@ describe("Toast Component", () => {
     test("renders with different types (success, error, info)", () => {
         const mockOnClose = jest.fn();
 
-        const { rerender } = render(
-            <Toast
-                message="Success message"
-                visible={true}
-                type="success"
-                onClose={mockOnClose}
-            />
-        );
+        const { rerender } = render(<Toast message="Success message" visible={true} type="success" onClose={mockOnClose} />);
 
         expect(document.querySelector(".toast-success")).toBeInTheDocument();
 
-        rerender(
-            <Toast
-                message="Error message"
-                visible={true}
-                type="error"
-                onClose={mockOnClose}
-            />
-        );
+        rerender(<Toast message="Error message" visible={true} type="error" onClose={mockOnClose} />);
 
         expect(document.querySelector(".toast-error")).toBeInTheDocument();
 
-        rerender(
-            <Toast
-                message="Info message"
-                visible={true}
-                type="info"
-                onClose={mockOnClose}
-            />
-        );
+        rerender(<Toast message="Info message" visible={true} type="info" onClose={mockOnClose} />);
 
         expect(document.querySelector(".toast-info")).toBeInTheDocument();
     });
@@ -77,13 +47,7 @@ describe("Toast Component", () => {
     test("does not render when visible is false", () => {
         const mockOnClose = jest.fn();
 
-        render(
-            <Toast
-                message="Test message"
-                visible={false}
-                onClose={mockOnClose}
-            />
-        );
+        render(<Toast message="Test message" visible={false} onClose={mockOnClose} />);
 
         expect(screen.queryByText("Test message")).not.toBeInTheDocument();
     });
@@ -92,15 +56,15 @@ describe("Toast Component", () => {
     test("calls onClose when close button is clicked", () => {
         const mockOnClose = jest.fn();
 
-        render(
-            <Toast
-                message="Test message"
-                visible={true}
-                onClose={mockOnClose}
-            />
-        );
+        render(<Toast message="Test message" visible={true} onClose={mockOnClose} />);
 
-        fireEvent.click(screen.getByRole("button", { class: "toast-close" }));
+        // Find the close button by looking for an element with the close class
+        const closeButton = document.querySelector(".toast-close");
+        expect(closeButton).toBeInTheDocument();
+
+        if (closeButton) {
+            fireEvent.click(closeButton);
+        }
 
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -109,13 +73,7 @@ describe("Toast Component", () => {
     test("has default type of success when not specified", () => {
         const mockOnClose = jest.fn();
 
-        render(
-            <Toast
-                message="Test message"
-                visible={true}
-                onClose={mockOnClose}
-            />
-        );
+        render(<Toast message="Test message" visible={true} onClose={mockOnClose} />);
 
         expect(document.querySelector(".toast-success")).toBeInTheDocument();
         expect(document.querySelector(".toast-error")).not.toBeInTheDocument();
@@ -127,13 +85,7 @@ describe("Toast Component", () => {
         jest.useFakeTimers();
         const mockOnClose = jest.fn();
 
-        render(
-            <Toast
-                message="Test message"
-                visible={true}
-                onClose={mockOnClose}
-            />
-        );
+        render(<Toast message="Test message" visible={true} onClose={mockOnClose} />);
 
         expect(mockOnClose).not.toHaveBeenCalled();
 
@@ -152,13 +104,7 @@ describe("Toast Component", () => {
         jest.useFakeTimers();
         const mockOnClose = jest.fn();
 
-        const { unmount } = render(
-            <Toast
-                message="Test message"
-                visible={true}
-                onClose={mockOnClose}
-            />
-        );
+        const { unmount } = render(<Toast message="Test message" visible={true} onClose={mockOnClose} />);
 
         const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
 

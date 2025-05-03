@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Footer from "./Footer";
+import Footer from "../../../components/layout/Footer";
 
 describe("Footer Component", () => {
     // Test 1: Footer renders with main navigation links
@@ -33,11 +33,7 @@ describe("Footer Component", () => {
     test("renders copyright text", () => {
         render(<Footer />);
 
-        expect(
-            screen.getByText(
-                /© 2025 EduTeach, School of Computer Science. All rights reserved./i
-            )
-        ).toBeInTheDocument();
+        expect(screen.getByText(/© 2025 EduTeach, School of Computer Science. All rights reserved./i)).toBeInTheDocument();
     });
 
     // Test 4: Footer container has correct styling props

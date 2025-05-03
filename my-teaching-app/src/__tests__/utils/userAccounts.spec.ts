@@ -2,12 +2,11 @@ import {
     initializeUserAccounts,
     getUserByCredentials,
     getUserById,
-    getUserByEmail,
     updateUserProfile,
     validateRoleSpecificEmail,
     userAccounts,
     UserAccount,
-} from "./userAccounts";
+} from "../../utils/userAccounts";
 
 describe("User Accounts Utilities", () => {
     // Setup mock localStorage

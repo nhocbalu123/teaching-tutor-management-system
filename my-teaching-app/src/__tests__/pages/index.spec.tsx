@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import Home from "./index";
+import Home from "../../pages/index";
 
 // Mock next/image
 jest.mock("next/image", () => ({
     __esModule: true,
-    default: (props: any) => {
+    default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
         // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
         return <img {...props} />;
     },
@@ -15,24 +15,20 @@ jest.mock("next/image", () => ({
 jest.mock("next/head", () => {
     return {
         __esModule: true,
-        default: ({ children }: { children: React.ReactNode }) => (
-            <div>{children}</div>
-        ),
+        default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     };
 });
 
 // Mock layout component
-jest.mock("../components/layout/Layout", () => {
+jest.mock("../../components/layout/Layout", () => {
     return {
         __esModule: true,
-        default: ({ children }: { children: React.ReactNode }) => (
-            <div data-testid="layout">{children}</div>
-        ),
+        default: ({ children }: { children: React.ReactNode }) => <div data-testid="layout">{children}</div>,
     };
 });
 
 // Mock lecturer utils
-jest.mock("../utils/lecturerUtils", () => ({
+jest.mock("../../utils/lecturerUtils", () => ({
     lecturers: [
         {
             id: "lecturer1",
@@ -92,10 +88,7 @@ describe("Home Page", () => {
 
         const getStartedButton = screen.getByText("Get Started");
         expect(getStartedButton).toBeInTheDocument();
-        expect(getStartedButton.closest("a")).toHaveAttribute(
-            "href",
-            "#tutors-info"
-        );
+        expect(getStartedButton.closest("a")).toHaveAttribute("href", "#tutors-info");
     });
 
     // Test 2: Renders stats section with correct data
@@ -128,9 +121,7 @@ describe("Home Page", () => {
         // Since the state is internal, we can't directly test it
         // But we can verify that localStorage.getItem was called
         // This is an implementation detail, but it's the best we can do without changing the component
-        expect(mockLocalStorage.getItem("currentUser")).toBe(
-            JSON.stringify(mockUser)
-        );
+        expect(mockLocalStorage.getItem("currentUser")).toBe(JSON.stringify(mockUser));
     });
 
     // Test 4: Opens modal when lecturer card is clicked
@@ -142,9 +133,7 @@ describe("Home Page", () => {
 
         // We're mocking a click on an element that matches the typical pattern for a lecturer card
         // This is an approximation since we don't have the full details of the lecturer cards
-        const lecturerElements = screen.queryAllByText(
-            /Dr. John Smith|Prof. Jane Doe/
-        );
+        const lecturerElements = screen.queryAllByText(/Dr. John Smith|Prof. Jane Doe/);
 
         if (lecturerElements.length > 0) {
             fireEvent.click(lecturerElements[0]);
