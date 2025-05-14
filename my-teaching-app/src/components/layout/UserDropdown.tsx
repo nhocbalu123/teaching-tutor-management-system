@@ -8,6 +8,7 @@ interface UserDropdownProps {
         fullName: string;
         email: string;
         role: string;
+        avatarPath?: string; // Added avatarPath property
         avatarNumber?: number;
     };
     onSignOut: () => void;
@@ -19,14 +20,23 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Determine avatar number based on name if not provided
-    const getAvatarNumber = () => {
-        if (user.avatarNumber) return user.avatarNumber;
+    // Updated function to get avatar path
+    const getAvatarPath = () => {
+        if (user.avatarPath) {
+            return user.avatarPath;
+        } else if (user.avatarNumber) {
+            return `/avatars/avatar-${user.avatarNumber}.jpg`;
+        } else {
+            // Generate a consistent avatar number based on email
+            const emailHash = user.email.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
-        // Generate a consistent avatar number based on email
-        const emailHash = user.email.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            // Use lecturer images if user is a lecturer
+            if (user.role === "lecturer") {
+                return `/lecturers/lecturer-${(emailHash % 4) + 1}.jpg`;
+            }
 
-        return (emailHash % 6) + 1;
+            return `/avatars/avatar-${(emailHash % 12) + 1}.jpg`;
+        }
     };
 
     // Toggle dropdown
@@ -84,7 +94,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
             {/* Avatar Button */}
             <div className="avatar-button" onClick={toggleDropdown}>
                 <div className="avatar-wrapper">
-                    <Image src={`/avatars/avatar-${getAvatarNumber()}.jpg`} alt={user.fullName} width={40} height={40} className="avatar-image" />
+                    <Image src={getAvatarPath()} alt={user.fullName} width={40} height={40} className="avatar-image" />
                     {isOpen && (
                         <>
                             <div className="avatar-connector"></div>
@@ -99,13 +109,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
                 {isOpen && (
                     <motion.div className="user-dropdown-menu" variants={dropdownVariants} initial="hidden" animate="visible" exit="exit">
                         <div className="dropdown-header">
-                            <Image
-                                src={`/avatars/avatar-${getAvatarNumber()}.jpg`}
-                                alt={user.fullName}
-                                width={60}
-                                height={60}
-                                className="dropdown-avatar"
-                            />
+                            <Image src={getAvatarPath()} alt={user.fullName} width={60} height={60} className="dropdown-avatar" />
                             <div className="user-info">
                                 <h3 className="user-name">
                                     <span className="first-name">{firstName}</span>

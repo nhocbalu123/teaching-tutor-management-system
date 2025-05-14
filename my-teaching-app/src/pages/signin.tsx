@@ -1,3 +1,4 @@
+// src/pages/signin.tsx
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -8,14 +9,14 @@ import { initializeDetailedApplications } from "../utils/tutorUtils";
 
 /**
  * Validation Rules for Sign In Form:
- * 
+ *
  * 1. Email:
  *    - Required field
  *    - Must be a valid email format
  *    - Must end with correct domain based on role:
  *      - Tutors: @tutor.edu.au
  *      - Lecturers: @lecturer.edu.au
- * 
+ *
  * 2. Password:
  *    - Required field
  *    - Minimum 8 characters
@@ -23,7 +24,7 @@ import { initializeDetailedApplications } from "../utils/tutorUtils";
  *    - Should contain at least one lowercase letter
  *    - Should contain at least one number
  *    - Should contain at least one special character
- * 
+ *
  * 3. Role Selection:
  *    - Either "tutor" or "lecturer" must be selected
  *    - Email domain must match the selected role
@@ -76,7 +77,7 @@ export default function SignIn() {
         });
     }, [password]);
 
-    // Fixed getUserByCredentials function
+    // Modified getUserByCredentials function to include avatarPath
     const getUserByCredentials = (email: string, password: string, role: string) => {
         if (typeof window !== "undefined") {
             interface UserType {
@@ -85,6 +86,7 @@ export default function SignIn() {
                 password: string;
                 role: string;
                 fullName: string;
+                avatarPath?: string; // Added avatarPath property
             }
 
             const users = JSON.parse(localStorage.getItem("users") || "[]") as UserType[];
@@ -129,7 +131,26 @@ export default function SignIn() {
             const user = getUserByCredentials(email, password, role);
 
             if (user) {
-                // Store the current user in localStorage
+                // Determine avatar path based on role if not provided
+                let avatarPath = user.avatarPath;
+
+                if (!avatarPath) {
+                    // Use a more diverse method to generate avatar numbers
+                    // Extract numeric portion of the ID if it exists, otherwise use character codes
+                    const idNum = parseInt(user.id.replace(/[^\d]/g, "")) || user.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+                    if (user.role === "lecturer") {
+                        // For lecturers: ensure we use all 4 lecturer images (1-4)
+                        const lecturerIndex = (idNum % 4) + 1;
+                        avatarPath = `/lecturers/lecturer-${lecturerIndex}.jpg`;
+                    } else {
+                        // For tutors: ensure we use all 12 tutor images (1-12)
+                        const tutorIndex = (idNum % 12) + 1;
+                        avatarPath = `/avatars/avatar-${tutorIndex}.jpg`;
+                    }
+                }
+
+                // Store the current user in localStorage with avatar path
                 localStorage.setItem(
                     "currentUser",
                     JSON.stringify({
@@ -137,6 +158,7 @@ export default function SignIn() {
                         role: user.role,
                         fullName: user.fullName,
                         id: user.id,
+                        avatarPath: avatarPath, // Include the avatar path
                     })
                 );
 

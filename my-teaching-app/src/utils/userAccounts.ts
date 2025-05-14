@@ -8,6 +8,7 @@ export interface UserAccount {
     bio?: string;
     skills?: string[];
     academicCredentials?: string;
+    avatarPath?: string;
 }
 
 // 12 tutor accounts with minimal information
@@ -19,6 +20,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "John Doe",
         academicCredentials: "Bachelor of Computer Science",
+        avatarPath: "/avatars/avatar-1.jpg",
     },
     {
         id: "tutor2",
@@ -27,6 +29,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Jane Smith",
         academicCredentials: "Masters in Computer Science",
+        avatarPath: "/avatars/avatar-2.jpg",
     },
     {
         id: "tutor3",
@@ -35,6 +38,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Michael Brown",
         academicCredentials: "Bachelor of Information Technology",
+        avatarPath: "/avatars/avatar-3.jpg",
     },
     {
         id: "tutor4",
@@ -43,6 +47,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Emily Johnson",
         academicCredentials: "Masters in Computer Engineering",
+        avatarPath: "/avatars/avatar-4.jpg",
     },
     {
         id: "tutor5",
@@ -51,6 +56,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "David Wilson",
         academicCredentials: "Bachelor of Computer Science",
+        avatarPath: "/avatars/avatar-5.jpg",
     },
     {
         id: "tutor6",
@@ -59,6 +65,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Sarah Taylor",
         academicCredentials: "Ph.D. Candidate in Cybersecurity",
+        avatarPath: "/avatars/avatar-6.jpg",
     },
     {
         id: "tutor7",
@@ -67,6 +74,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Alex Martinez",
         academicCredentials: "Masters in Software Engineering",
+        avatarPath: "/avatars/avatar-7.jpg",
     },
     {
         id: "tutor8",
@@ -75,6 +83,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Olivia Anderson",
         academicCredentials: "Bachelor of Science in Computer Science",
+        avatarPath: "/avatars/avatar-8.jpg",
     },
     {
         id: "tutor9",
@@ -83,6 +92,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "James Thomas",
         academicCredentials: "Masters in Web Technologies",
+        avatarPath: "/avatars/avatar-9.jpg",
     },
     {
         id: "tutor10",
@@ -91,6 +101,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Sophia Garcia",
         academicCredentials: "Bachelor of Information Technology",
+        avatarPath: "/avatars/avatar-10.jpg",
     },
     {
         id: "tutor11",
@@ -99,6 +110,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Daniel Lee",
         academicCredentials: "Ph.D. Student in Computer Science",
+        avatarPath: "/avatars/avatar-11.jpg",
     },
     {
         id: "tutor12",
@@ -107,6 +119,7 @@ const tutorAccounts: UserAccount[] = [
         role: "tutor",
         fullName: "Emma Clark",
         academicCredentials: "Masters in IT Security",
+        avatarPath: "/avatars/avatar-12.jpg",
     },
 ];
 
@@ -119,6 +132,7 @@ const lecturerAccounts: UserAccount[] = [
         role: "lecturer",
         fullName: "Dr. Sophie Chen",
         bio: "Specializes in AI research and education",
+        avatarPath: "/lecturers/lecturer-1.jpg",
     },
     {
         id: "lecturer2",
@@ -127,6 +141,7 @@ const lecturerAccounts: UserAccount[] = [
         role: "lecturer",
         fullName: "Prof. Michael Rodriguez",
         bio: "15+ years of industry experience in software architecture",
+        avatarPath: "/lecturers/lecturer-2.jpg",
     },
     {
         id: "lecturer3",
@@ -135,6 +150,7 @@ const lecturerAccounts: UserAccount[] = [
         role: "lecturer",
         fullName: "Dr. Aisha Patel",
         bio: "Specializes in network security and ethical hacking",
+        avatarPath: "/lecturers/lecturer-3.jpg",
     },
     {
         id: "lecturer4",
@@ -143,6 +159,7 @@ const lecturerAccounts: UserAccount[] = [
         role: "lecturer",
         fullName: "Dr. James Wilson",
         bio: "Expert in algorithm optimization and data science",
+        avatarPath: "/lecturers/lecturer-4.jpg",
     },
 ];
 

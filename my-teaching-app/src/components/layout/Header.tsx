@@ -14,6 +14,7 @@ interface UserData {
     bio?: string;
     skills?: string[];
     academicCredentials?: string;
+    avatarPath?: string; // Added avatarPath property
 }
 
 const Header: React.FC = () => {
@@ -43,8 +44,7 @@ const Header: React.FC = () => {
             }
 
             // Check for dark mode preference
-            const darkModePreference =
-                localStorage.getItem("darkMode") === "true";
+            const darkModePreference = localStorage.getItem("darkMode") === "true";
             setIsDarkMode(darkModePreference);
             if (darkModePreference) {
                 document.documentElement.classList.add("dark");
@@ -110,18 +110,7 @@ const Header: React.FC = () => {
 
     // Determine which navigation links to show
     const showTutorLink = !isLoggedIn || (isLoggedIn && userRole === "tutor");
-    const showLecturerLink =
-        !isLoggedIn || (isLoggedIn && userRole === "lecturer");
-
-    // Get avatar number based on user ID (to keep it consistent)
-    const getAvatarNumber = () => {
-        if (!userData?.id) return 1;
-
-        // Use the first character of user ID to determine avatar (1-6)
-        const firstChar = userData.id.charAt(0);
-        const charCode = firstChar.charCodeAt(0);
-        return (charCode % 6) + 1;
-    };
+    const showLecturerLink = !isLoggedIn || (isLoggedIn && userRole === "lecturer");
 
     return (
         <header className={`main-header ${isScrolled ? "scrolled" : ""}`}>
@@ -131,13 +120,7 @@ const Header: React.FC = () => {
                     <Link href="/" className="logo-link">
                         <div className="logo-container">
                             <div className="logo-image-container">
-                                <Image
-                                    src="/letter-e.png"
-                                    alt="Logo"
-                                    width={36}
-                                    height={36}
-                                    className="logo-image"
-                                />
+                                <Image src="/letter-e.png" alt="Logo" width={36} height={36} className="logo-image" />
                             </div>
                             <span className="logo-text">
                                 <span className="logo-prefix">du</span>Team
@@ -149,37 +132,18 @@ const Header: React.FC = () => {
                 {/* Center Navigation */}
                 <nav className="main-nav">
                     <div className="nav-links">
-                        <Link
-                            href="/"
-                            className={`nav-link ${
-                                router.pathname === "/" ? "active" : ""
-                            }`}
-                        >
+                        <Link href="/" className={`nav-link ${router.pathname === "/" ? "active" : ""}`}>
                             Home
                         </Link>
 
                         {showTutorLink && (
-                            <Link
-                                href="/tutor"
-                                className={`nav-link ${
-                                    router.pathname.startsWith("/tutor")
-                                        ? "active"
-                                        : ""
-                                }`}
-                            >
+                            <Link href="/tutor" className={`nav-link ${router.pathname.startsWith("/tutor") ? "active" : ""}`}>
                                 Tutor
                             </Link>
                         )}
 
                         {showLecturerLink && (
-                            <Link
-                                href="/lecturer"
-                                className={`nav-link ${
-                                    router.pathname.startsWith("/lecturer")
-                                        ? "active"
-                                        : ""
-                                }`}
-                            >
+                            <Link href="/lecturer" className={`nav-link ${router.pathname.startsWith("/lecturer") ? "active" : ""}`}>
                                 Lecturer
                             </Link>
                         )}
@@ -192,11 +156,10 @@ const Header: React.FC = () => {
                     {!isLoggedIn && (
                         <button
                             onClick={toggleDarkMode}
-                            className={`theme-toggle-btn header-theme-toggle ${
-                                isThemeToggleAdding ? "adding" : ""
-                            } ${isThemeToggleRemoving ? "removing" : ""}`}
-                            aria-label="Toggle dark mode"
-                        >
+                            className={`theme-toggle-btn header-theme-toggle ${isThemeToggleAdding ? "adding" : ""} ${
+                                isThemeToggleRemoving ? "removing" : ""
+                            }`}
+                            aria-label="Toggle dark mode">
                             <div className="theme-icon-wrapper">
                                 {/* Sun icon */}
                                 <svg
@@ -204,8 +167,7 @@ const Header: React.FC = () => {
                                     className="theme-icon sun"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
+                                    stroke="currentColor">
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -219,8 +181,7 @@ const Header: React.FC = () => {
                                     className="theme-icon moon"
                                     fill="none"
                                     viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
+                                    stroke="currentColor">
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -234,16 +195,10 @@ const Header: React.FC = () => {
 
                     {!isLoggedIn ? (
                         <>
-                            <Link
-                                href="/signin"
-                                className="auth-button outline"
-                            >
+                            <Link href="/signin" className="auth-button outline">
                                 Sign In
                             </Link>
-                            <Link
-                                href="/signup"
-                                className="auth-button primary"
-                            >
+                            <Link href="/signup" className="auth-button primary">
                                 Sign Up
                             </Link>
                         </>
@@ -253,7 +208,7 @@ const Header: React.FC = () => {
                                 fullName: userData?.fullName || "User",
                                 email: userData?.email || "",
                                 role: userData?.role || "user",
-                                avatarNumber: getAvatarNumber(),
+                                avatarPath: userData?.avatarPath,
                             }}
                             onSignOut={handleSignOut}
                             onToggleDarkMode={toggleDarkMode}
