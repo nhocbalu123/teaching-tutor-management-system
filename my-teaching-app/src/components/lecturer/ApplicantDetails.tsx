@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * ApplicantDetails Component
- * 
+ *
  * This component displays detailed information about a selected tutor application.
  * It allows lecturers to:
  * - View applicant's personal information
@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
  * - Add comments about the applicant
  * - Select or unselect the applicant
  * - Add the applicant to the ranking list
- * 
+ *
  * The component includes validation to ensure at least one course is selected
  * before allowing the applicant to be added to the ranking.
  */
@@ -35,7 +35,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     onSaveComment,
     onUnselectApplicant,
     onAddToRanking,
-    showToast
+    showToast,
 }) => {
     // State to track selected courses for this applicant
     const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
@@ -54,9 +54,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
      * @param courseCode - The code of the course to toggle
      */
     const handleCourseSelection = (courseCode: string) => {
-        setSelectedCourses(prev => {
+        setSelectedCourses((prev) => {
             if (prev.includes(courseCode)) {
-                return prev.filter(course => course !== courseCode);
+                return prev.filter((course) => course !== courseCode);
             } else {
                 return [...prev, courseCode];
             }
@@ -84,7 +84,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
         return (
             <div className="empty-details">
                 <div className="empty-details-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-16 w-16"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -94,7 +100,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     </svg>
                 </div>
                 <h3 className="empty-details-title">No Applicant Selected</h3>
-                <p className="empty-details-text">Select an applicant from the list to view their details</p>
+                <p className="empty-details-text">
+                    Select an applicant from the list to view their details
+                </p>
             </div>
         );
     }
@@ -115,7 +123,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     /**
      * Validates all fields in the applicant details
      * Returns true if all validations pass, false otherwise
-     * 
+     *
      * @returns {boolean} - Whether all fields are valid
      */
     const validateAllFields = (): boolean => {
@@ -124,13 +132,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             showToast("Please select at least one course", "error");
             return false;
         }
-        
+
         // Check if comment is provided
         if (!comment.trim()) {
             showToast("Please provide a comment about the applicant", "error");
             return false;
         }
-        
+
         // All validations pass
         return true;
     };
@@ -140,13 +148,26 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
      * Only works if all fields are validated and the applicant is selected
      */
     const handleAddToRanking = () => {
-        if (!validateAllFields()) {
+        // Check if at least one course is selected
+        if (selectedCourses.length === 0) {
+            showToast("Please select at least one course", "error");
             return;
         }
+
+        // Check if comment is provided
+        if (!comment.trim()) {
+            showToast("Please add a comment before adding to ranking", "error");
+            return;
+        }
+
         if (!application.selected) {
-            showToast("Please select the applicant before adding to ranking", "error");
+            showToast(
+                "Please select the applicant before adding to ranking",
+                "error"
+            );
             return;
         }
+
         onAddToRanking();
         showToast("Applicant added to ranking successfully!", "success");
     };
@@ -159,7 +180,8 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}>
+                transition={{ duration: 0.3 }}
+            >
                 <div className="flex justify-between items-start mb-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">
@@ -167,20 +189,40 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         </h2>
                         <p className="text-gray-600">{application.email}</p>
                         <div className="applicant-badges mt-2">
-                            <span className={`availability-badge ${application.availability === "Full Time" ? "full-time" : "part-time"}`}>
+                            <span
+                                className={`availability-badge ${
+                                    application.availability === "Full Time"
+                                        ? "full-time"
+                                        : "part-time"
+                                }`}
+                            >
                                 {application.availability}
                             </span>
-                            <span className="date-badge">Applied: {new Date(application.dateApplied).toLocaleDateString()}</span>
+                            <span className="date-badge">
+                                Applied:{" "}
+                                {new Date(
+                                    application.dateApplied
+                                ).toLocaleDateString()}
+                            </span>
                         </div>
                     </div>
                     <div className="flex gap-2">
                         {application.selected ? (
-                            <button
-                                onClick={onUnselectApplicant}
-                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                            >
-                                Unselect
-                            </button>
+                            <>
+                                <button
+                                    onClick={onUnselectApplicant}
+                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                >
+                                    Unselect
+                                </button>
+                                <button
+                                    onClick={handleAddToRanking}
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                                    title="Add to ranking"
+                                >
+                                    Add to Ranking
+                                </button>
+                            </>
                         ) : (
                             <button
                                 onClick={handleSaveAndSelect}
@@ -189,21 +231,18 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                                 Select Applicant
                             </button>
                         )}
-                        {selectedCourses.length > 0 && application.selected && comment.trim() && (
-                            <button
-                                onClick={handleAddToRanking}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                                title="Add to ranking"
-                            >
-                                Add to Ranking
-                            </button>
-                        )}
                     </div>
                 </div>
 
                 <div className="section mb-6">
                     <h4 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="section-icon"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -230,16 +269,27 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         </div>
                         <div className="courses-container">
                             {application.courses.map((courseCode) => {
-                                const course = availableCourses.find((c) => c.code === courseCode);
-                                const isSelected = selectedCourses.includes(courseCode);
+                                const course = availableCourses.find(
+                                    (c) => c.code === courseCode
+                                );
+                                const isSelected =
+                                    selectedCourses.includes(courseCode);
                                 return (
                                     <div
                                         key={courseCode}
-                                        className={`course-card ${isSelected ? 'selected' : ''}`}
-                                        onClick={() => handleCourseSelection(courseCode)}
+                                        className={`course-card ${
+                                            isSelected ? "selected" : ""
+                                        }`}
+                                        onClick={() =>
+                                            handleCourseSelection(courseCode)
+                                        }
                                     >
-                                        <div className="course-code">{courseCode}</div>
-                                        <div className="course-name">{course?.name || "Unknown Course"}</div>
+                                        <div className="course-code">
+                                            {courseCode}
+                                        </div>
+                                        <div className="course-name">
+                                            {course?.name || "Unknown Course"}
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -249,7 +299,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
                 <div className="section mb-6">
                     <h4 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="section-icon"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -274,7 +330,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
                 <div className="section mb-6">
                     <h4 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="section-icon"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -295,7 +357,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
                 <div className="section mb-6">
                     <h4 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="section-icon"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path d="M12 14l9-5-9-5-9 5 9 5z" />
                             <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                             <path
@@ -307,12 +375,20 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         </svg>
                         Academic Credentials
                     </h4>
-                    <p className="academic-text">{application.academicCredentials}</p>
+                    <p className="academic-text">
+                        {application.academicCredentials}
+                    </p>
                 </div>
 
                 <div className="section">
                     <h4 className="section-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="section-icon"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
