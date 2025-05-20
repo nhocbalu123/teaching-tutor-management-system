@@ -113,6 +113,12 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             return;
         }
 
+        // Check if already ranked
+        if (application.rank !== undefined) {
+            showToast("Applicant is already added to ranking", "info");
+            return;
+        }
+
         onAddToRanking();
         showToast("Applicant added to ranking successfully!", "success");
     };
@@ -162,13 +168,37 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                                 >
                                     Unselect
                                 </button>
-                                <button
-                                    onClick={handleAddToRanking}
-                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                                    title="Add to ranking"
-                                >
-                                    Add to Ranking
-                                </button>
+                                {application.rank !== undefined ? (
+                                    <button
+                                        disabled
+                                        className="px-4 py-2 bg-purple-500 text-white rounded cursor-default flex items-center"
+                                        title="Already added to ranking"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5 mr-1"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M5 13l4 4L19 7"
+                                            />
+                                        </svg>
+                                        Added to Ranking
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleAddToRanking}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                                        title="Add to ranking"
+                                    >
+                                        Add to Ranking
+                                    </button>
+                                )}
                             </>
                         ) : (
                             <button

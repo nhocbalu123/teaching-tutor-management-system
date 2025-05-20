@@ -233,6 +233,9 @@ export default function LecturerPage() {
 
         saveApplication(updatedApplication);
 
+        // Update selected application in state to reflect the change
+        setSelectedApplication(updatedApplication);
+
         // Refresh applications
         loadApplications();
 

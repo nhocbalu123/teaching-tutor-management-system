@@ -130,9 +130,23 @@
     color: #10b981;
 }
 
-.selected-icon {
+.applicant-selected-icon {
     width: 18px;
     height: 18px;
+}
+
+.applicant-ranked {
+    position: absolute;
+    top: 0.75rem;
+    right: 2.5rem; /* Position it to the left of the selected icon */
+    color: #8b5cf6; /* Purple color for the crown */
+}
+
+.ranked-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    stroke: none;
 }
 
 .applied-date {
