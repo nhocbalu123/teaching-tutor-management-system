@@ -369,11 +369,6 @@
     transition: all 0.3s ease;
 }
 
-.academic-text:hover {
-    border-color: var(--color-primary);
-    background-color: var(--color-bg-hover);
-}
-
 /* Comments */
 .comment-textarea {
     width: 100%;
