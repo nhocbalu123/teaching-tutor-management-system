@@ -37,48 +37,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     onAddToRanking,
     showToast,
 }) => {
-    // State to track selected courses for this applicant
-    const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-
-    // Update selected courses when application changes
-    useEffect(() => {
-        if (application?.selectedForCourses) {
-            setSelectedCourses(application.selectedForCourses);
-        } else {
-            setSelectedCourses([]);
-        }
-    }, [application]);
-
-    /**
-     * Toggles the selection state of a course
-     * @param courseCode - The code of the course to toggle
-     */
-    const handleCourseSelection = (courseCode: string) => {
-        setSelectedCourses((prev) => {
-            if (prev.includes(courseCode)) {
-                return prev.filter((course) => course !== courseCode);
-            } else {
-                return [...prev, courseCode];
-            }
-        });
-    };
-
-    /**
-     * Selects all courses the applicant has applied for
-     */
-    const handleSelectAll = () => {
-        if (application) {
-            setSelectedCourses(application.courses);
-        }
-    };
-
-    /**
-     * Deselects all courses
-     */
-    const handleDeselectAll = () => {
-        setSelectedCourses([]);
-    };
-
     // Show empty state when no application is selected
     if (!application) {
         return (
@@ -108,15 +66,14 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     }
 
     /**
-     * Saves the comment and selects the applicant for the selected courses
-     * Validates that at least one course is selected
+     * Saves the comment and selects the applicant
      */
     const handleSaveAndSelect = () => {
-        if (selectedCourses.length === 0) {
-            showToast("Please select at least one course", "error");
+        if (!comment.trim()) {
+            showToast("Please provide a comment about the applicant", "error");
             return;
         }
-        onSaveComment(selectedCourses);
+        onSaveComment(application.courses);
         showToast("Applicant saved and selected successfully!", "success");
     };
 
@@ -127,12 +84,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
      * @returns {boolean} - Whether all fields are valid
      */
     const validateAllFields = (): boolean => {
-        // Check if at least one course is selected
-        if (selectedCourses.length === 0) {
-            showToast("Please select at least one course", "error");
-            return false;
-        }
-
         // Check if comment is provided
         if (!comment.trim()) {
             showToast("Please provide a comment about the applicant", "error");
@@ -148,12 +99,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
      * Only works if all fields are validated and the applicant is selected
      */
     const handleAddToRanking = () => {
-        // Check if at least one course is selected
-        if (selectedCourses.length === 0) {
-            showToast("Please select at least one course", "error");
-            return;
-        }
-
         // Check if comment is provided
         if (!comment.trim()) {
             showToast("Please add a comment before adding to ranking", "error");
@@ -250,50 +195,24 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                             />
                         </svg>
-                        Applied for Courses
+                        Applied for Course
                     </h4>
                     <div className="courses-selection mb-4">
-                        <div className="flex gap-2 mb-2">
-                            <button
-                                onClick={handleSelectAll}
-                                className="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors"
-                            >
-                                Select All
-                            </button>
-                            <button
-                                onClick={handleDeselectAll}
-                                className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
-                            >
-                                Deselect All
-                            </button>
-                        </div>
-                        <div className="courses-container">
-                            {application.courses.map((courseCode) => {
-                                const course = availableCourses.find(
-                                    (c) => c.code === courseCode
-                                );
-                                const isSelected =
-                                    selectedCourses.includes(courseCode);
-                                return (
-                                    <div
-                                        key={courseCode}
-                                        className={`course-card ${
-                                            isSelected ? "selected" : ""
-                                        }`}
-                                        onClick={() =>
-                                            handleCourseSelection(courseCode)
-                                        }
-                                    >
-                                        <div className="course-code">
-                                            {courseCode}
-                                        </div>
-                                        <div className="course-name">
-                                            {course?.name || "Unknown Course"}
-                                        </div>
+                        {application.courses.map((courseCode) => {
+                            const course = availableCourses.find(
+                                (c) => c.code === courseCode
+                            );
+                            return (
+                                <div key={courseCode} className="course-card">
+                                    <div className="course-code">
+                                        {courseCode}
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    <div className="course-name">
+                                        {course?.name || "Unknown Course"}
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
