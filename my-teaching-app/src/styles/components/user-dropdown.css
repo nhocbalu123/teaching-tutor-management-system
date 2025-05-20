@@ -8,15 +8,19 @@
 .avatar-button {
     cursor: pointer;
     position: relative;
-    transition: transform 0.3s ease;
-}
-
-.avatar-button:hover {
-    transform: scale(1.05);
 }
 
 .avatar-wrapper {
     position: relative;
+}
+
+.avatar-content {
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.avatar-button:hover .avatar-content {
+    transform: scale(1.05);
 }
 
 .avatar-image {
@@ -32,6 +36,7 @@
 .avatar-button:hover .avatar-image {
     border-color: var(--color-secondary);
     box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    animation: pulse 1.5s infinite;
 }
 
 /* Avatar connector */
@@ -46,8 +51,7 @@
     border-right: 12px solid transparent;
     border-bottom: 12px solid #fef5ef;
     z-index: 52;
-    transition: opacity 0.3s ease;
-    animation: fadeIn 0.3s ease;
+    opacity: 1;
 }
 
 .avatar-connector-2 {
@@ -60,8 +64,7 @@
     border-bottom: 13px solid #e5e7eb;
     border-radius: 8px;
     z-index: 51;
-    transition: opacity 0.3s ease;
-    animation: fadeIn 0.3s ease;
+    opacity: 1;
 }
 
 /* Dark mode support for the connector */
@@ -353,7 +356,8 @@
 }
 
 .avatar-button:hover .avatar-image {
-    animation: pulse 1.5s infinite;
+    border-color: var(--color-secondary);
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 
 /* Base state for moon icon */

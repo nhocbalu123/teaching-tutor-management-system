@@ -16,7 +16,12 @@ interface UserDropdownProps {
     isDarkMode: boolean;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDarkMode, isDarkMode }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({
+    user,
+    onSignOut,
+    onToggleDarkMode,
+    isDarkMode,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +33,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
             return `/avatars/avatar-${user.avatarNumber}.jpg`;
         } else {
             // Generate a consistent avatar number based on email
-            const emailHash = user.email.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const emailHash = user.email
+                .split("")
+                .reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
             // Use lecturer images if user is a lecturer
             if (user.role === "lecturer") {
@@ -47,7 +54,10 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
                 setIsOpen(false);
             }
         };
@@ -94,7 +104,15 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
             {/* Avatar Button */}
             <div className="avatar-button" onClick={toggleDropdown}>
                 <div className="avatar-wrapper">
-                    <Image src={getAvatarPath()} alt={user.fullName} width={40} height={40} className="avatar-image" />
+                    <div className="avatar-content">
+                        <Image
+                            src={getAvatarPath()}
+                            alt={user.fullName}
+                            width={40}
+                            height={40}
+                            className="avatar-image"
+                        />
+                    </div>
                     {isOpen && (
                         <>
                             <div className="avatar-connector"></div>
@@ -107,19 +125,47 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
             {/* Dropdown Menu */}
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div className="user-dropdown-menu" variants={dropdownVariants} initial="hidden" animate="visible" exit="exit">
+                    <motion.div
+                        className="user-dropdown-menu"
+                        variants={dropdownVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
                         <div className="dropdown-header">
-                            <Image src={getAvatarPath()} alt={user.fullName} width={60} height={60} className="dropdown-avatar" />
+                            <Image
+                                src={getAvatarPath()}
+                                alt={user.fullName}
+                                width={60}
+                                height={60}
+                                className="dropdown-avatar"
+                            />
                             <div className="user-info">
                                 <h3 className="user-name">
-                                    <span className="first-name">{firstName}</span>
-                                    {lastName && <span className="last-name"> {lastName}</span>}
+                                    <span className="first-name">
+                                        {firstName}
+                                    </span>
+                                    {lastName && (
+                                        <span className="last-name">
+                                            {" "}
+                                            {lastName}
+                                        </span>
+                                    )}
                                 </h3>
                                 <p className="user-email">{user.email}</p>
                                 <div className="user-role">{user.role}</div>
                             </div>
-                            <button className="close-button" onClick={() => setIsOpen(false)} aria-label="Close dropdown">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <button
+                                className="close-button"
+                                onClick={() => setIsOpen(false)}
+                                aria-label="Close dropdown"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
                                     <path
                                         fillRule="evenodd"
                                         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -140,7 +186,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
                                             className="theme-icon light"
                                             fill="none"
                                             viewBox="0 0 24 24"
-                                            stroke="currentColor">
+                                            stroke="currentColor"
+                                        >
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -153,7 +200,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
                                             className="theme-icon dark"
                                             fill="none"
                                             viewBox="0 0 24 24"
-                                            stroke="currentColor">
+                                            stroke="currentColor"
+                                        >
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -164,21 +212,28 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user, onSignOut, onToggleDa
                                     </div>
 
                                     <div
-                                        className={`theme-toggle ${isDarkMode ? "active" : ""}`}
+                                        className={`theme-toggle ${
+                                            isDarkMode ? "active" : ""
+                                        }`}
                                         onClick={onToggleDarkMode}
-                                        aria-label="Toggle dark mode">
+                                        aria-label="Toggle dark mode"
+                                    >
                                         <div className="toggle-handle"></div>
                                     </div>
                                 </div>
 
                                 {/* Sign Out Button */}
-                                <button className="sign-out-button" onClick={onSignOut}>
+                                <button
+                                    className="sign-out-button"
+                                    onClick={onSignOut}
+                                >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className="action-icon"
                                         fill="none"
                                         viewBox="0 0 24 24"
-                                        stroke="currentColor">
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
