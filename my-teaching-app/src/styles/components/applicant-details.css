@@ -324,7 +324,7 @@
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     font-size: 0.875rem;
-    resize: vertical;
+    resize: none;
     min-height: 120px;
     transition: all 0.3s ease;
 }
