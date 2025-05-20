@@ -59,7 +59,6 @@ export default function Home() {
         };
     }, []);
 
-
     return (
         <>
             <Head>
@@ -88,11 +87,21 @@ export default function Home() {
                                     Tutor Team
                                 </h1>
                                 <p className="hero-subtitle">
-                                    Connect with the School of Computer Science and apply for tutor and lab-assistant positions
+                                    Connect with the School of Computer Science
+                                    and apply for tutor and lab-assistant
+                                    positions
                                 </p>
-                                <Link href="#tutors-info" className="hero-btn scroll-link">
+                                <Link
+                                    href="#tutors-info"
+                                    className="hero-btn scroll-link"
+                                >
                                     Get Started
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
                                         <path
                                             fillRule="evenodd"
                                             d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
@@ -121,7 +130,8 @@ export default function Home() {
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 className="h-5 w-5 text-white"
                                                 viewBox="0 0 20 20"
-                                                fill="currentColor">
+                                                fill="currentColor"
+                                            >
                                                 <path
                                                     fillRule="evenodd"
                                                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -129,7 +139,9 @@ export default function Home() {
                                                 />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-gray-600">Top Tutors</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Top Tutors
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="absolute -bottom-2 -left-20 z-20 animate-float-delayed">
@@ -139,11 +151,14 @@ export default function Home() {
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 className="h-5 w-5 text-white"
                                                 viewBox="0 0 20 20"
-                                                fill="currentColor">
+                                                fill="currentColor"
+                                            >
                                                 <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-gray-600">Academic Excellence</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Academic Excellence
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -162,24 +177,42 @@ export default function Home() {
                                             </div>
                                             <p
                                                 className="text-gray-800 dark:text-gray-300 font-medium"
-                                                style={{ color: "var(--color-text-primary)" }}>
+                                                style={{
+                                                    color: "var(--color-text-primary)",
+                                                }}
+                                            >
                                                 Active Users
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="stats-content">
-                                    <p className="stats-text">We have over 300 satisfied and happy tutor applicants around the university</p>
+                                    <p className="stats-text">
+                                        We have over 300 satisfied and happy
+                                        tutor applicants around the university
+                                    </p>
 
                                     {/* Avatar row */}
                                     <div className="avatar-group">
                                         {[...Array(6)].map((_, i) => (
                                             <div className="avatar" key={i}>
-                                                <Image src={`/avatars/avatar-${i + 1}.jpg`} alt="User avatar" width={36} height={36} />
+                                                <Image
+                                                    src={`/avatars/avatar-${
+                                                        i + 1
+                                                    }.jpg`}
+                                                    alt="User avatar"
+                                                    width={36}
+                                                    height={36}
+                                                />
                                             </div>
                                         ))}
                                         <div className="avatar plus-avatar flex items-center justify-center bg-orange-100 text-orange-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-5 w-5"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
                                                 <path
                                                     fillRule="evenodd"
                                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -188,15 +221,21 @@ export default function Home() {
                                             </svg>
                                         </div>
 
-                                        <Link href="#tutors-info" className="ml-[24px]">
+                                        <Link
+                                            href="#tutors-info"
+                                            className="ml-[24px]"
+                                        >
                                             <div className="more-button flex items-center justify-center bg-orange-500 text-white px-6 py-1 rounded-full text-sm font-medium">
                                                 <div className="flex items-center justify-center w-full">
-                                                    <span className="more-text pb-[4px]">Explore more</span>
+                                                    <span className="more-text pb-[4px]">
+                                                        Explore more
+                                                    </span>
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         className="h-4 w-4 ml-1"
                                                         viewBox="0 0 20 20"
-                                                        fill="currentColor">
+                                                        fill="currentColor"
+                                                    >
                                                         <path
                                                             fillRule="evenodd"
                                                             d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
@@ -214,106 +253,174 @@ export default function Home() {
                 </section>
 
                 {/* Tutor Section */}
-                <section className="section py-16" id="tutors-info" style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+                <section
+                    className="section py-16"
+                    id="tutors-info"
+                    style={{ backgroundColor: "var(--color-bg-secondary)" }}
+                >
                     <div className="container mx-auto">
                         <div className="max-w-5xl mx-auto">
-                            <h2 className="text-4xl font-bold mb-4 text-center" style={{ color: "var(--color-primary)" }}>
+                            <h2
+                                className="text-4xl font-bold mb-4 text-center"
+                                style={{ color: "var(--color-primary)" }}
+                            >
                                 For Tutor Applicants
                             </h2>
-                            <p className="text-center text-lg mb-12 max-w-3xl mx-auto" style={{ color: "var(--color-text-primary)" }}>
-                                Join our team of exceptional tutors and help shape the next generation of computer science professionals. Follow these
-                                simple steps to get started.
+                            <p
+                                className="text-center text-lg mb-12 max-w-3xl mx-auto"
+                                style={{ color: "var(--color-text-primary)" }}
+                            >
+                                Join our team of exceptional tutors and help
+                                shape the next generation of computer science
+                                professionals. Follow these simple steps to get
+                                started.
                             </p>
 
                             {/* Timeline Design */}
                             <div className="timeline-container">
                                 <div className="timeline-item">
-                                    <div className="timeline-title">Create Your Profile</div>
+                                    <div className="timeline-title">
+                                        Create Your Profile
+                                    </div>
                                     <div className="timeline-description">
-                                        Showcase your skills, academic credentials, and previous teaching experience to stand out from other
+                                        Showcase your skills, academic
+                                        credentials, and previous teaching
+                                        experience to stand out from other
                                         applicants.
                                     </div>
                                     <ul className="timeline-features">
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Academic qualifications visibility</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Academic qualifications
+                                                visibility
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Skills showcase with verification</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Skills showcase with
+                                                verification
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Teaching experience highlights</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Teaching experience highlights
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div className="timeline-item">
-                                    <div className="timeline-title">Apply for Positions</div>
+                                    <div className="timeline-title">
+                                        Apply for Positions
+                                    </div>
                                     <div className="timeline-description">
-                                        Browse available courses and apply for tutor and lab-assistant roles that match your expertise and
-                                        availability.
+                                        Browse available courses and apply for
+                                        tutor and lab-assistant roles that match
+                                        your expertise and availability.
                                     </div>
                                     <ul className="timeline-features">
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Course-specific applications</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Course-specific applications
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Flexible scheduling options</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Flexible scheduling options
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
                                             <span>Tailored cover letters</span>
                                         </li>
                                     </ul>
                                 </div>
 
                                 <div className="timeline-item">
-                                    <div className="timeline-title">Get Selected</div>
+                                    <div className="timeline-title">
+                                        Get Selected
+                                    </div>
                                     <div className="timeline-description">
-                                        Lecturers review your profile and select candidates that best fit their course requirements.
+                                        Lecturers review your profile and select
+                                        candidates that best fit their course
+                                        requirements.
                                     </div>
                                     <ul className="timeline-features">
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Real-time application status</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Real-time application status
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Direct communication with lecturers</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Direct communication with
+                                                lecturers
+                                            </span>
                                         </li>
                                         <li>
-                                            <span className="feature-icon">✓</span>
-                                            <span>Personalized feedback on applications</span>
+                                            <span className="feature-icon">
+                                                ✓
+                                            </span>
+                                            <span>
+                                                Personalized feedback on
+                                                applications
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div className="text-center mt-12">
-                                {!isLoggedIn ? (
-                                    <Link
-                                        href="/signin"
-                                        className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg">
-                                        Apply as a Tutor
-                                    </Link>
-                                ) : userRole === "tutor" ? (
-                                    <Link
-                                        href="/tutor"
-                                        className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg">
-                                        Go to Tutor Dashboard
-                                    </Link>
-                                ) : null /* Lecturer sees nothing */}
+                                {
+                                    !isLoggedIn ? (
+                                        <Link
+                                            href="/signin"
+                                            className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg"
+                                        >
+                                            Apply as a Tutor
+                                        </Link>
+                                    ) : userRole === "tutor" ? (
+                                        <Link
+                                            href="/tutor"
+                                            className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg"
+                                        >
+                                            Go to Tutor Dashboard
+                                        </Link>
+                                    ) : null /* Lecturer sees nothing */
+                                }
                             </div>
                         </div>
                     </div>
                 </section>
 
                 {/* Lecturer Section */}
-                <section className="section py-16" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+                <section
+                    className="section py-16"
+                    style={{ backgroundColor: "var(--color-bg-primary)" }}
+                >
                     <div className="container mx-auto">
                         <div className="max-w-6xl mx-auto">
                             {/* Section title with decorative bar */}
@@ -322,8 +429,10 @@ export default function Home() {
                                 <div className="section-title-content">
                                     <h2>Meet Our Lecturers</h2>
                                     <p>
-                                        Meet our exceptional team of computer science lecturers who bring real-world experience and academic
-                                        excellence to our programs.
+                                        Meet our exceptional team of computer
+                                        science lecturers who bring real-world
+                                        experience and academic excellence to
+                                        our programs.
                                     </p>
                                 </div>
                             </div>
@@ -331,10 +440,18 @@ export default function Home() {
                             {/* Lecturer Grid */}
                             <div className="lecturer-grid">
                                 {lecturers.map((lecturer, index) => (
-                                    <div key={lecturer.id} className={`lecturer-card lecturer${index + 1}`} onClick={() => openModal(lecturer.id)}>
+                                    <div
+                                        key={lecturer.id}
+                                        className={`lecturer-card lecturer${
+                                            index + 1
+                                        }`}
+                                        onClick={() => openModal(lecturer.id)}
+                                    >
                                         <div className="lecturer-image-container">
                                             <Image
-                                                src={`/lecturers/lecturer-${index + 1}.jpg`}
+                                                src={`/lecturers/lecturer-${
+                                                    index + 1
+                                                }.jpg`}
                                                 alt={lecturer.name}
                                                 width={400}
                                                 height={400}
@@ -342,10 +459,18 @@ export default function Home() {
                                             />
                                             <div className="lecturer-decoration"></div>
                                         </div>
-                                        <h3 className="lecturer-name">{lecturer.name}</h3>
-                                        <p className="lecturer-title">{lecturer.title}</p>
-                                        <p className="lecturer-specialization">{lecturer.specialization}</p>
-                                        <button className="more-info-btn">More Information</button>
+                                        <h3 className="lecturer-name">
+                                            {lecturer.name}
+                                        </h3>
+                                        <p className="lecturer-title">
+                                            {lecturer.title}
+                                        </p>
+                                        <p className="lecturer-specialization">
+                                            {lecturer.specialization}
+                                        </p>
+                                        <button className="more-info-btn">
+                                            More Information
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -354,13 +479,20 @@ export default function Home() {
                             {lecturers.map((lecturer, index) => (
                                 <div
                                     key={`${lecturer.id}-modal`}
-                                    className={`modal-overlay ${activeModal === lecturer.id ? "active" : ""}`}
-                                    onClick={handleOverlayClick}>
+                                    className={`modal-overlay ${
+                                        activeModal === lecturer.id
+                                            ? "active"
+                                            : ""
+                                    }`}
+                                    onClick={handleOverlayClick}
+                                >
                                     <div className="modal-container">
                                         <div className="modal-image-section">
                                             <div className="modal-image-container">
                                                 <Image
-                                                    src={`/lecturers/lecturer-${index + 1}.jpg`}
+                                                    src={`/lecturers/lecturer-${
+                                                        index + 1
+                                                    }.jpg`}
                                                     alt={lecturer.name}
                                                     width={400}
                                                     height={400}
@@ -369,46 +501,90 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <div className="modal-content">
-                                            <div className="modal-close" onClick={closeModal}>
+                                            <div
+                                                className="modal-close"
+                                                onClick={closeModal}
+                                            >
                                                 ✕
                                             </div>
-                                            <h3 className="modal-title">{lecturer.name}</h3>
+                                            <h3 className="modal-title">
+                                                {lecturer.name}
+                                            </h3>
                                             <p className="modal-subtitle">
-                                                {lecturer.title} in {lecturer.specialization}
+                                                {lecturer.title} in{" "}
+                                                {lecturer.specialization}
                                             </p>
-                                            <p className="modal-text">{lecturer.bio}</p>
+                                            <p className="modal-text">
+                                                {lecturer.bio}
+                                            </p>
                                             <ul className="modal-info-list">
                                                 <li className="modal-info-item">
-                                                    <span className="modal-info-icon">📚</span>
-                                                    <span>Teaches: {lecturer.courses}</span>
+                                                    <span className="modal-info-icon">
+                                                        📚
+                                                    </span>
+                                                    <span>
+                                                        Teaches:{" "}
+                                                        {lecturer.courses}
+                                                    </span>
                                                 </li>
                                                 {lecturer.awards && (
                                                     <li className="modal-info-item">
-                                                        <span className="modal-info-icon">🏆</span>
-                                                        <span>Awards: {lecturer.awards}</span>
+                                                        <span className="modal-info-icon">
+                                                            🏆
+                                                        </span>
+                                                        <span>
+                                                            Awards:{" "}
+                                                            {lecturer.awards}
+                                                        </span>
                                                     </li>
                                                 )}
                                                 {lecturer.experience && (
                                                     <li className="modal-info-item">
-                                                        <span className="modal-info-icon">🏢</span>
-                                                        <span>Industry Experience: {lecturer.experience}</span>
+                                                        <span className="modal-info-icon">
+                                                            🏢
+                                                        </span>
+                                                        <span>
+                                                            Industry Experience:{" "}
+                                                            {
+                                                                lecturer.experience
+                                                            }
+                                                        </span>
                                                     </li>
                                                 )}
                                                 {lecturer.certifications && (
                                                     <li className="modal-info-item">
-                                                        <span className="modal-info-icon">🔰</span>
-                                                        <span>Certifications: {lecturer.certifications}</span>
+                                                        <span className="modal-info-icon">
+                                                            🔰
+                                                        </span>
+                                                        <span>
+                                                            Certifications:{" "}
+                                                            {
+                                                                lecturer.certifications
+                                                            }
+                                                        </span>
                                                     </li>
                                                 )}
                                                 {lecturer.publications && (
                                                     <li className="modal-info-item">
-                                                        <span className="modal-info-icon">📖</span>
-                                                        <span>Publications: {lecturer.publications}</span>
+                                                        <span className="modal-info-icon">
+                                                            📖
+                                                        </span>
+                                                        <span>
+                                                            Publications:{" "}
+                                                            {
+                                                                lecturer.publications
+                                                            }
+                                                        </span>
                                                     </li>
                                                 )}
                                                 <li className="modal-info-item">
-                                                    <span className="modal-info-icon">📧</span>
-                                                    <span>Contact: {lecturer.contact}</span>
+                                                    <span className="modal-info-icon">
+                                                        📧
+                                                    </span>
+                                                    <span>
+                                                        Contact:{" "}
+                                                        {lecturer.contact}
+                                                    </span>
                                                 </li>
                                             </ul>
                                         </div>
