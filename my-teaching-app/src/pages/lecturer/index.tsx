@@ -2,7 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../components/layout/Layout";
-import { TutorApplication, getApplications, saveApplication, initializeDetailedApplications } from "../../utils/tutorUtils";
+import {
+    TutorApplication,
+    getApplications,
+    saveApplication,
+    initializeDetailedApplications,
+} from "../../utils/tutorUtils";
 import { availableCourses } from "../../utils/coursesUtils";
 import Head from "next/head";
 import ApplicantList from "../../components/lecturer/ApplicantList";
@@ -17,12 +22,17 @@ export default function LecturerPage() {
     const router = useRouter();
     const [applications, setApplications] = useState<TutorApplication[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<string>("");
-    const [selectedApplication, setSelectedApplication] = useState<TutorApplication | null>(null);
+    const [selectedApplication, setSelectedApplication] =
+        useState<TutorApplication | null>(null);
     const [comment, setComment] = useState<string>("");
-    const [rankedApplications, setRankedApplications] = useState<TutorApplication[]>([]);
+    const [rankedApplications, setRankedApplications] = useState<
+        TutorApplication[]
+    >([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("none");
-    const [activeTab, setActiveTab] = useState<"applications" | "rankings" | "stats">("applications");
+    const [activeTab, setActiveTab] = useState<
+        "applications" | "rankings" | "stats"
+    >("applications");
     const [lecturerName, setLecturerName] = useState<string>("");
     const [currentLecturerId, setCurrentLecturerId] = useState<string>("");
 
@@ -87,13 +97,19 @@ export default function LecturerPage() {
 
         return () => {
             window.removeEventListener("storage", handleStorageChange);
-            window.removeEventListener("applicationUpdated", handleApplicationUpdate);
+            window.removeEventListener(
+                "applicationUpdated",
+                handleApplicationUpdate
+            );
             clearInterval(intervalId);
         };
     }, []);
 
     // Show toast notification
-    const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
+    const showToast = (
+        message: string,
+        type: "success" | "error" | "info" = "success"
+    ) => {
         setToast({
             visible: true,
             message,
@@ -114,7 +130,9 @@ export default function LecturerPage() {
         // Get previously ranked applications
         const ranked = appData.filter((app) => app.rank !== undefined);
         // Sort by rank to ensure proper display
-        setRankedApplications(ranked.sort((a, b) => (a.rank || 999) - (b.rank || 999)));
+        setRankedApplications(
+            ranked.sort((a, b) => (a.rank || 999) - (b.rank || 999))
+        );
     };
 
     // Filter applications by course and search query
@@ -128,8 +146,14 @@ export default function LecturerPage() {
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             const courseMatches = app.courses.some((course) => {
-                const courseInfo = availableCourses.find((c) => c.code === course);
-                return courseInfo && (courseInfo.code.toLowerCase().includes(query) || courseInfo.name.toLowerCase().includes(query));
+                const courseInfo = availableCourses.find(
+                    (c) => c.code === course
+                );
+                return (
+                    courseInfo &&
+                    (courseInfo.code.toLowerCase().includes(query) ||
+                        courseInfo.name.toLowerCase().includes(query))
+                );
             });
 
             return (
@@ -147,9 +171,13 @@ export default function LecturerPage() {
     const sortedApplications = [...filteredApplications].sort((a, b) => {
         if (sortBy === "none") return 0;
         if (sortBy === "name") return a.fullName.localeCompare(b.fullName);
-        if (sortBy === "availability") return a.availability.localeCompare(b.availability);
+        if (sortBy === "availability")
+            return a.availability.localeCompare(b.availability);
         if (sortBy === "date") {
-            return new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime();
+            return (
+                new Date(b.dateApplied).getTime() -
+                new Date(a.dateApplied).getTime()
+            );
         }
         return 0;
     });
@@ -218,12 +246,17 @@ export default function LecturerPage() {
         if (!currentRank) return;
 
         // Find the application that's currently at the position we want to move to
-        const prevRankApp = rankedApplications.find((app) => app.rank === currentRank - 1);
+        const prevRankApp = rankedApplications.find(
+            (app) => app.rank === currentRank - 1
+        );
 
         if (prevRankApp && prevRankApp.rank) {
             // Update ranks for both applications
             const updatedApp = { ...application, rank: currentRank - 1 };
-            const updatedPrevApp = { ...prevRankApp, rank: prevRankApp.rank + 1 };
+            const updatedPrevApp = {
+                ...prevRankApp,
+                rank: prevRankApp.rank + 1,
+            };
 
             // Save both updates
             saveApplication(updatedApp);
@@ -243,12 +276,17 @@ export default function LecturerPage() {
         if (!currentRank) return;
 
         // Find the application that's currently at the position we want to move to
-        const nextRankApp = rankedApplications.find((app) => app.rank === currentRank + 1);
+        const nextRankApp = rankedApplications.find(
+            (app) => app.rank === currentRank + 1
+        );
 
         if (nextRankApp && nextRankApp.rank) {
             // Update ranks for both applications
             const updatedApp = { ...application, rank: currentRank + 1 };
-            const updatedNextApp = { ...nextRankApp, rank: nextRankApp.rank - 1 };
+            const updatedNextApp = {
+                ...nextRankApp,
+                rank: nextRankApp.rank - 1,
+            };
 
             // Save both updates
             saveApplication(updatedApp);
@@ -263,7 +301,9 @@ export default function LecturerPage() {
     };
 
     const handleRemoveFromRanking = (applicationId: string) => {
-        const application = applications.find((app) => app.id === applicationId);
+        const application = applications.find(
+            (app) => app.id === applicationId
+        );
         if (!application) return;
 
         const updatedApplication = {
@@ -282,9 +322,14 @@ export default function LecturerPage() {
 
     // Dashboard stats
     const totalApplications = applications.length;
-    const selectedApplications = applications.filter((app) => app.selected).length;
+    const selectedApplications = applications.filter(
+        (app) => app.selected
+    ).length;
     const pendingApplications = totalApplications - selectedApplications;
-    const selectionRate = totalApplications > 0 ? Math.round((selectedApplications / totalApplications) * 100) : 0;
+    const selectionRate =
+        totalApplications > 0
+            ? Math.round((selectedApplications / totalApplications) * 100)
+            : 0;
 
     return (
         <>
@@ -298,15 +343,26 @@ export default function LecturerPage() {
                         className="dashboard-header"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}>
+                        transition={{ duration: 0.5 }}
+                    >
                         <div className="header-content">
-                            <h1 className="dashboard-title">Lecturer Dashboard</h1>
-                            <p className="dashboard-subtitle">Welcome back, {lecturerName}</p>
+                            <h1 className="dashboard-title">
+                                Lecturer Dashboard
+                            </h1>
+                            <p className="dashboard-subtitle">
+                                Welcome back, {lecturerName}
+                            </p>
                         </div>
                         <div className="quick-stats">
                             <div className="stat-card">
                                 <div className="summary-icon total-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -316,12 +372,20 @@ export default function LecturerPage() {
                                     </svg>
                                 </div>
                                 <div className="stat-details">
-                                    <span className="stat-value">{totalApplications}</span>
+                                    <span className="stat-value">
+                                        {totalApplications}
+                                    </span>
                                 </div>
                             </div>
                             <div className="stat-card">
                                 <div className="summary-icon selected-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -331,12 +395,20 @@ export default function LecturerPage() {
                                     </svg>
                                 </div>
                                 <div className="stat-details">
-                                    <span className="stat-value">{selectedApplications}</span>
+                                    <span className="stat-value">
+                                        {selectedApplications}
+                                    </span>
                                 </div>
                             </div>
                             <div className="stat-card">
                                 <div className="summary-icon pending-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -346,12 +418,20 @@ export default function LecturerPage() {
                                     </svg>
                                 </div>
                                 <div className="stat-details">
-                                    <span className="stat-value">{pendingApplications}</span>
+                                    <span className="stat-value">
+                                        {pendingApplications}
+                                    </span>
                                 </div>
                             </div>
                             <div className="stat-card">
                                 <div className="summary-icon rate-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -361,7 +441,9 @@ export default function LecturerPage() {
                                     </svg>
                                 </div>
                                 <div className="stat-details">
-                                    <span className="stat-value">{selectionRate}%</span>
+                                    <span className="stat-value">
+                                        {selectionRate}%
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -369,8 +451,19 @@ export default function LecturerPage() {
 
                     {/* Main Tab Navigation */}
                     <div className="dashboard-tabs">
-                        <button className={`tab-button ${activeTab === "applications" ? "active" : ""}`} onClick={() => setActiveTab("applications")}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="tab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button
+                            className={`tab-button ${
+                                activeTab === "applications" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("applications")}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="tab-icon"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -380,8 +473,19 @@ export default function LecturerPage() {
                             </svg>
                             Applications
                         </button>
-                        <button className={`tab-button ${activeTab === "rankings" ? "active" : ""}`} onClick={() => setActiveTab("rankings")}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="tab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button
+                            className={`tab-button ${
+                                activeTab === "rankings" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("rankings")}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="tab-icon"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -391,8 +495,19 @@ export default function LecturerPage() {
                             </svg>
                             Rankings
                         </button>
-                        <button className={`tab-button ${activeTab === "stats" ? "active" : ""}`} onClick={() => setActiveTab("stats")}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="tab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button
+                            className={`tab-button ${
+                                activeTab === "stats" ? "active" : ""
+                            }`}
+                            onClick={() => setActiveTab("stats")}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="tab-icon"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -408,64 +523,122 @@ export default function LecturerPage() {
                     <div className="dashboard-content">
                         {/* Applications Tab */}
                         {activeTab === "applications" && (
-                            <motion.div className="applications-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                            <motion.div
+                                className="applications-tab"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                            >
                                 <div className="filter-tools">
-                                    <div className="search-bar">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="search-icon"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                    <div className="filter-group">
+                                        <label htmlFor="searchInput">
+                                            Search:
+                                        </label>
+                                        <div className="search-input-container">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="search-icon"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                />
+                                            </svg>
+                                            <input
+                                                id="searchInput"
+                                                type="text"
+                                                placeholder="Search by name, course, availability, or skills..."
+                                                value={searchQuery}
+                                                onChange={(e) =>
+                                                    setSearchQuery(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="search-input"
                                             />
-                                        </svg>
-                                        <input
-                                            type="text"
-                                            placeholder="Search by name, course, availability, or skills..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="search-input"
-                                        />
-                                        {searchQuery && (
-                                            <button className="search-clear" onClick={() => setSearchQuery("")}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        )}
+                                            {searchQuery && (
+                                                <button
+                                                    className="search-clear"
+                                                    onClick={() =>
+                                                        setSearchQuery("")
+                                                    }
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="filter-selects">
                                         <div className="filter-group">
-                                            <label htmlFor="courseFilter">Course:</label>
+                                            <label htmlFor="courseFilter">
+                                                Course:
+                                            </label>
                                             <select
                                                 id="courseFilter"
                                                 value={selectedCourse}
-                                                onChange={(e) => setSelectedCourse(e.target.value)}
-                                                className="filter-select">
-                                                <option value="">All Courses</option>
-                                                {availableCourses.map((course) => (
-                                                    <option key={course.code} value={course.code}>
-                                                        {course.code} - {course.name}
-                                                    </option>
-                                                ))}
+                                                onChange={(e) =>
+                                                    setSelectedCourse(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="filter-select"
+                                            >
+                                                <option value="">
+                                                    All Courses
+                                                </option>
+                                                {availableCourses.map(
+                                                    (course) => (
+                                                        <option
+                                                            key={course.code}
+                                                            value={course.code}
+                                                        >
+                                                            {course.code} -{" "}
+                                                            {course.name}
+                                                        </option>
+                                                    )
+                                                )}
                                             </select>
                                         </div>
                                         <div className="filter-group">
-                                            <label htmlFor="sortBy">Sort by:</label>
-                                            <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="filter-select">
-                                                <option value="none">Default</option>
-                                                <option value="name">Name</option>
-                                                <option value="availability">Availability</option>
-                                                <option value="date">Date Applied</option>
+                                            <label htmlFor="sortBy">
+                                                Sort by:
+                                            </label>
+                                            <select
+                                                id="sortBy"
+                                                value={sortBy}
+                                                onChange={(e) =>
+                                                    setSortBy(e.target.value)
+                                                }
+                                                className="filter-select"
+                                            >
+                                                <option value="none">
+                                                    Default
+                                                </option>
+                                                <option value="name">
+                                                    Name
+                                                </option>
+                                                <option value="availability">
+                                                    Availability
+                                                </option>
+                                                <option value="date">
+                                                    Date Applied
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -473,21 +646,31 @@ export default function LecturerPage() {
 
                                 <div className="application-panels">
                                     <div className="applicant-list-panel">
-                                        <h2 className="panel-title">Applicants</h2>
+                                        <h2 className="panel-title">
+                                            Applicants
+                                        </h2>
                                         <ApplicantList
                                             applications={sortedApplications}
-                                            selectedApplication={selectedApplication}
-                                            onSelectApplication={handleSelectApplication}
+                                            selectedApplication={
+                                                selectedApplication
+                                            }
+                                            onSelectApplication={
+                                                handleSelectApplication
+                                            }
                                         />
                                     </div>
                                     <div className="applicant-details-panel">
-                                        <h2 className="panel-title">Applicant Details</h2>
+                                        <h2 className="panel-title">
+                                            Applicant Details
+                                        </h2>
                                         <ApplicantDetails
                                             application={selectedApplication}
                                             comment={comment}
                                             setComment={setComment}
                                             onSaveComment={handleSaveComment}
-                                            onUnselectApplicant={handleUnselectApplicant}
+                                            onUnselectApplicant={
+                                                handleUnselectApplicant
+                                            }
                                             onAddToRanking={handleAddToRanking}
                                             showToast={showToast}
                                         />
@@ -498,27 +681,49 @@ export default function LecturerPage() {
 
                         {/* Rankings Tab */}
                         {activeTab === "rankings" && (
-                            <motion.div className="rankings-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                            <motion.div
+                                className="rankings-tab"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                            >
                                 <div className="rankings-container">
-                                    <h2 className="rankings-title">Ranked Candidates</h2>
+                                    <h2 className="rankings-title">
+                                        Ranked Candidates
+                                    </h2>
                                     <div className="filter-group course-filter">
-                                        <label htmlFor="rankingCourseFilter">Filter by Course:</label>
+                                        <label htmlFor="rankingCourseFilter">
+                                            Filter by Course:
+                                        </label>
                                         <select
                                             id="rankingCourseFilter"
                                             value={selectedCourse}
-                                            onChange={(e) => setSelectedCourse(e.target.value)}
-                                            className="filter-select">
-                                            <option value="">All Courses</option>
+                                            onChange={(e) =>
+                                                setSelectedCourse(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="filter-select"
+                                        >
+                                            <option value="">
+                                                All Courses
+                                            </option>
                                             {availableCourses.map((course) => (
-                                                <option key={course.code} value={course.code}>
-                                                    {course.code} - {course.name}
+                                                <option
+                                                    key={course.code}
+                                                    value={course.code}
+                                                >
+                                                    {course.code} -{" "}
+                                                    {course.name}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
                                     <div className="rankings-list">
                                         <RankedCandidates
-                                            rankedApplications={rankedApplications}
+                                            rankedApplications={
+                                                rankedApplications
+                                            }
                                             selectedCourse={selectedCourse}
                                             onMoveUp={handleMoveUp}
                                             onMoveDown={handleMoveDown}
@@ -531,11 +736,20 @@ export default function LecturerPage() {
 
                         {/* Analytics Tab */}
                         {activeTab === "stats" && (
-                            <motion.div className="analytics-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                            <motion.div
+                                className="analytics-tab"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                            >
                                 <div className="analytics-container">
-                                    <h2 className="analytics-title">Application Analytics</h2>
+                                    <h2 className="analytics-title">
+                                        Application Analytics
+                                    </h2>
                                     <div className="analytics-content">
-                                        <ApplicantStatsVisualization applications={applications} />
+                                        <ApplicantStatsVisualization
+                                            applications={applications}
+                                        />
                                     </div>
                                 </div>
                             </motion.div>
@@ -548,7 +762,9 @@ export default function LecturerPage() {
                     message={toast.message}
                     visible={toast.visible}
                     type={toast.type}
-                    onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+                    onClose={() =>
+                        setToast((prev) => ({ ...prev, visible: false }))
+                    }
                 />
             </Layout>
         </>

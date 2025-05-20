@@ -11,7 +11,11 @@
     flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 2rem;
-    background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-bg-primary) 0%,
+        var(--color-bg-secondary) 100%
+    );
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -26,7 +30,11 @@
 .dashboard-title {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    background: linear-gradient(
+        90deg,
+        var(--color-primary) 0%,
+        var(--color-secondary) 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -193,15 +201,27 @@
 @media (min-width: 768px) {
     .filter-tools {
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
     }
 }
 
-.search-bar {
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+/* Add specific width for search filter group */
+.filter-group:first-child {
+    flex: 1;
+    max-width: 600px;
+}
+
+.search-input-container {
     position: relative;
     width: 100%;
-    max-width: 500px;
 }
 
 .search-icon {
@@ -212,6 +232,21 @@
     width: 20px;
     height: 20px;
     color: var(--color-text-secondary);
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+}
+
+.search-clear:hover {
+    color: var(--color-primary);
 }
 
 .search-input {
@@ -234,13 +269,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-width: 200px;
 }
 
 .filter-group label {
@@ -347,7 +375,11 @@
 
 /* Dark Mode Adjustments */
 .dark .dashboard-header {
-    background: linear-gradient(135deg, var(--color-bg-primary) 0%, rgba(31, 41, 55, 0.8) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-bg-primary) 0%,
+        rgba(31, 41, 55, 0.8) 100%
+    );
 }
 
 .dark .stat-card,
