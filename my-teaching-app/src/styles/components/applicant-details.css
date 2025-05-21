@@ -155,15 +155,17 @@
     font-size: 0.75rem;
     padding: 0.375rem 0.75rem;
     border-radius: 1rem;
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border);
+    background-color: rgba(249, 115, 22, 0.05);
+    color: rgb(234, 88, 12);
+    border: 1px solid rgba(249, 115, 22, 0.1);
     transition: all 0.3s ease;
 }
 
 .date-badge:hover {
-    background-color: var(--color-bg-hover);
+    background-color: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.2);
     transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.1);
 }
 
 /* Section styles */
@@ -422,21 +424,25 @@
 .dark .role-item {
     background-color: rgba(249, 115, 22, 0.15);
     border-color: rgba(249, 115, 22, 0.3);
-    color: rgb(
-        251,
-        146,
-        60
-    ) !important; /* Lighter orange for better visibility in dark mode */
+    color: rgb(251, 146, 60) !important;
 }
 
 .dark .role-item:hover {
-    background-color: rgba(
-        249,
-        115,
-        22,
-        0.2
-    ); /* Even darker orange for hover in dark mode */
+    background-color: rgba(249, 115, 22, 0.2);
     border-color: rgb(249, 115, 22);
+}
+
+.dark .date-badge {
+    background-color: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.2);
+    color: rgb(251, 146, 60);
+}
+
+.dark .date-badge:hover {
+    background-color: rgba(249, 115, 22, 0.25);
+    border-color: rgba(249, 115, 22, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
 }
 
 .dark .skill-tag {
