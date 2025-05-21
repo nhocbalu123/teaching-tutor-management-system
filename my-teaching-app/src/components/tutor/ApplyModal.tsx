@@ -36,7 +36,13 @@ interface ApplyModalProps {
     currentUserId: string;
 }
 
-const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubmit, currentUserId }) => {
+const ApplyModal: React.FC<ApplyModalProps> = ({
+    isOpen,
+    course,
+    onClose,
+    onSubmit,
+    currentUserId,
+}) => {
     // State for form fields
     const [previousRoles, setPreviousRoles] = useState("");
     const [academicCredentials, setAcademicCredentials] = useState("");
@@ -55,8 +61,12 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
     useEffect(() => {
         if (isOpen && course) {
             // Select 2-3 random skills when modal opens
-            const shuffled = [...availableSkills].sort(() => 0.5 - Math.random());
-            setSelectedSkills(shuffled.slice(0, 2 + Math.floor(Math.random() * 2)));
+            const shuffled = [...availableSkills].sort(
+                () => 0.5 - Math.random()
+            );
+            setSelectedSkills(
+                shuffled.slice(0, 2 + Math.floor(Math.random() * 2))
+            );
             // Reset errors when modal opens
             setErrors({});
         }
@@ -72,21 +82,32 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
      *
      * @param e - The keyboard event
      */
-    const handleSkillInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleSkillInputKeyDown = (
+        e: React.KeyboardEvent<HTMLInputElement>
+    ) => {
         if (e.key === "Enter" && skillInput.trim() !== "") {
             e.preventDefault();
             // Validate custom skill input
             if (skillInput.trim().length < 2) {
-                setErrors((prev) => ({ ...prev, skills: "Custom skills must be at least 2 characters long" }));
+                setErrors((prev) => ({
+                    ...prev,
+                    skills: "Custom skills must be at least 2 characters long",
+                }));
                 return;
             }
             if (selectedSkills.length >= 5) {
-                setErrors((prev) => ({ ...prev, skills: "Maximum 5 skills allowed" }));
+                setErrors((prev) => ({
+                    ...prev,
+                    skills: "Maximum 5 skills allowed",
+                }));
                 return;
             }
             // Check for special characters
             if (!/^[a-zA-Z0-9\s]+$/.test(skillInput.trim())) {
-                setErrors((prev) => ({ ...prev, skills: "Skills should only contain letters, numbers, and spaces" }));
+                setErrors((prev) => ({
+                    ...prev,
+                    skills: "Skills should only contain letters, numbers, and spaces",
+                }));
                 return;
             }
             if (!selectedSkills.includes(skillInput.trim())) {
@@ -103,7 +124,9 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
      * @param skillToRemove - The skill to remove
      */
     const handleRemoveSkill = (skillToRemove: string) => {
-        setSelectedSkills(selectedSkills.filter((skill) => skill !== skillToRemove));
+        setSelectedSkills(
+            selectedSkills.filter((skill) => skill !== skillToRemove)
+        );
     };
 
     /**
@@ -120,19 +143,23 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
         } = {};
 
         // Validate previous roles (optional field)
-        const roles = previousRoles.split("\n").filter((role) => role.trim() !== "");
+        const roles = previousRoles
+            .split("\n")
+            .filter((role) => role.trim() !== "");
         if (roles.length > 10) {
             newErrors.previousRoles = "Maximum 10 previous roles allowed";
         }
         // Check each role format
         for (const role of roles) {
             if (role.trim().length < 5) {
-                newErrors.previousRoles = "Each role must be at least 5 characters long";
+                newErrors.previousRoles =
+                    "Each role must be at least 5 characters long";
                 break;
             }
             // Basic format validation: should contain course code and year
             if (!/^[A-Z]+\d+.*\(\d{4}\)$/.test(role.trim())) {
-                newErrors.previousRoles = "Roles should follow format: COSC1111 Lab Assistant (2024)";
+                newErrors.previousRoles =
+                    "Roles should follow format: COSC1111 Lab Assistant (2024)";
                 break;
             }
         }
@@ -141,7 +168,8 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
         if (!academicCredentials.trim()) {
             newErrors.academicCredentials = "Academic credentials are required";
         } else if (academicCredentials.trim().length < 10) {
-            newErrors.academicCredentials = "Academic credentials must be at least 10 characters long";
+            newErrors.academicCredentials =
+                "Academic credentials must be at least 10 characters long";
         }
 
         // Validate skills
@@ -176,7 +204,9 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
             email: "", // Will be populated from user data in saveApplication
             fullName: "", // Will be populated from user data in saveApplication
             courses: [course.code],
-            previousRoles: previousRoles.split("\n").filter((role) => role.trim() !== ""),
+            previousRoles: previousRoles
+                .split("\n")
+                .filter((role) => role.trim() !== ""),
             availability: course.availability,
             skills: selectedSkills,
             academicCredentials: academicCredentials,
@@ -195,10 +225,23 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                 {/* Modal header with title and close button */}
                 <div className="apply-modal-header p-6">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-bold apply-modal-title">Apply for Course</h3>
+                        <h3 className="text-xl font-bold apply-modal-title">
+                            Apply for Course
+                        </h3>
                         <button onClick={onClose} className="apply-modal-close">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
                             </svg>
                         </button>
                     </div>
@@ -207,7 +250,9 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                 <form onSubmit={handleSubmit} className="p-6">
                     {/* Course Info (Read-only) */}
                     <div className="mb-6">
-                        <label className="block apply-modal-label font-bold mb-2">Course</label>
+                        <label className="block apply-modal-label font-bold mb-2">
+                            Course
+                        </label>
                         <div className="apply-modal-readonly-field p-3 rounded-lg">
                             <p className="font-semibold apply-modal-text-primary">
                                 {course.code} - {course.name}
@@ -218,23 +263,34 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                     {/* Role & Availability (Read-only) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label className="block apply-modal-label font-bold mb-2">Role</label>
+                            <label className="block apply-modal-label font-bold mb-2">
+                                Role
+                            </label>
                             <div className="apply-modal-readonly-field p-3 rounded-lg">
-                                <p className="font-medium apply-modal-text-primary">{course.role}</p>
+                                <p className="font-medium apply-modal-text-primary">
+                                    {course.role}
+                                </p>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block apply-modal-label font-bold mb-2">Availability</label>
+                            <label className="block apply-modal-label font-bold mb-2">
+                                Availability
+                            </label>
                             <div className="apply-modal-readonly-field p-3 rounded-lg">
-                                <p className="font-medium apply-modal-text-primary">{course.availability}</p>
+                                <p className="font-medium apply-modal-text-primary">
+                                    {course.availability}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Previous Teaching Roles */}
                     <div className="mb-6">
-                        <label className="block apply-modal-label font-bold mb-2" htmlFor="previousRoles">
+                        <label
+                            className="block apply-modal-label font-bold mb-2"
+                            htmlFor="previousRoles"
+                        >
                             Previous Teaching Roles
                         </label>
                         <textarea
@@ -247,38 +303,62 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                             }`}
                             rows={3}
                         />
-                        {errors.previousRoles && <p className="text-red-500 text-sm mt-1">{errors.previousRoles}</p>}
+                        {errors.previousRoles && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.previousRoles}
+                            </p>
+                        )}
                         <p className="text-xs apply-modal-secondary-text mt-1">
-                            Format: [Course Code] [Role Type] (Year) - One per line, maximum 10 roles
+                            Format: [Course Code] [Role Type] (Year) - One per
+                            line, maximum 10 roles
                         </p>
                     </div>
 
                     {/* Academic Credentials */}
                     <div className="mb-6">
-                        <label className="block apply-modal-label font-bold mb-2" htmlFor="academicCredentials">
+                        <label
+                            className="block apply-modal-label font-bold mb-2"
+                            htmlFor="academicCredentials"
+                        >
                             Academic Credentials
                         </label>
                         <textarea
                             id="academicCredentials"
                             value={academicCredentials}
-                            onChange={(e) => setAcademicCredentials(e.target.value)}
+                            onChange={(e) =>
+                                setAcademicCredentials(e.target.value)
+                            }
                             placeholder="Describe your academic background, degrees, certifications, etc."
                             className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary/20 apply-modal-input ${
-                                errors.academicCredentials ? "border-red-500" : ""
+                                errors.academicCredentials
+                                    ? "border-red-500"
+                                    : ""
                             }`}
                             rows={4}
                             required
                         />
-                        {errors.academicCredentials && <p className="text-red-500 text-sm mt-1">{errors.academicCredentials}</p>}
-                        <p className="text-xs apply-modal-secondary-text mt-1">Minimum 10 characters required.</p>
+                        {errors.academicCredentials && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.academicCredentials}
+                            </p>
+                        )}
+                        <p className="text-xs apply-modal-secondary-text mt-1">
+                            Minimum 10 characters required.
+                        </p>
                     </div>
 
                     {/* Skills */}
                     <div className="mb-6">
-                        <label className="block apply-modal-label font-bold mb-2">Skills</label>
-                        <div className="flex flex-wrap mb-2">
+                        <label className="block apply-modal-label font-bold mb-2">
+                            Skills
+                        </label>
+                        <div className="flex flex-wrap gap-3 mb-2">
                             {selectedSkills.map((skill, index) => (
-                                <SkillTag key={index} skill={skill} onRemove={handleRemoveSkill} />
+                                <SkillTag
+                                    key={index}
+                                    skill={skill}
+                                    onRemove={handleRemoveSkill}
+                                />
                             ))}
                         </div>
 
@@ -288,7 +368,9 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                                 <input
                                     type="text"
                                     value={skillInput}
-                                    onChange={(e) => setSkillInput(e.target.value)}
+                                    onChange={(e) =>
+                                        setSkillInput(e.target.value)
+                                    }
                                     onKeyDown={handleSkillInputKeyDown}
                                     placeholder="Type skill and press Enter"
                                     className={`flex-1 p-2 border rounded-l-lg focus:ring-2 focus:ring-primary/20 apply-modal-input ${
@@ -302,28 +384,52 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                                         if (skillInput.trim() !== "") {
                                             // Validate custom skill input
                                             if (skillInput.trim().length < 2) {
-                                                setErrors((prev) => ({ ...prev, skills: "Custom skills must be at least 2 characters long" }));
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    skills: "Custom skills must be at least 2 characters long",
+                                                }));
                                                 return;
                                             }
                                             if (selectedSkills.length >= 5) {
-                                                setErrors((prev) => ({ ...prev, skills: "Maximum 5 skills allowed" }));
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    skills: "Maximum 5 skills allowed",
+                                                }));
                                                 return;
                                             }
                                             // Check for special characters
-                                            if (!/^[a-zA-Z0-9\s]+$/.test(skillInput.trim())) {
-                                                setErrors((prev) => ({ ...prev, skills: "Skills should only contain letters, numbers, and spaces" }));
+                                            if (
+                                                !/^[a-zA-Z0-9\s]+$/.test(
+                                                    skillInput.trim()
+                                                )
+                                            ) {
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    skills: "Skills should only contain letters, numbers, and spaces",
+                                                }));
                                                 return;
                                             }
-                                            if (!selectedSkills.includes(skillInput.trim())) {
-                                                setSelectedSkills([...selectedSkills, skillInput.trim()]);
-                                                setErrors((prev) => ({ ...prev, skills: undefined }));
+                                            if (
+                                                !selectedSkills.includes(
+                                                    skillInput.trim()
+                                                )
+                                            ) {
+                                                setSelectedSkills([
+                                                    ...selectedSkills,
+                                                    skillInput.trim(),
+                                                ]);
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    skills: undefined,
+                                                }));
                                             }
                                             setSkillInput("");
                                         } else {
                                             setShowSkillInput(false);
                                         }
                                     }}
-                                    className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-secondary">
+                                    className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-secondary"
+                                >
                                     Add
                                 </button>
                             </div>
@@ -331,8 +437,14 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                             <button
                                 type="button"
                                 onClick={() => setShowSkillInput(true)}
-                                className="flex items-center text-primary hover:text-secondary">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                className="flex items-center text-primary hover:text-secondary"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5 mr-1"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
                                     <path
                                         fillRule="evenodd"
                                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -343,44 +455,83 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ isOpen, course, onClose, onSubm
                             </button>
                         )}
 
-                        {errors.skills && <p className="text-red-500 text-sm mt-1">{errors.skills}</p>}
+                        {errors.skills && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.skills}
+                            </p>
+                        )}
                         <p className="text-xs apply-modal-secondary-text mt-1">
-                            At least 2 skills required, maximum 5 skills allowed. Skills should be relevant to the course.
+                            At least 2 skills required, maximum 5 skills
+                            allowed. Skills should be relevant to the course.
                         </p>
 
                         {/* Popular skills section */}
                         <div className="mt-4">
-                            <p className="text-sm apply-modal-secondary-text mb-2">Popular skills:</p>
+                            <p className="text-sm apply-modal-secondary-text mb-2">
+                                Popular skills:
+                            </p>
                             <div className="flex flex-wrap">
-                                {availableSkills.slice(0, 6).map((skill, index) => (
-                                    <button
-                                        key={index}
-                                        type="button"
-                                        onClick={() => {
-                                            if (!selectedSkills.includes(skill)) {
-                                                if (selectedSkills.length >= 5) {
-                                                    setErrors((prev) => ({ ...prev, skills: "Maximum 5 skills allowed" }));
-                                                    return;
+                                {availableSkills
+                                    .slice(0, 6)
+                                    .map((skill, index) => (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            onClick={() => {
+                                                if (
+                                                    !selectedSkills.includes(
+                                                        skill
+                                                    )
+                                                ) {
+                                                    if (
+                                                        selectedSkills.length >=
+                                                        5
+                                                    ) {
+                                                        setErrors((prev) => ({
+                                                            ...prev,
+                                                            skills: "Maximum 5 skills allowed",
+                                                        }));
+                                                        return;
+                                                    }
+                                                    setSelectedSkills([
+                                                        ...selectedSkills,
+                                                        skill,
+                                                    ]);
+                                                    setErrors((prev) => ({
+                                                        ...prev,
+                                                        skills: undefined,
+                                                    }));
                                                 }
-                                                setSelectedSkills([...selectedSkills, skill]);
-                                                setErrors((prev) => ({ ...prev, skills: undefined }));
-                                            }
-                                        }}
-                                        className={`popular-skill-button ${selectedSkills.includes(skill) ? "opacity-50" : ""}`}
-                                        disabled={selectedSkills.includes(skill)}>
-                                        {skill}
-                                    </button>
-                                ))}
+                                            }}
+                                            className={`popular-skill-button ${
+                                                selectedSkills.includes(skill)
+                                                    ? "opacity-50"
+                                                    : ""
+                                            }`}
+                                            disabled={selectedSkills.includes(
+                                                skill
+                                            )}
+                                        >
+                                            {skill}
+                                        </button>
+                                    ))}
                             </div>
                         </div>
                     </div>
 
                     {/* Form actions */}
                     <div className="flex justify-end pt-4 border-t apply-modal-border">
-                        <button type="button" onClick={onClose} className="mr-2 px-4 py-2 border rounded-lg">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="mr-2 px-4 py-2 border rounded-lg"
+                        >
                             Cancel
                         </button>
-                        <button type="submit" className="px-4 py-2 text-white rounded-lg">
+                        <button
+                            type="submit"
+                            className="px-4 py-2 text-white rounded-lg"
+                        >
                             Submit Application
                         </button>
                     </div>
