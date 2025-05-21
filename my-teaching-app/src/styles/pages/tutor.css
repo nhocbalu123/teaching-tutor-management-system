@@ -4,7 +4,11 @@
 .tutor-hero-section {
     position: relative;
     padding: 8rem 2rem 6rem;
-    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-bg-secondary) 0%,
+        var(--color-bg-primary) 100%
+    );
     overflow: hidden;
     border-bottom: 1px solid var(--color-border);
 }
@@ -110,7 +114,11 @@
 .circle-1 {
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, var(--color-primary) 0%, rgba(249, 115, 22, 0) 70%);
+    background: radial-gradient(
+        circle,
+        var(--color-primary) 0%,
+        rgba(249, 115, 22, 0) 70%
+    );
     top: -100px;
     right: 10%;
     animation: float 8s infinite ease-in-out;
@@ -119,7 +127,11 @@
 .circle-2 {
     width: 200px;
     height: 200px;
-    background: radial-gradient(circle, var(--color-secondary) 0%, rgba(251, 146, 60, 0) 70%);
+    background: radial-gradient(
+        circle,
+        var(--color-secondary) 0%,
+        rgba(251, 146, 60, 0) 70%
+    );
     bottom: -50px;
     left: 15%;
     animation: float 6s infinite ease-in-out 1s;
@@ -128,7 +140,11 @@
 .circle-3 {
     width: 150px;
     height: 150px;
-    background: radial-gradient(circle, var(--color-orange-300) 0%, rgba(253, 186, 116, 0) 70%);
+    background: radial-gradient(
+        circle,
+        var(--color-orange-300) 0%,
+        rgba(253, 186, 116, 0) 70%
+    );
     top: 20%;
     left: 10%;
     animation: float 10s infinite ease-in-out 2s;
@@ -143,23 +159,29 @@
 
 /* Alert Messages */
 .message {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
     display: flex;
     align-items: center;
+    min-width: 320px;
+    max-width: 600px;
+    width: auto;
     padding: 1rem;
     border-radius: 0.75rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px #00000020;
+    z-index: 9999;
+    background-color: #ffffff;
 }
 
 .success-message {
-    background-color: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background-color: #ecfdf5;
+    border: 1px solid #10b981;
 }
 
 .error-message {
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background-color: #fef2f2;
+    border: 1px solid #ef4444;
 }
 
 .message-icon {
@@ -174,24 +196,28 @@
 }
 
 .message-icon.success {
-    background-color: rgba(16, 185, 129, 0.2);
+    background-color: #d1fae5;
     color: #10b981;
 }
 
 .message-icon.error {
-    background-color: rgba(239, 68, 68, 0.2);
+    background-color: #fee2e2;
     color: #ef4444;
 }
 
 .message-content {
     flex: 1;
-    color: var(--color-text-primary);
+    color: #111827;
+    margin-right: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .message-close {
     background: none;
     border: none;
-    color: var(--color-text-secondary);
+    color: #6b7280;
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
@@ -203,8 +229,70 @@
 }
 
 .message-close:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: var(--color-text-primary);
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+/* Dark mode adjustments */
+.dark .message {
+    background-color: #1f2937;
+    box-shadow: 0 4px 10px #00000040;
+}
+
+.dark .success-message {
+    background-color: #064e3b;
+    border: 1px solid #10b981;
+}
+
+.dark .error-message {
+    background-color: #7f1d1d;
+    border: 1px solid #ef4444;
+}
+
+.dark .message-icon.success {
+    background-color: #065f46;
+    color: #34d399;
+}
+
+.dark .message-icon.error {
+    background-color: #991b1b;
+    color: #f87171;
+}
+
+.dark .message-content {
+    color: #f9fafb;
+}
+
+.dark .message-close {
+    color: #9ca3af;
+}
+
+.dark .message-close:hover {
+    background-color: #374151;
+    color: #f9fafb;
+}
+
+/* Animation */
+@keyframes message-slide-in {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes message-slide-out {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
 }
 
 /* Search and Filters */
@@ -410,7 +498,11 @@
 
 /* Dark Mode Adjustments */
 .dark .tutor-hero-section {
-    background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, var(--color-bg-primary) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(31, 41, 55, 0.8) 0%,
+        var(--color-bg-primary) 100%
+    );
 }
 
 .dark .hero-highlight::after {
@@ -466,5 +558,13 @@
 
     .search-input {
         padding: 0.8rem 3rem 0.8rem 3rem;
+    }
+
+    .message {
+        left: 16px;
+        right: 16px;
+        min-width: auto;
+        max-width: calc(100% - 32px);
+        width: calc(100% - 32px);
     }
 }

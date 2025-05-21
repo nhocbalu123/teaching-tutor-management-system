@@ -23,7 +23,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     // Initialize dark mode from localStorage on initial load
     useEffect(() => {
         // Check for theme preference in localStorage or system
-        if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        if (
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
             document.documentElement.classList.add("dark");
         } else {
             document.documentElement.classList.remove("dark");
@@ -34,7 +38,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         <>
             <Head>
                 <title>duTeach - Find Expert Tutors</title>
-                <meta name="description" content="Connect with top-rated tutors for courses at the School of Computer Science" />
+                <meta
+                    name="description"
+                    content="Connect with top-rated tutors for courses at the School of Computer Science"
+                />
+                <link rel="stylesheet" href="/custom-styles.css" />
             </Head>
             <Component {...pageProps} />
         </>
