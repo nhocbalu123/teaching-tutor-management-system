@@ -188,7 +188,21 @@ export default function LecturerPage() {
         setComment(application.comment || "");
     };
 
-    const handleSaveComment = (selectedCourses: string[]) => {
+    const handleSaveComment = (/* selectedCourses: string[] */) => {
+        // selectedCourses might not be needed here anymore
+        if (selectedApplication) {
+            const updatedApplication = {
+                ...selectedApplication,
+                comment: comment,
+            };
+            saveApplication(updatedApplication);
+            setApplications(getApplications()); // Refresh applications list
+            setSelectedApplication(updatedApplication); // Update the selected application state
+            showToast("Comment saved!", "success"); // Add a toast for comment saving
+        }
+    };
+
+    const handleSelectApplicantButton = (selectedCourses: string[]) => {
         if (selectedApplication) {
             const updatedApplication = {
                 ...selectedApplication,
@@ -196,11 +210,12 @@ export default function LecturerPage() {
                 selectedBy: currentLecturerId,
                 selectedDate: new Date().toISOString().split("T")[0],
                 selectedForCourses: selectedCourses,
-                comment: comment,
+                // comment: comment, // Comment is now saved by handleSaveComment
             };
             saveApplication(updatedApplication);
             setApplications(getApplications());
             setSelectedApplication(updatedApplication);
+            showToast("Applicant selected successfully!", "success");
         }
     };
 
@@ -223,6 +238,15 @@ export default function LecturerPage() {
 
     const handleAddToRanking = () => {
         if (!selectedApplication) return;
+
+        // Check if a comment has been made
+        if (!comment && !selectedApplication.comment) {
+            showToast(
+                "Please add a comment before adding to ranking.",
+                "error"
+            );
+            return;
+        }
 
         // Determine the next rank number
         const nextRank = rankedApplications.length + 1;
@@ -682,6 +706,9 @@ export default function LecturerPage() {
                                             application={selectedApplication}
                                             comment={comment}
                                             setComment={setComment}
+                                            onSelectApplicant={
+                                                handleSelectApplicantButton
+                                            }
                                             onSaveComment={handleSaveComment}
                                             onUnselectApplicant={
                                                 handleUnselectApplicant

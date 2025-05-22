@@ -22,6 +22,7 @@ interface ApplicantDetailsProps {
     application: TutorApplication | null;
     comment: string;
     setComment: (comment: string) => void;
+    onSelectApplicant: (selectedCourses: string[]) => void;
     onSaveComment: (selectedCourses: string[]) => void;
     onUnselectApplicant: () => void;
     onAddToRanking: () => void;
@@ -32,6 +33,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     application,
     comment,
     setComment,
+    onSelectApplicant,
     onSaveComment,
     onUnselectApplicant,
     onAddToRanking,
@@ -68,13 +70,10 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     /**
      * Saves the comment and selects the applicant
      */
-    const handleSaveAndSelect = () => {
-        if (!comment.trim()) {
-            showToast("Please provide a comment about the applicant", "error");
-            return;
+    const handleSelectButtonClick = () => {
+        if (application) {
+            onSelectApplicant(application.courses);
         }
-        onSaveComment(application.courses);
-        showToast("Applicant saved and selected successfully!", "success");
     };
 
     /**
@@ -99,12 +98,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
      * Only works if all fields are validated and the applicant is selected
      */
     const handleAddToRanking = () => {
-        // Check if comment is provided
-        if (!comment.trim()) {
-            showToast("Please add a comment before adding to ranking", "error");
-            return;
-        }
-
         if (!application.selected) {
             showToast(
                 "Please select the applicant before adding to ranking",
@@ -120,7 +113,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
         }
 
         onAddToRanking();
-        showToast("Applicant added to ranking successfully!", "success");
     };
 
     return (
@@ -202,7 +194,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                             </>
                         ) : (
                             <button
-                                onClick={handleSaveAndSelect}
+                                onClick={handleSelectButtonClick}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                             >
                                 Select Applicant
@@ -335,18 +327,25 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                             />
                         </svg>
-                        Comments
+                        Lecturer Comment
                     </h4>
                     <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
+                        placeholder="Add your comment about the applicant..."
                         className="comment-textarea"
-                        rows={3}
-                        placeholder="Add your comments about this applicant..."
-                    />
+                        rows={4}
+                    ></textarea>
+                    <button
+                        onClick={() => onSaveComment(application.courses)}
+                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        disabled={!comment.trim()}
+                    >
+                        Save Comment
+                    </button>
                 </div>
             </motion.div>
         </AnimatePresence>
