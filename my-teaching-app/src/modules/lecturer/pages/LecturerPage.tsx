@@ -241,7 +241,7 @@ export default function LecturerPage() {
                 selectedBy: undefined,
                 selectedDate: undefined,
                 selectedForCourses: undefined,
-                comment: comment,
+                rank: undefined,
             };
             saveApplication(updatedApplication);
             setApplications(getApplications());
