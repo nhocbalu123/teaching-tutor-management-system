@@ -739,68 +739,56 @@ body {
     border: 2px solid transparent;
     border-radius: 12px;
     padding: 1.5rem;
+    padding-bottom: 4rem;
     box-sizing: border-box;
-    justify-content: flex-start;
 }
 
-.lecturer-card::before {
-    content: "More Information";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-    padding: 0.75rem 2rem;
-    border-radius: 30px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease,
-        transform 0.3s ease;
-    z-index: 2;
-    white-space: nowrap;
-    width: fit-content;
-}
-
-.lecturer-card:hover::before {
-    opacity: 1;
-    background-color: var(--color-primary);
-    color: white;
-    transform: translate(-50%, -50%) scale(1.05);
-}
-
+/* Add a pseudo-element to extend the card's hover detection area */
 .lecturer-card::after {
     content: "";
     position: absolute;
-    top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 12px;
+    bottom: -3rem; /* Extend 3rem below card to fully cover button */
+    height: 3rem;
+    background: transparent; /* Make it invisible */
+    z-index: 9; /* Below the button but still interactive */
 }
 
-.lecturer-card:hover::after {
-    opacity: 1;
+.lecturer-card .more-info-btn {
+    display: block;
+    position: absolute;
+    bottom: -2rem;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.5rem 1.5rem;
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    width: fit-content;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
 }
 
-.more-info-btn {
+.lecturer-card .more-info-btn::before {
     display: none;
 }
 
-.lecturer-card > * {
-    width: 100%;
+.lecturer-card .more-info-btn:hover {
+    background-color: var(--color-primary);
+    color: white;
 }
 
 .lecturer-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.15);
+    /* border-color: var(--color-primary); Removed to prevent border change */
+    /* box-shadow: 0 10px 25px rgba(249, 115, 22, 0.15); Removed */
 }
 
 .lecturer-image-container {

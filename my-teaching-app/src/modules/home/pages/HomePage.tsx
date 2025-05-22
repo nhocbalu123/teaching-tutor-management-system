@@ -449,27 +449,29 @@ export default function HomePage() {
                                         }`}
                                         onClick={() => openModal(lecturer.id)}
                                     >
-                                        <div className="lecturer-image-container">
-                                            <Image
-                                                src={`/lecturers/lecturer-${
-                                                    index + 1
-                                                }.jpg`}
-                                                alt={lecturer.name}
-                                                width={200}
-                                                height={200}
-                                                className="lecturer-image"
-                                            />
-                                            <div className="lecturer-decoration"></div>
+                                        <div>
+                                            <div className="lecturer-image-container">
+                                                <Image
+                                                    src={`/lecturers/lecturer-${
+                                                        index + 1
+                                                    }.jpg`}
+                                                    alt={lecturer.name}
+                                                    width={200}
+                                                    height={200}
+                                                    className="lecturer-image"
+                                                />
+                                                <div className="lecturer-decoration"></div>
+                                            </div>
+                                            <h3 className="lecturer-name">
+                                                {lecturer.name}
+                                            </h3>
+                                            <p className="lecturer-title">
+                                                {lecturer.title}
+                                            </p>
+                                            <p className="lecturer-specialization">
+                                                {lecturer.specialization}
+                                            </p>
                                         </div>
-                                        <h3 className="lecturer-name">
-                                            {lecturer.name}
-                                        </h3>
-                                        <p className="lecturer-title">
-                                            {lecturer.title}
-                                        </p>
-                                        <p className="lecturer-specialization">
-                                            {lecturer.specialization}
-                                        </p>
                                         <button className="more-info-btn">
                                             More Information
                                         </button>
