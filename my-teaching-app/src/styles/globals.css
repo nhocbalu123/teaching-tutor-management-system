@@ -21,9 +21,9 @@
 @import "./components/user-dropdown.css";
 @import "./components/visual-stats-summary.css";
 @import "./components/course-card.css";
-@import "./components/toast.css";
+@import "../modules/core/styles/toast.css";
 @import "./components/modal.css";
 
-@import "./authentication.css";
+@import "../modules/auth/styles/authentication.css";
 @import "./lecturerDashboard.css";
 @import "./timeline.css";
