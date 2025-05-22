@@ -202,6 +202,20 @@ export default function LecturerPage() {
         }
     };
 
+    const handleDeleteComment = () => {
+        if (selectedApplication) {
+            const updatedApplication = {
+                ...selectedApplication,
+                comment: "",
+            };
+            saveApplication(updatedApplication);
+            setApplications(getApplications()); // Refresh applications list
+            setSelectedApplication(updatedApplication); // Update the selected application state
+            setComment(""); // Clear comment in the input field
+            showToast("Comment deleted!", "success");
+        }
+    };
+
     const handleSelectApplicantButton = (selectedCourses: string[]) => {
         if (selectedApplication) {
             const updatedApplication = {
@@ -710,6 +724,9 @@ export default function LecturerPage() {
                                                 handleSelectApplicantButton
                                             }
                                             onSaveComment={handleSaveComment}
+                                            onDeleteComment={
+                                                handleDeleteComment
+                                            }
                                             onUnselectApplicant={
                                                 handleUnselectApplicant
                                             }
