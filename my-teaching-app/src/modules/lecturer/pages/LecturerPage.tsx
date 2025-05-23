@@ -106,6 +106,18 @@ export default function LecturerPage() {
         };
     }, []);
 
+    // Handle rankings tab course selection
+    useEffect(() => {
+        // If switching to rankings tab and no course is selected, select the first available course
+        if (
+            activeTab === "rankings" &&
+            !selectedCourse &&
+            availableCourses.length > 0
+        ) {
+            setSelectedCourse(availableCourses[0].code);
+        }
+    }, [activeTab, selectedCourse]);
+
     // Show toast notification
     const showToast = (
         message: string,
@@ -764,9 +776,6 @@ export default function LecturerPage() {
                                             }
                                             className="filter-select"
                                         >
-                                            <option value="">
-                                                All Courses
-                                            </option>
                                             {availableCourses.map(
                                                 (course: {
                                                     code: string;
@@ -782,6 +791,26 @@ export default function LecturerPage() {
                                                 )
                                             )}
                                         </select>
+                                        <p className="filter-note">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="note-icon"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                            </svg>
+                                            Rankings are course-specific to
+                                            avoid confusion with candidates who
+                                            may have the same rank for different
+                                            courses.
+                                        </p>
                                     </div>
                                     <div className="rankings-list">
                                         <RankedCandidates

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
 import { availableCourses } from "@/modules/core/utils/coursesUtils"; // Updated import path
 import { motion, AnimatePresence } from "framer-motion";
@@ -76,23 +76,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
         if (application) {
             onSelectApplicant(application.courses);
         }
-    };
-
-    /**
-     * Validates all fields in the applicant details
-     * Returns true if all validations pass, false otherwise
-     *
-     * @returns {boolean} - Whether all fields are valid
-     */
-    const validateAllFields = (): boolean => {
-        // Check if comment is provided
-        if (!comment.trim()) {
-            showToast("Please provide a comment about the applicant", "error");
-            return false;
-        }
-
-        // All validations pass
-        return true;
     };
 
     /**
