@@ -1,0 +1,11 @@
+/* Core/Global Styles */
+@import "tailwindcss";
+@import "./variables.css";
+@import "./overrides.css";
+@import "./themes/light.css";
+@import "./themes/dark.css";
+@import "./themes/lecturer-theme.css";
+@import "./timeline.css";        /* Global timeline styles */
+@import "./toast.css";
+@import "./header.css";          /* Global header component */
+@import "./user-dropdown.css";   /* Global user dropdown */

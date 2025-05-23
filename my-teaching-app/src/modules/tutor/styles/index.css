@@ -1,0 +1,4 @@
+/* Tutor Module Styles */
+@import "./tutor.css";
+@import "./modal.css";           /* Tutor-specific modal */
+@import "./course-card.css";     /* Tutor course cards */

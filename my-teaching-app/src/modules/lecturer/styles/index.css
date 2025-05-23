@@ -1,0 +1,8 @@
+/* Lecturer Module Styles */
+@import "./lecturer.css";
+@import "./lecturerDashboard.css";
+@import "./applicant-details.css";
+@import "./applicant-list.css";
+@import "./ranked-candidates.css";
+@import "./stats-visualization.css";
+@import "./visual-stats-summary.css";

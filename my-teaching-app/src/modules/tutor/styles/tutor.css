@@ -157,144 +157,6 @@
     padding: 2rem 1.5rem;
 }
 
-/* Alert Messages */
-.message {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    min-width: 320px;
-    max-width: 600px;
-    width: auto;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 10px #00000020;
-    z-index: 9999;
-    background-color: #ffffff;
-}
-
-.success-message {
-    background-color: #ecfdf5;
-    border: 1px solid #10b981;
-}
-
-.error-message {
-    background-color: #fef2f2;
-    border: 1px solid #ef4444;
-}
-
-.message-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 1rem;
-    flex-shrink: 0;
-}
-
-.message-icon.success {
-    background-color: #d1fae5;
-    color: #10b981;
-}
-
-.message-icon.error {
-    background-color: #fee2e2;
-    color: #ef4444;
-}
-
-.message-content {
-    flex: 1;
-    color: #111827;
-    margin-right: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.message-close {
-    background: none;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 1rem;
-    transition: all 0.3s ease;
-}
-
-.message-close:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-}
-
-/* Dark mode adjustments */
-.dark .message {
-    background-color: #1f2937;
-    box-shadow: 0 4px 10px #00000040;
-}
-
-.dark .success-message {
-    background-color: #064e3b;
-    border: 1px solid #10b981;
-}
-
-.dark .error-message {
-    background-color: #7f1d1d;
-    border: 1px solid #ef4444;
-}
-
-.dark .message-icon.success {
-    background-color: #065f46;
-    color: #34d399;
-}
-
-.dark .message-icon.error {
-    background-color: #991b1b;
-    color: #f87171;
-}
-
-.dark .message-content {
-    color: #f9fafb;
-}
-
-.dark .message-close {
-    color: #9ca3af;
-}
-
-.dark .message-close:hover {
-    background-color: #374151;
-    color: #f9fafb;
-}
-
-/* Animation */
-@keyframes message-slide-in {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes message-slide-out {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-}
-
 /* Search and Filters */
 .search-filters-container {
     margin-bottom: 2rem;
@@ -302,8 +164,7 @@
 
 .search-bar {
     position: relative;
-    max-width: 800px;
-    margin: 0 auto 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .search-icon {
@@ -311,21 +172,20 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
+    color: var(--color-text-secondary);
     width: 1.25rem;
     height: 1.25rem;
-    color: var(--color-text-secondary);
 }
 
 .search-input {
     width: 100%;
-    padding: 1rem 3rem 1rem 3rem;
-    border-radius: 1rem;
+    padding: 0.75rem 3rem 0.75rem 3rem;
+    font-size: 1rem;
     border: 1px solid var(--color-border);
+    border-radius: 9999px;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
-    font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
 .search-input:focus {
@@ -339,49 +199,49 @@
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background-color: transparent;
     border: none;
     color: var(--color-text-secondary);
     cursor: pointer;
-    width: 1.5rem;
-    height: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
     border-radius: 50%;
-    transition: all 0.3s ease;
+    opacity: 0.7;
+    transition: all 0.2s ease;
 }
 
 .search-clear:hover {
+    opacity: 1;
     background-color: rgba(0, 0, 0, 0.05);
-    color: var(--color-text-primary);
 }
 
-/* Filter Pills */
 .filter-pills {
     display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
     gap: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .filter-pill {
-    background: none;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
-    border-radius: 2rem;
-    padding: 0.6rem 1.5rem;
-    font-size: 0.95rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
     font-weight: 500;
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .filter-pill:hover {
-    background-color: rgba(249, 115, 22, 0.05);
+    background-color: rgba(249, 115, 22, 0.1);
     border-color: var(--color-primary);
-    transform: translateY(-2px);
+    color: var(--color-primary);
 }
 
 .filter-pill.active {
@@ -390,36 +250,33 @@
     color: white;
 }
 
-/* Course Grid */
 .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    gap: 2rem;
 }
 
 .course-card-wrapper {
-    height: 100%;
+    transition: transform 0.3s ease;
 }
 
-/* Loading State */
 .loading-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 0;
-    color: var(--color-text-secondary);
+    padding: 3rem 0;
+    text-align: center;
 }
 
 .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(249, 115, 22, 0.2);
-    border-top: 3px solid var(--color-primary);
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(249, 115, 22, 0.2);
+    border-top: 4px solid var(--color-primary);
     border-radius: 50%;
+    margin-bottom: 1.5rem;
     animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -431,46 +288,41 @@
     }
 }
 
-/* Empty State */
 .no-courses {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
     text-align: center;
-    padding: 4rem 0;
-    color: var(--color-text-secondary);
 }
 
 .no-courses h3 {
     font-size: 1.5rem;
     font-weight: 600;
+    margin-bottom: 0.5rem;
     color: var(--color-text-primary);
-    margin: 1.5rem 0 0.5rem;
 }
 
 .no-courses p {
+    color: var(--color-text-secondary);
     max-width: 400px;
-    line-height: 1.6;
 }
 
-/* Animations */
 @keyframes float {
-    0% {
-        transform: translateY(0px);
+    0%,
+    100% {
+        transform: translateY(0);
     }
     50% {
-        transform: translateY(-15px);
-    }
-    100% {
-        transform: translateY(0px);
+        transform: translateY(-20px);
     }
 }
 
-/* Dark Mode Adjustments */
 .dark .tutor-hero-section {
     background: linear-gradient(
         135deg,
-        rgba(31, 41, 55, 0.8) 0%,
+        var(--color-bg-secondary) 0%,
         var(--color-bg-primary) 100%
     );
 }
@@ -480,14 +332,14 @@
 }
 
 .dark .search-clear:hover,
-.dark .message-close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.dark .filter-pill:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Responsive Adjustments */
+/* Responsive Styling */
 @media (max-width: 768px) {
     .tutor-hero-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .tutor-hero-subtitle {
@@ -496,12 +348,12 @@
 
     .tutor-stats {
         flex-direction: column;
-        gap: 1rem;
     }
 
     .stat-divider {
-        width: 80%;
+        width: 80px;
         height: 1px;
+        margin: 0.75rem 0;
     }
 
     .stat-value {
@@ -515,11 +367,11 @@
 
 @media (max-width: 640px) {
     .tutor-hero-section {
-        padding: 7rem 1rem 4rem;
+        padding: 6rem 1.5rem 4rem;
     }
 
     .tutor-hero-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
 
     .tutor-container {
@@ -527,14 +379,6 @@
     }
 
     .search-input {
-        padding: 0.8rem 3rem 0.8rem 3rem;
-    }
-
-    .message {
-        left: 16px;
-        right: 16px;
-        min-width: auto;
-        max-width: calc(100% - 32px);
-        width: calc(100% - 32px);
+        padding: 0.75rem 2.5rem 0.75rem 2.5rem;
     }
 }

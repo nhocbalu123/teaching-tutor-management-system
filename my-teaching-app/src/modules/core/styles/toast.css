@@ -1,5 +1,9 @@
 /* filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\styles\toast.css */
-.toast-notification {
+/* Notification and message styles for application-wide use */
+
+/* Base styles for both toasts and messages */
+.toast-notification,
+.message {
     position: fixed;
     bottom: 20px;
     left: 20px;
@@ -15,13 +19,15 @@
     background-color: #ffffff;
 }
 
-/* Toast types */
-.toast-success {
+/* Toast and message types */
+.toast-success,
+.success-message {
     background-color: #ecfdf5;
     border: 1px solid #10b981;
 }
 
-.toast-error {
+.toast-error,
+.error-message {
     background-color: #fef2f2;
     border: 1px solid #ef4444;
 }
@@ -31,8 +37,9 @@
     border: 1px solid #3b82f6;
 }
 
-/* Toast icon */
-.toast-icon {
+/* Toast and message icons */
+.toast-icon,
+.message-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -43,12 +50,14 @@
     flex-shrink: 0;
 }
 
-.toast-success .toast-icon {
+.toast-success .toast-icon,
+.message-icon.success {
     background-color: #d1fae5;
     color: #10b981;
 }
 
-.toast-error .toast-icon {
+.toast-error .toast-icon,
+.message-icon.error {
     background-color: #fee2e2;
     color: #ef4444;
 }
@@ -58,8 +67,9 @@
     color: #3b82f6;
 }
 
-/* Toast content */
-.toast-content {
+/* Toast and message content */
+.toast-content,
+.message-content {
     flex: 1;
     color: #111827;
     margin-right: 1rem;
@@ -69,7 +79,8 @@
 }
 
 /* Close button */
-.toast-close {
+.toast-close,
+.message-close {
     background: none;
     border: none;
     color: #6b7280;
@@ -83,23 +94,27 @@
     transition: all 0.3s ease;
 }
 
-.toast-close:hover {
+.toast-close:hover,
+.message-close:hover {
     background-color: #f3f4f6;
     color: #111827;
 }
 
 /* Dark mode adjustments */
-.dark .toast-notification {
+.dark .toast-notification,
+.dark .message {
     background-color: #1f2937;
     box-shadow: 0 4px 10px #00000040;
 }
 
-.dark .toast-success {
+.dark .toast-success,
+.dark .success-message {
     background-color: #064e3b;
     border: 1px solid #10b981;
 }
 
-.dark .toast-error {
+.dark .toast-error,
+.dark .error-message {
     background-color: #7f1d1d;
     border: 1px solid #ef4444;
 }
@@ -109,12 +124,14 @@
     border: 1px solid #3b82f6;
 }
 
-.dark .toast-success .toast-icon {
+.dark .toast-success .toast-icon,
+.dark .message-icon.success {
     background-color: #065f46;
     color: #34d399;
 }
 
-.dark .toast-error .toast-icon {
+.dark .toast-error .toast-icon,
+.dark .message-icon.error {
     background-color: #991b1b;
     color: #f87171;
 }
@@ -124,21 +141,25 @@
     color: #60a5fa;
 }
 
-.dark .toast-content {
+.dark .toast-content,
+.dark .message-content {
     color: #f9fafb;
 }
 
-.dark .toast-close {
+.dark .toast-close,
+.dark .message-close {
     color: #9ca3af;
 }
 
-.dark .toast-close:hover {
+.dark .toast-close:hover,
+.dark .message-close:hover {
     background-color: #374151;
     color: #f9fafb;
 }
 
 /* Animation */
-@keyframes toast-slide-in {
+@keyframes toast-slide-in,
+@keyframes message-slide-in {
     from {
         transform: translateX(-100%);
         opacity: 0;
@@ -149,7 +170,8 @@
     }
 }
 
-@keyframes toast-slide-out {
+@keyframes toast-slide-out,
+@keyframes message-slide-out {
     from {
         transform: translateX(0);
         opacity: 1;
@@ -162,7 +184,8 @@
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
-    .toast-notification {
+    .toast-notification,
+    .message {
         left: 16px;
         right: 16px;
         min-width: auto;
