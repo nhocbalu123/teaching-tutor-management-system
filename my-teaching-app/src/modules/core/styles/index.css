@@ -1,11 +1,27 @@
-/* Core/Global Styles */
+/* ======== CORE/GLOBAL STYLES ======== */
+/* This is the main entry point for all core/global styles */
+
+/* CSS Framework */
 @import "tailwindcss";
-@import "./variables.css";
-@import "./overrides.css";
+
+/* Core Foundation */
+@import "./variables.css"; /* CSS custom properties */
+@import "./base.css"; /* Base element styles */
+@import "./overrides.css"; /* Framework overrides */
+
+/* Theme System */
 @import "./themes/light.css";
 @import "./themes/dark.css";
 @import "./themes/lecturer-theme.css";
-@import "./timeline.css";        /* Global timeline styles */
-@import "./toast.css";
-@import "./header.css";          /* Global header component */
-@import "./user-dropdown.css";   /* Global user dropdown */
+
+/* Core Utilities */
+@import "./utilities.css"; /* Utility classes */
+@import "./responsive.css"; /* Global responsive utilities */
+
+/* Global Components */
+@import "./header.css"; /* Global header component */
+@import "./user-dropdown.css"; /* Global user dropdown */
+@import "./toast.css"; /* Global toast notifications */
+@import "./timeline.css"; /* Global timeline component */
+
+/* Note: Module-specific styles should be imported in their respective modules */

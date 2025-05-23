@@ -112,7 +112,10 @@
 }
 
 .timeline-item:hover .timeline-title {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    background-image: linear-gradient(
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0)
+    );
 }
 
 /* Header flap */

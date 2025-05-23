@@ -1,2 +1,7 @@
-/* Auth Module Styles */
+/* ======== AUTH MODULE STYLES ======== */
+/* Entry point for all authentication module styles */
+
+/* Authentication pages styles */
 @import "./authentication.css";
+
+/* Note: Add additional auth module styles here as needed */

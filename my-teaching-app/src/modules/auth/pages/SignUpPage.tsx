@@ -1,7 +1,8 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\auth\pages\SignUpPage.tsx
+// src/pages/signup.tsx
 import React from "react";
-import Layout from "@/modules/core/components/layout/Layout";
 import Link from "next/link";
+import Layout from "@/modules/core/components/layout/Layout";
 import Head from "next/head";
 
 export default function SignUpPage() {

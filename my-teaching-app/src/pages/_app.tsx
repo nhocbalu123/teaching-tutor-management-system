@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import "../modules/core/styles/globals.css";
+import "../modules/core/styles/index.css";
+// Module styles imports
+import "../modules/home/styles/index.css";
+import "../modules/auth/styles/index.css";
+import "../modules/tutor/styles/index.css";
+import "../modules/lecturer/styles/index.css";
 import type { AppProps } from "next/app";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -42,7 +47,6 @@ function MyApp({ Component, pageProps }: AppProps) {
                     name="description"
                     content="Connect with top-rated tutors for courses at the School of Computer Science"
                 />
-                <link rel="stylesheet" href="/custom-styles.css" />
             </Head>
             <Component {...pageProps} />
         </>
