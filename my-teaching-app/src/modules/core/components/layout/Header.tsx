@@ -117,7 +117,7 @@ const Header: React.FC = () => {
 
     return (
         <header className={`main-header ${isScrolled ? "scrolled" : ""}`}>
-            <div className="container mx-auto flex justify-between items-center">
+            <div className="container mx-auto header-grid">
                 {/* Logo with proper alignment */}
                 <div className="logo-wrapper">
                     <Link href="/" className="logo-link">

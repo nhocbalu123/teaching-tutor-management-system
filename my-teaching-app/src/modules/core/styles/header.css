@@ -18,6 +18,26 @@
     border-bottom: 1px solid var(--color-border);
 }
 
+/* Header Grid Layout for Centered Navigation */
+.header-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+}
+
+.logo-wrapper {
+    justify-self: start;
+}
+
+.main-nav {
+    justify-self: center;
+}
+
+.header-actions {
+    justify-self: end;
+}
+
 /* Logo Styles */
 .logo-link {
     text-decoration: none;
@@ -292,6 +312,10 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+    .header-grid {
+        gap: 1rem;
+    }
+
     .nav-links {
         gap: 1.5rem;
     }
@@ -310,6 +334,11 @@
         padding: 0.8rem 1rem;
     }
 
+    .header-grid {
+        grid-template-columns: auto 1fr auto;
+        gap: 0.5rem;
+    }
+
     .nav-links {
         gap: 1rem;
     }
@@ -320,6 +349,33 @@
 
     .auth-button {
         padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-grid {
+        grid-template-columns: auto auto auto;
+        justify-content: space-between;
+    }
+
+    .logo-wrapper {
+        justify-self: start;
+    }
+
+    .main-nav {
+        justify-self: center;
+    }
+
+    .header-actions {
+        justify-self: end;
+    }
+
+    .nav-links {
+        gap: 0.75rem;
+    }
+
+    .nav-link {
         font-size: 0.9rem;
     }
 }
