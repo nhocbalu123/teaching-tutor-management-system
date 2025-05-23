@@ -265,10 +265,21 @@ export default function LecturerPage() {
     const handleAddToRanking = () => {
         if (!selectedApplication) return;
 
-        // Check if a comment has been made
-        if (!comment && !selectedApplication.comment) {
+        // Check if a comment has been made and saved
+        if (!selectedApplication.comment) {
             showToast(
-                "Please add a comment before adding to ranking.",
+                "Please add and save a comment before adding to ranking.",
+                "error"
+            );
+            return;
+        }
+
+        // Check if there's an unsaved comment (current comment differs from saved comment)
+        const hasUnsavedComment =
+            comment !== (selectedApplication.comment || "");
+        if (hasUnsavedComment) {
+            showToast(
+                "Please save your comment before adding to ranking.",
                 "error"
             );
             return;

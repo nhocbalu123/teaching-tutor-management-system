@@ -97,6 +97,25 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             return;
         }
 
+        // Check if a comment has been saved
+        if (!application.comment) {
+            showToast(
+                "Please add and save a comment before adding to ranking.",
+                "error"
+            );
+            return;
+        }
+
+        // Check if there's an unsaved comment
+        const hasUnsavedComment = comment !== (application.comment || "");
+        if (hasUnsavedComment) {
+            showToast(
+                "Please save your comment before adding to ranking.",
+                "error"
+            );
+            return;
+        }
+
         onAddToRanking();
     };
 
@@ -170,8 +189,26 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                                 ) : (
                                     <button
                                         onClick={handleAddToRanking}
-                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                                        title="Add to ranking"
+                                        className={`px-4 py-2 rounded transition-colors ${
+                                            !application.comment ||
+                                            comment !==
+                                                (application.comment || "")
+                                                ? "bg-gray-400 cursor-not-allowed text-white"
+                                                : "bg-green-600 hover:bg-green-700 text-white"
+                                        }`}
+                                        title={
+                                            !application.comment
+                                                ? "Please add and save a comment before adding to ranking"
+                                                : comment !==
+                                                  (application.comment || "")
+                                                ? "Please save your comment before adding to ranking"
+                                                : "Add to ranking"
+                                        }
+                                        disabled={
+                                            !application.comment ||
+                                            comment !==
+                                                (application.comment || "")
+                                        }
                                     >
                                         Add to Ranking
                                     </button>
