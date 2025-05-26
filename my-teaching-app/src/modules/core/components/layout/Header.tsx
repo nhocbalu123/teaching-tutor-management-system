@@ -1,10 +1,8 @@
-"use client";
-
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\layout\Header.tsx
 // src/components/layout/Header.tsx
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import UserDropdown from "@/modules/core/components/layout/UserDropdown";
 
@@ -22,7 +20,6 @@ interface UserData {
 
 const Header: React.FC = () => {
     const router = useRouter();
-    const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userRole, setUserRole] = useState<string | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -147,7 +144,7 @@ const Header: React.FC = () => {
                         <Link
                             href="/"
                             className={`nav-link ${
-                                pathname === "/" ? "active" : ""
+                                router.pathname === "/" ? "active" : ""
                             }`}
                         >
                             Home
@@ -157,7 +154,7 @@ const Header: React.FC = () => {
                             <Link
                                 href="/tutor"
                                 className={`nav-link ${
-                                    pathname.startsWith("/tutor")
+                                    router.pathname.startsWith("/tutor")
                                         ? "active"
                                         : ""
                                 }`}
@@ -170,7 +167,7 @@ const Header: React.FC = () => {
                             <Link
                                 href="/lecturer"
                                 className={`nav-link ${
-                                    pathname.startsWith("/lecturer")
+                                    router.pathname.startsWith("/lecturer")
                                         ? "active"
                                         : ""
                                 }`}

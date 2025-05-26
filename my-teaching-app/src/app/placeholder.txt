@@ -1,2 +1,0 @@
-# This is a placeholder file to create the app directory.
-# It can be deleted after other files are added. 

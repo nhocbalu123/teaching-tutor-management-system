@@ -1,9 +1,7 @@
-"use client";
-
 // filepath: c:\\s3978302\\Full Stack Development\\s3959931-s3978302-a2\\my-teaching-app\\src\\modules\\lecturer\\pages\\LecturerPage.tsx
 // src/pages/lecturer/index.tsx
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import Layout from "@/modules/core/components/layout/Layout"; // Updated import path
 import {
     TutorApplication,
@@ -12,6 +10,7 @@ import {
     initializeDetailedApplications,
 } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
 import { availableCourses } from "@/modules/core/utils/coursesUtils"; // Updated import path
+import Head from "next/head";
 import ApplicantList from "@/modules/lecturer/components/ApplicantList"; // Updated import path
 import ApplicantDetails from "@/modules/lecturer/components/ApplicantDetails"; // Updated import path
 import RankedCandidates from "@/modules/lecturer/components/RankedCandidates"; // Updated import path
@@ -399,6 +398,9 @@ export default function LecturerPage() {
 
     return (
         <>
+            <Head>
+                <title>TeachTeam - Lecturer Dashboard</title>
+            </Head>
             <Layout>
                 <div className="lecturer-dashboard">
                     {/* Dashboard Header */}
