@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import Head from "next/head";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Layout from "@/modules/core/components/layout/Layout";
 import {
@@ -205,10 +206,6 @@ const TutorPage: React.FC = () => {
 
     return (
         <Layout>
-            <Head>
-                <title>TeachTeam - Tutor Portal</title>
-            </Head>
-
             {/* Hero Section */}
             <motion.div
                 className="tutor-hero-section"

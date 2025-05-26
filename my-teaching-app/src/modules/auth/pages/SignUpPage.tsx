@@ -3,14 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import Layout from "@/modules/core/components/layout/Layout";
-import Head from "next/head";
 
 export default function SignUpPage() {
     return (
         <>
-            <Head>
-                <title>TeachTeam - Sign Up</title>
-            </Head>
             <Layout>
                 <div className="flex items-center justify-center py-16">
                     <div className="circle-form">

@@ -1,3 +1,5 @@
+"use client";
+
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\home\pages\HomePage.tsx
 import React, { useState, useEffect } from "react";
 import Link from "next/link";

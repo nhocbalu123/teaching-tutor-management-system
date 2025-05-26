@@ -1,7 +1,9 @@
+"use client";
+
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\auth\pages\SignInPage.tsx
 // src/pages/signin.tsx
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Layout from "@/modules/core/components/layout/Layout";
 import Head from "next/head";
