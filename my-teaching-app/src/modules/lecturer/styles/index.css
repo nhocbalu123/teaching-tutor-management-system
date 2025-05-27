@@ -2,14 +2,14 @@
 /* Entry point for all lecturer module styles */
 
 /* Core lecturer styles */
-@import "./lecturer.css";
-@import "./lecturerDashboard.css";
+@import './lecturer.css';
+@import './lecturerDashboard.css';
 
 /* Applicant management styles */
-@import "./applicant-details.css";
-@import "./applicant-list.css";
-@import "./ranked-candidates.css";
+@import './applicant-details.css';
+@import './applicant-list.css';
+@import './ranked-candidates.css';
 
 /* Data visualization styles */
-@import "./stats-visualization.css";
-@import "./visual-stats-summary.css";
+@import './stats-visualization.css';
+@import './visual-stats-summary.css';

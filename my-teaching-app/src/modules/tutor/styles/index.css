@@ -2,8 +2,8 @@
 /* Entry point for all tutor module styles */
 
 /* Core tutor styles */
-@import "./tutor.css";
+@import './tutor.css';
 
 /* Tutor components */
-@import "./modal.css"; /* Tutor-specific modals */
-@import "./course-card.css"; /* Course card components */
+@import './modal.css'; /* Tutor-specific modals */
+@import './course-card.css'; /* Course card components */

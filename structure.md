@@ -61,7 +61,7 @@ my-teaching-app/
 
 Notes:
 
--   The top-level styles/ directory has been fully integrated into modules/core/styles/
--   Each module contains only the directories it actually uses
--   All tests are co-located within their respective modules
--   The modular structure allows for clear separation of concerns between different user roles and features
+- The top-level styles/ directory has been fully integrated into modules/core/styles/
+- Each module contains only the directories it actually uses
+- All tests are co-located within their respective modules
+- The modular structure allows for clear separation of concerns between different user roles and features
