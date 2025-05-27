@@ -1,7 +1,7 @@
-import React from 'react';
-import { TutorApplication } from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { availableCourses } from '@/modules/core/utils/coursesUtils'; // Updated import path
-import { motion, AnimatePresence } from 'framer-motion';
+import React from "react";
+import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { availableCourses } from "@/modules/core/utils/coursesUtils"; // Updated import path
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * ApplicantDetails Component
@@ -27,7 +27,7 @@ interface ApplicantDetailsProps {
   onDeleteComment: () => void;
   onUnselectApplicant: () => void;
   onAddToRanking: () => void;
-  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  showToast: (message: string, type?: "success" | "error" | "info") => void;
 }
 
 const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
@@ -85,31 +85,31 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   const handleAddToRanking = () => {
     if (!application.selected) {
       showToast(
-        'Please select the applicant before adding to ranking',
-        'error'
+        "Please select the applicant before adding to ranking",
+        "error"
       );
       return;
     }
 
     // Check if already ranked
     if (application.rank !== undefined) {
-      showToast('Applicant is already added to ranking', 'info');
+      showToast("Applicant is already added to ranking", "info");
       return;
     }
 
     // Check if a comment has been saved
     if (!application.comment) {
       showToast(
-        'Please add and save a comment before adding to ranking.',
-        'error'
+        "Please add and save a comment before adding to ranking.",
+        "error"
       );
       return;
     }
 
     // Check if there's an unsaved comment
-    const hasUnsavedComment = comment !== (application.comment || '');
+    const hasUnsavedComment = comment !== (application.comment || "");
     if (hasUnsavedComment) {
-      showToast('Please save your comment before adding to ranking.', 'error');
+      showToast("Please save your comment before adding to ranking.", "error");
       return;
     }
 
@@ -133,15 +133,15 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             <div className="applicant-badges mt-2">
               <span
                 className={`availability-badge ${
-                  application.availability === 'Full Time'
-                    ? 'full-time'
-                    : 'part-time'
+                  application.availability === "Full Time"
+                    ? "full-time"
+                    : "part-time"
                 }`}
               >
                 {application.availability}
               </span>
               <span className="date-badge">
-                Applied:{' '}
+                Applied:{" "}
                 {new Date(application.dateApplied).toLocaleDateString()}
               </span>
             </div>
@@ -182,20 +182,20 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     onClick={handleAddToRanking}
                     className={`px-4 py-2 rounded transition-colors ${
                       !application.comment ||
-                      comment !== (application.comment || '')
-                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
+                      comment !== (application.comment || "")
+                        ? "bg-gray-400 cursor-not-allowed text-white"
+                        : "bg-green-600 hover:bg-green-700 text-white"
                     }`}
                     title={
                       !application.comment
-                        ? 'Please add and save a comment before adding to ranking'
-                        : comment !== (application.comment || '')
-                          ? 'Please save your comment before adding to ranking'
-                          : 'Add to ranking'
+                        ? "Please add and save a comment before adding to ranking"
+                        : comment !== (application.comment || "")
+                          ? "Please save your comment before adding to ranking"
+                          : "Add to ranking"
                     }
                     disabled={
                       !application.comment ||
-                      comment !== (application.comment || '')
+                      comment !== (application.comment || "")
                     }
                   >
                     Add to Ranking
@@ -240,7 +240,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 <div key={courseCode} className="course-card">
                   <div className="course-code">{courseCode}</div>
                   <div className="course-name">
-                    {course?.name || 'Unknown Course'}
+                    {course?.name || "Unknown Course"}
                   </div>
                 </div>
               );

@@ -95,68 +95,68 @@
 }
 
 /* Dark theme styles */
-[data-theme='dark'] .details-container {
+[data-theme="dark"] .details-container {
   background-color: var(--color-bg-primary);
   box-shadow: var(--shadow-sm);
 }
 
-[data-theme='dark'] .empty-details {
+[data-theme="dark"] .empty-details {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-border);
 }
 
-[data-theme='dark'] .empty-details:hover {
+[data-theme="dark"] .empty-details:hover {
   border-color: var(--color-primary);
   background-color: var(--color-bg-hover);
 }
 
-[data-theme='dark'] .course-card {
+[data-theme="dark"] .course-card {
   background-color: var(--color-bg-primary);
   border-color: var(--color-border);
 }
 
-[data-theme='dark'] .course-card:hover {
+[data-theme="dark"] .course-card:hover {
   background-color: rgba(79, 70, 229, 0.15);
   border-color: var(--color-primary);
 }
 
-[data-theme='dark'] .course-card.selected {
+[data-theme="dark"] .course-card.selected {
   background-color: rgba(79, 70, 229, 0.2);
   border-color: var(--color-primary);
 }
 
-[data-theme='dark'] .role-item {
+[data-theme="dark"] .role-item {
   background-color: var(--color-bg-primary);
   border-color: var(--color-border);
 }
 
-[data-theme='dark'] .role-item:hover {
+[data-theme="dark"] .role-item:hover {
   background-color: var(--color-bg-hover);
 }
 
-[data-theme='dark'] .skill-tag {
+[data-theme="dark"] .skill-tag {
   background-color: rgba(79, 70, 229, 0.15);
   border-color: rgba(79, 70, 229, 0.3);
 }
 
-[data-theme='dark'] .skill-tag:hover {
+[data-theme="dark"] .skill-tag:hover {
   background-color: rgba(79, 70, 229, 0.25);
 }
 
-[data-theme='dark'] .academic-text {
+[data-theme="dark"] .academic-text {
   background-color: var(--color-bg-primary);
   border-color: var(--color-border);
 }
 
-[data-theme='dark'] .academic-text:hover {
+[data-theme="dark"] .academic-text:hover {
   background-color: var(--color-bg-hover);
 }
 
-[data-theme='dark'] .comment-textarea {
+[data-theme="dark"] .comment-textarea {
   background-color: var(--color-bg-primary);
   border-color: var(--color-border);
 }
 
-[data-theme='dark'] .comment-textarea:focus {
+[data-theme="dark"] .comment-textarea:focus {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }

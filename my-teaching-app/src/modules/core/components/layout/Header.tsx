@@ -1,16 +1,16 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\layout\Header.tsx
 // src/components/layout/Header.tsx
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
-import UserDropdown from '@/modules/core/components/layout/UserDropdown';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import UserDropdown from "@/modules/core/components/layout/UserDropdown";
 
 // Define a proper type for user data
 interface UserData {
   id: string;
   email: string;
-  role: 'tutor' | 'lecturer';
+  role: "tutor" | "lecturer";
   fullName: string;
   bio?: string;
   skills?: string[];
@@ -31,8 +31,8 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('currentUser');
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("currentUser");
 
       if (user) {
         const userData = JSON.parse(user);
@@ -45,12 +45,12 @@ const Header: React.FC = () => {
       }
 
       // Check for dark mode preference
-      const darkModePreference = localStorage.getItem('darkMode') === 'true';
+      const darkModePreference = localStorage.getItem("darkMode") === "true";
       setIsDarkMode(darkModePreference);
       if (darkModePreference) {
-        document.documentElement.classList.add('dark');
+        document.documentElement.classList.add("dark");
       } else {
-        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.remove("dark");
       }
     }
 
@@ -63,19 +63,19 @@ const Header: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   // Function to handle sign out
   const handleSignOut = () => {
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem("currentUser");
     setIsLoggedIn(false);
     setUserRole(null);
-    router.push('/');
+    router.push("/");
   };
 
   // Function to toggle dark mode
@@ -85,11 +85,11 @@ const Header: React.FC = () => {
 
     // Apply dark mode changes to document
     if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("darkMode", "false");
     }
   };
 
@@ -110,12 +110,12 @@ const Header: React.FC = () => {
   }, [isLoggedIn]);
 
   // Determine which navigation links to show
-  const showTutorLink = !isLoggedIn || (isLoggedIn && userRole === 'tutor');
+  const showTutorLink = !isLoggedIn || (isLoggedIn && userRole === "tutor");
   const showLecturerLink =
-    !isLoggedIn || (isLoggedIn && userRole === 'lecturer');
+    !isLoggedIn || (isLoggedIn && userRole === "lecturer");
 
   return (
-    <header className={`main-header ${isScrolled ? 'scrolled' : ''}`}>
+    <header className={`main-header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container mx-auto header-grid">
         {/* Logo with proper alignment */}
         <div className="logo-wrapper">
@@ -142,7 +142,7 @@ const Header: React.FC = () => {
           <div className="nav-links">
             <Link
               href="/"
-              className={`nav-link ${router.pathname === '/' ? 'active' : ''}`}
+              className={`nav-link ${router.pathname === "/" ? "active" : ""}`}
             >
               Home
             </Link>
@@ -151,7 +151,7 @@ const Header: React.FC = () => {
               <Link
                 href="/tutor"
                 className={`nav-link ${
-                  router.pathname.startsWith('/tutor') ? 'active' : ''
+                  router.pathname.startsWith("/tutor") ? "active" : ""
                 }`}
               >
                 Tutor
@@ -162,7 +162,7 @@ const Header: React.FC = () => {
               <Link
                 href="/lecturer"
                 className={`nav-link ${
-                  router.pathname.startsWith('/lecturer') ? 'active' : ''
+                  router.pathname.startsWith("/lecturer") ? "active" : ""
                 }`}
               >
                 Lecturer
@@ -178,8 +178,8 @@ const Header: React.FC = () => {
             <button
               onClick={toggleDarkMode}
               className={`theme-toggle-btn header-theme-toggle ${
-                isThemeToggleAdding ? 'adding' : ''
-              } ${isThemeToggleRemoving ? 'removing' : ''}`}
+                isThemeToggleAdding ? "adding" : ""
+              } ${isThemeToggleRemoving ? "removing" : ""}`}
               aria-label="Toggle dark mode"
             >
               <div className="theme-icon-wrapper">
@@ -229,9 +229,9 @@ const Header: React.FC = () => {
           ) : (
             <UserDropdown
               user={{
-                fullName: userData?.fullName || 'User',
-                email: userData?.email || '',
-                role: userData?.role || 'user',
+                fullName: userData?.fullName || "User",
+                email: userData?.email || "",
+                role: userData?.role || "user",
                 avatarPath: userData?.avatarPath,
               }}
               onSignOut={handleSignOut}

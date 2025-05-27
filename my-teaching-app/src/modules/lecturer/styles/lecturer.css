@@ -57,7 +57,7 @@
 
 /* Add a pseudo-element to extend the card's hover detection area */
 .lecturer-card::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   right: 0;

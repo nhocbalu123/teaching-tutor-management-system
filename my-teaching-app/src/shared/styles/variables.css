@@ -57,7 +57,7 @@
 }
 
 /* Dark mode variables */
-[data-theme='dark'] {
+[data-theme="dark"] {
   /* Text colors */
   --color-text-primary: #f9fafb;
   --color-text-secondary: #e5e7eb;

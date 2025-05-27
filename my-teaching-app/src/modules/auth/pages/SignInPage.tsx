@@ -1,12 +1,12 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\auth\pages\SignInPage.tsx
 // src/pages/signin.tsx
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import Layout from '@/modules/core/components/layout/Layout';
-import Head from 'next/head';
-import { initializeUserAccounts } from '@/modules/auth/utils/userAccounts';
-import { initializeDetailedApplications } from '@/modules/tutor/utils/tutorUtils';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Layout from "@/modules/core/components/layout/Layout";
+import Head from "next/head";
+import { initializeUserAccounts } from "@/modules/auth/utils/userAccounts";
+import { initializeDetailedApplications } from "@/modules/tutor/utils/tutorUtils";
 
 /**
  * Validation Rules for Sign In Form:
@@ -33,11 +33,11 @@ import { initializeDetailedApplications } from '@/modules/tutor/utils/tutorUtils
 
 export default function SignInPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'tutor' | 'lecturer'>('tutor');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"tutor" | "lecturer">("tutor");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,7 +52,7 @@ export default function SignInPage() {
 
   // Initialize user accounts and applications in localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       initializeUserAccounts();
       initializeDetailedApplications();
     }
@@ -84,7 +84,7 @@ export default function SignInPage() {
     password: string,
     role: string
   ) => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       interface UserType {
         id: string;
         email: string;
@@ -95,9 +95,9 @@ export default function SignInPage() {
       }
 
       const users = JSON.parse(
-        localStorage.getItem('users') || '[]'
+        localStorage.getItem("users") || "[]"
       ) as UserType[];
-      console.log('All users:', users); // Debug log
+      console.log("All users:", users); // Debug log
 
       // First find by email and password
       const user = users.find(
@@ -106,7 +106,7 @@ export default function SignInPage() {
           u.password === password
       );
 
-      console.log('Found user:', user); // Debug log
+      console.log("Found user:", user); // Debug log
 
       // Then check role
       if (user && user.role === role) {
@@ -119,19 +119,19 @@ export default function SignInPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     setIsLoading(true);
 
     // Basic validation
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       setIsLoading(false);
       return;
     }
 
     if (!validatePassword(password)) {
-      setError('Password must be at least 8 characters long');
+      setError("Password must be at least 8 characters long");
       setIsLoading(false);
       return;
     }
@@ -149,12 +149,12 @@ export default function SignInPage() {
           // Use a more diverse method to generate avatar numbers
           // Extract numeric portion of the ID if it exists, otherwise use character codes
           const idNum =
-            parseInt(user.id.replace(/[^\d]/g, '')) ||
+            parseInt(user.id.replace(/[^\d]/g, "")) ||
             user.id
-              .split('')
+              .split("")
               .reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
-          if (user.role === 'lecturer') {
+          if (user.role === "lecturer") {
             // For lecturers: ensure we use all 4 lecturer images (1-4)
             const lecturerIndex = (idNum % 4) + 1;
             avatarPath = `/lecturers/lecturer-${lecturerIndex}.jpg`;
@@ -167,7 +167,7 @@ export default function SignInPage() {
 
         // Store the current user in localStorage with avatar path
         localStorage.setItem(
-          'currentUser',
+          "currentUser",
           JSON.stringify({
             email: user.email,
             role: user.role,
@@ -177,31 +177,31 @@ export default function SignInPage() {
           })
         );
 
-        setSuccess('Sign in successful! Redirecting...');
+        setSuccess("Sign in successful! Redirecting...");
 
         // Redirect based on role
         setTimeout(() => {
-          if (user.role === 'tutor') {
-            router.push('/tutor');
-          } else if (user.role === 'lecturer') {
-            router.push('/lecturer');
+          if (user.role === "tutor") {
+            router.push("/tutor");
+          } else if (user.role === "lecturer") {
+            router.push("/lecturer");
           }
         }, 1000);
       } else {
-        setError('Invalid email or password for selected role');
-        console.log('Login failed for:', email, role); // Debug log
+        setError("Invalid email or password for selected role");
+        console.log("Login failed for:", email, role); // Debug log
       }
       setIsLoading(false);
     }, 1000);
   };
 
-  const handleRoleChange = (newRole: 'tutor' | 'lecturer') => {
+  const handleRoleChange = (newRole: "tutor" | "lecturer") => {
     setRole(newRole);
 
     // Set email domain based on role
-    if (email.includes('@')) {
-      const emailName = email.split('@')[0];
-      if (newRole === 'tutor') {
+    if (email.includes("@")) {
+      const emailName = email.split("@")[0];
+      if (newRole === "tutor") {
         setEmail(`${emailName}@tutor.edu.au`);
       } else {
         setEmail(`${emailName}@lecturer.edu.au`);
@@ -215,16 +215,16 @@ export default function SignInPage() {
     setEmail(emailInput);
 
     // If there's an @, check and suggest the proper domain
-    if (emailInput.includes('@')) {
-      const parts = emailInput.split('@');
+    if (emailInput.includes("@")) {
+      const parts = emailInput.split("@");
       if (
         parts.length === 2 &&
-        parts[1] !== (role === 'tutor' ? 'tutor.edu.au' : 'lecturer.edu.au')
+        parts[1] !== (role === "tutor" ? "tutor.edu.au" : "lecturer.edu.au")
       ) {
         if (parts[1].length > 0) {
           // Only suggest if user has typed something after @
           const suggestedEmail = `${parts[0]}@${
-            role === 'tutor' ? 'tutor.edu.au' : 'lecturer.edu.au'
+            role === "tutor" ? "tutor.edu.au" : "lecturer.edu.au"
           }`;
           // Update with correct domain format
           setEmail(suggestedEmail);
@@ -247,7 +247,7 @@ export default function SignInPage() {
             <form onSubmit={handleSubmit}>
               <h2
                 className="text-center text-2xl font-bold mb-6"
-                style={{ color: 'var(--color-primary)' }}
+                style={{ color: "var(--color-primary)" }}
               >
                 Welcome Back
               </h2>
@@ -264,7 +264,7 @@ export default function SignInPage() {
 
               <div className="mb-4 relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -313,22 +313,22 @@ export default function SignInPage() {
                   <div
                     className={`password-strength-meter ${
                       password.length < 4
-                        ? 'password-strength-very-weak'
+                        ? "password-strength-very-weak"
                         : password.length < 6
-                          ? 'password-strength-weak'
+                          ? "password-strength-weak"
                           : passwordStrength.length &&
                               passwordStrength.uppercase &&
                               passwordStrength.lowercase &&
                               passwordStrength.number &&
                               passwordStrength.special
-                            ? 'password-strength-strong'
+                            ? "password-strength-strong"
                             : passwordStrength.length &&
                                 (passwordStrength.uppercase ||
                                   passwordStrength.lowercase) &&
                                 (passwordStrength.number ||
                                   passwordStrength.special)
-                              ? 'password-strength-medium'
-                              : 'password-strength-weak'
+                              ? "password-strength-medium"
+                              : "password-strength-weak"
                     }`}
                   >
                     <div className="segment"></div>
@@ -339,41 +339,41 @@ export default function SignInPage() {
                   <div
                     className={`password-strength-text ${
                       password.length < 4
-                        ? 'password-strength-very-weak'
+                        ? "password-strength-very-weak"
                         : password.length < 6
-                          ? 'password-strength-weak'
+                          ? "password-strength-weak"
                           : passwordStrength.length &&
                               passwordStrength.uppercase &&
                               passwordStrength.lowercase &&
                               passwordStrength.number &&
                               passwordStrength.special
-                            ? 'password-strength-strong'
+                            ? "password-strength-strong"
                             : passwordStrength.length &&
                                 (passwordStrength.uppercase ||
                                   passwordStrength.lowercase) &&
                                 (passwordStrength.number ||
                                   passwordStrength.special)
-                              ? 'password-strength-medium'
-                              : 'password-strength-weak'
+                              ? "password-strength-medium"
+                              : "password-strength-weak"
                     }`}
                   >
                     {password.length < 4
-                      ? 'Very weak password'
+                      ? "Very weak password"
                       : password.length < 6
-                        ? 'Please use 6+ characters'
+                        ? "Please use 6+ characters"
                         : passwordStrength.length &&
                             passwordStrength.uppercase &&
                             passwordStrength.lowercase &&
                             passwordStrength.number &&
                             passwordStrength.special
-                          ? 'Strong password'
+                          ? "Strong password"
                           : passwordStrength.length &&
                               (passwordStrength.uppercase ||
                                 passwordStrength.lowercase) &&
                               (passwordStrength.number ||
                                 passwordStrength.special)
-                            ? 'Good password'
-                            : 'Weak password'}
+                            ? "Good password"
+                            : "Weak password"}
                   </div>
                 </>
               )}
@@ -383,17 +383,17 @@ export default function SignInPage() {
                 <div className="role-toggle-container">
                   <button
                     type="button"
-                    className={`role-btn ${role === 'tutor' ? 'active' : ''}`}
-                    onClick={() => handleRoleChange('tutor')}
+                    className={`role-btn ${role === "tutor" ? "active" : ""}`}
+                    onClick={() => handleRoleChange("tutor")}
                   >
                     Tutor
                   </button>
                   <button
                     type="button"
                     className={`role-btn ${
-                      role === 'lecturer' ? 'active' : ''
+                      role === "lecturer" ? "active" : ""
                     }`}
-                    onClick={() => handleRoleChange('lecturer')}
+                    onClick={() => handleRoleChange("lecturer")}
                   >
                     Lecturer
                   </button>
@@ -405,12 +405,12 @@ export default function SignInPage() {
                 className="sign-in-button"
                 disabled={isLoading}
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? "Signing in..." : "Sign In"}
               </button>
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
-                  Do not have an account?{' '}
+                  Do not have an account?{" "}
                   <Link
                     href="/signup"
                     className="text-primary font-medium hover:underline"

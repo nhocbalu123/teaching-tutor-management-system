@@ -1,6 +1,6 @@
-import React from 'react';
-import { TutorApplication } from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { motion } from 'framer-motion';
+import React from "react";
+import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { motion } from "framer-motion";
 
 /**
  * ApplicantList Component
@@ -81,7 +81,7 @@ const ApplicantList: React.FC<ApplicantListProps> = ({
             <motion.div
               key={application.id}
               className={`applicant-item ${
-                selectedApplication?.id === application.id ? 'selected' : ''
+                selectedApplication?.id === application.id ? "selected" : ""
               }`}
               onClick={() => onSelectApplication(application)}
               variants={itemVariants}
@@ -91,9 +91,9 @@ const ApplicantList: React.FC<ApplicantListProps> = ({
               {/* Applicant avatar with initials */}
               <div className="applicant-avatar">
                 {application.fullName
-                  .split(' ')
+                  .split(" ")
                   .map((n) => n[0])
-                  .join('')
+                  .join("")
                   .toUpperCase()}
               </div>
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import { TutorApplication } from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { motion, AnimatePresence } from 'framer-motion';
+import React from "react";
+import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { motion, AnimatePresence } from "framer-motion";
 
 interface RankedCandidatesProps {
   rankedApplications: TutorApplication[];
@@ -66,7 +66,7 @@ const RankedCandidates: React.FC<RankedCandidatesProps> = ({
         <p className="empty-rankings-text">
           {selectedCourse
             ? `No candidates have been ranked for ${selectedCourse} yet.`
-            : 'No candidates have been ranked yet.'}
+            : "No candidates have been ranked yet."}
         </p>
         <p className="empty-rankings-help">
           To rank candidates, select an applicant and click &quot;Add to
@@ -104,7 +104,7 @@ const RankedCandidates: React.FC<RankedCandidatesProps> = ({
                 {app.courses
                   .filter((c) => (selectedCourse ? c === selectedCourse : true))
                   .map((c) => c)
-                  .join(', ')}
+                  .join(", ")}
               </div>
               <div className="ranked-skills">
                 {app.skills.slice(0, 2).map((skill, idx) => (

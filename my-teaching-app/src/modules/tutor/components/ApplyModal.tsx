@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { CourseWithDetails } from '@/modules/core/utils/coursesUtils';
+import React, { useState, useEffect } from "react";
+import { CourseWithDetails } from "@/modules/core/utils/coursesUtils";
 import {
   TutorApplication,
   availableSkills,
-} from '@/modules/tutor/utils/tutorUtils';
-import SkillTag from '@/modules/tutor/components/SkillTag';
+} from "@/modules/tutor/utils/tutorUtils";
+import SkillTag from "@/modules/tutor/components/SkillTag";
 
 /**
  * Validation Rules for Tutor Application Form:
@@ -47,11 +47,11 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
   currentUserId,
 }) => {
   // State for form fields
-  const [previousRoles, setPreviousRoles] = useState('');
-  const [academicCredentials, setAcademicCredentials] = useState('');
+  const [previousRoles, setPreviousRoles] = useState("");
+  const [academicCredentials, setAcademicCredentials] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [showSkillInput, setShowSkillInput] = useState(false);
-  const [skillInput, setSkillInput] = useState('');
+  const [skillInput, setSkillInput] = useState("");
 
   // Validation error states
   const [errors, setErrors] = useState<{
@@ -84,20 +84,20 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
   const handleSkillInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
-    if (e.key === 'Enter' && skillInput.trim() !== '') {
+    if (e.key === "Enter" && skillInput.trim() !== "") {
       e.preventDefault();
       // Validate custom skill input
       if (skillInput.trim().length < 2) {
         setErrors((prev) => ({
           ...prev,
-          skills: 'Custom skills must be at least 2 characters long',
+          skills: "Custom skills must be at least 2 characters long",
         }));
         return;
       }
       if (selectedSkills.length >= 5) {
         setErrors((prev) => ({
           ...prev,
-          skills: 'Maximum 5 skills allowed',
+          skills: "Maximum 5 skills allowed",
         }));
         return;
       }
@@ -105,7 +105,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
       if (!/^[a-zA-Z0-9\s]+$/.test(skillInput.trim())) {
         setErrors((prev) => ({
           ...prev,
-          skills: 'Skills should only contain letters, numbers, and spaces',
+          skills: "Skills should only contain letters, numbers, and spaces",
         }));
         return;
       }
@@ -113,7 +113,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
         setSelectedSkills([...selectedSkills, skillInput.trim()]);
         setErrors((prev) => ({ ...prev, skills: undefined }));
       }
-      setSkillInput('');
+      setSkillInput("");
     }
   };
 
@@ -143,37 +143,37 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
 
     // Validate previous roles (optional field)
     const roles = previousRoles
-      .split('\n')
-      .filter((role) => role.trim() !== '');
+      .split("\n")
+      .filter((role) => role.trim() !== "");
     if (roles.length > 10) {
-      newErrors.previousRoles = 'Maximum 10 previous roles allowed';
+      newErrors.previousRoles = "Maximum 10 previous roles allowed";
     }
     // Check each role format
     for (const role of roles) {
       if (role.trim().length < 5) {
         newErrors.previousRoles =
-          'Each role must be at least 5 characters long';
+          "Each role must be at least 5 characters long";
         break;
       }
       // Basic format validation: should contain course code and year
       if (!/^[A-Z]+\d+.*\(\d{4}\)$/.test(role.trim())) {
         newErrors.previousRoles =
-          'Roles should follow format: COSC1111 Lab Assistant (2024)';
+          "Roles should follow format: COSC1111 Lab Assistant (2024)";
         break;
       }
     }
 
     // Validate academic credentials - only minimum length required
     if (!academicCredentials.trim()) {
-      newErrors.academicCredentials = 'Academic credentials are required';
+      newErrors.academicCredentials = "Academic credentials are required";
     } else if (academicCredentials.trim().length < 10) {
       newErrors.academicCredentials =
-        'Academic credentials must be at least 10 characters long';
+        "Academic credentials must be at least 10 characters long";
     }
 
     // Validate skills
     if (selectedSkills.length < 2) {
-      newErrors.skills = 'At least 2 skills are required';
+      newErrors.skills = "At least 2 skills are required";
     }
 
     setErrors(newErrors);
@@ -200,16 +200,16 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
     const application: TutorApplication = {
       id: Date.now().toString(), // Generate unique ID for new application
       userId: currentUserId,
-      email: '', // Will be populated from user data in saveApplication
-      fullName: '', // Will be populated from user data in saveApplication
+      email: "", // Will be populated from user data in saveApplication
+      fullName: "", // Will be populated from user data in saveApplication
       courses: [course.code],
       previousRoles: previousRoles
-        .split('\n')
-        .filter((role) => role.trim() !== ''),
+        .split("\n")
+        .filter((role) => role.trim() !== ""),
       availability: course.availability,
       skills: selectedSkills,
       academicCredentials: academicCredentials,
-      dateApplied: new Date().toISOString().split('T')[0],
+      dateApplied: new Date().toISOString().split("T")[0],
     };
 
     onSubmit(application);
@@ -298,7 +298,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
               onChange={(e) => setPreviousRoles(e.target.value)}
               placeholder="List your previous roles (one per line), e.g., COSC1111 Lab Assistant (2024)"
               className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary/20 apply-modal-input ${
-                errors.previousRoles ? 'border-red-500' : ''
+                errors.previousRoles ? "border-red-500" : ""
               }`}
               rows={3}
             />
@@ -327,7 +327,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
               onChange={(e) => setAcademicCredentials(e.target.value)}
               placeholder="Describe your academic background, degrees, certifications, etc."
               className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary/20 apply-modal-input ${
-                errors.academicCredentials ? 'border-red-500' : ''
+                errors.academicCredentials ? "border-red-500" : ""
               }`}
               rows={4}
               required
@@ -367,27 +367,27 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                   onKeyDown={handleSkillInputKeyDown}
                   placeholder="Type skill and press Enter"
                   className={`flex-1 p-2 border rounded-l-lg focus:ring-2 focus:ring-primary/20 apply-modal-input ${
-                    errors.skills ? 'border-red-500' : ''
+                    errors.skills ? "border-red-500" : ""
                   }`}
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    if (skillInput.trim() !== '') {
+                    if (skillInput.trim() !== "") {
                       // Validate custom skill input
                       if (skillInput.trim().length < 2) {
                         setErrors((prev) => ({
                           ...prev,
                           skills:
-                            'Custom skills must be at least 2 characters long',
+                            "Custom skills must be at least 2 characters long",
                         }));
                         return;
                       }
                       if (selectedSkills.length >= 5) {
                         setErrors((prev) => ({
                           ...prev,
-                          skills: 'Maximum 5 skills allowed',
+                          skills: "Maximum 5 skills allowed",
                         }));
                         return;
                       }
@@ -396,7 +396,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                         setErrors((prev) => ({
                           ...prev,
                           skills:
-                            'Skills should only contain letters, numbers, and spaces',
+                            "Skills should only contain letters, numbers, and spaces",
                         }));
                         return;
                       }
@@ -410,7 +410,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                           skills: undefined,
                         }));
                       }
-                      setSkillInput('');
+                      setSkillInput("");
                     } else {
                       setShowSkillInput(false);
                     }
@@ -465,7 +465,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                         if (selectedSkills.length >= 5) {
                           setErrors((prev) => ({
                             ...prev,
-                            skills: 'Maximum 5 skills allowed',
+                            skills: "Maximum 5 skills allowed",
                           }));
                           return;
                         }
@@ -477,7 +477,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                       }
                     }}
                     className={`popular-skill-button ${
-                      selectedSkills.includes(skill) ? 'opacity-50' : ''
+                      selectedSkills.includes(skill) ? "opacity-50" : ""
                     }`}
                     disabled={selectedSkills.includes(skill)}
                   >

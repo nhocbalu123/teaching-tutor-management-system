@@ -1,8 +1,8 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\layout\UserDropdown.tsx
 // src/components/layout/UserDropdown.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UserDropdownProps {
   user: {
@@ -35,11 +35,11 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
     } else {
       // Generate a consistent avatar number based on email
       const emailHash = user.email
-        .split('')
+        .split("")
         .reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
       // Use lecturer images if user is a lecturer
-      if (user.role === 'lecturer') {
+      if (user.role === "lecturer") {
         return `/lecturers/lecturer-${(emailHash % 4) + 1}.jpg`;
       }
 
@@ -63,9 +63,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -80,7 +80,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 500,
         damping: 30,
       },
@@ -96,9 +96,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   };
 
   // Split name into parts for styling
-  const nameParts = user.fullName.split(' ');
+  const nameParts = user.fullName.split(" ");
   const firstName = nameParts[0];
-  const lastName = nameParts.slice(1).join(' ');
+  const lastName = nameParts.slice(1).join(" ");
 
   return (
     <div className="user-dropdown-container" ref={dropdownRef}>
@@ -206,7 +206,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
                   </div>
 
                   <div
-                    className={`theme-toggle ${isDarkMode ? 'active' : ''}`}
+                    className={`theme-toggle ${isDarkMode ? "active" : ""}`}
                     onClick={onToggleDarkMode}
                     aria-label="Toggle dark mode"
                   >

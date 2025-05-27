@@ -114,23 +114,23 @@
   transition: all 0.3s ease;
 }
 
-.apply-modal button[type='submit'] {
+.apply-modal button[type="submit"] {
   background-color: var(--apply-modal-button-bg);
   color: white;
   transition: background-color 0.3s ease;
 }
 
-.apply-modal button[type='submit']:hover {
+.apply-modal button[type="submit"]:hover {
   background-color: var(--apply-modal-button-hover);
 }
 
-.apply-modal button[type='button'] {
+.apply-modal button[type="button"] {
   color: var(--apply-modal-text-primary);
   border-color: var(--apply-modal-border);
   transition: all 0.3s ease;
 }
 
-.apply-modal button[type='button']:hover {
+.apply-modal button[type="button"]:hover {
   background-color: var(--apply-modal-bg-secondary);
 }
 

@@ -134,14 +134,14 @@ The reorganized styles integrate seamlessly with the existing CSS architecture:
 
 ```css
 /* In globals.css */
-@import './organized-styles.css';
+@import "./organized-styles.css";
 
 /* In organized-styles.css */
-@import './base.css';
-@import './utilities.css';
-@import './components/modal.css';
-@import '../../home/styles/hero.css';
-@import '../../lecturer/styles/lecturer.css';
+@import "./base.css";
+@import "./utilities.css";
+@import "./components/modal.css";
+@import "../../home/styles/hero.css";
+@import "../../lecturer/styles/lecturer.css";
 ```
 
 ## Migration Notes

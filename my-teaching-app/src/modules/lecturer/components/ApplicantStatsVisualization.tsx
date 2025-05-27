@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { TutorApplication } from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { motion } from "framer-motion";
 import {
   PieChart,
   Pie,
@@ -15,7 +15,7 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-} from 'recharts';
+} from "recharts";
 
 interface ApplicantStatsVisualizationProps {
   applications: TutorApplication[];
@@ -85,16 +85,16 @@ const ApplicantStatsVisualization: React.FC<
 
   // Colors for charts
   const COLORS = [
-    '#0088FE',
-    '#00C49F',
-    '#FFBB28',
-    '#FF8042',
-    '#8884D8',
-    '#4CAF50',
-    '#FF5252',
-    '#9C27B0',
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884D8",
+    "#4CAF50",
+    "#FF5252",
+    "#9C27B0",
   ];
-  const SELECTION_COLORS = ['#00C49F', '#FF8042'];
+  const SELECTION_COLORS = ["#00C49F", "#FF8042"];
 
   // Function to process timeline data
   const processTimelineData = (apps: TutorApplication[]) => {
@@ -177,8 +177,8 @@ const ApplicantStatsVisualization: React.FC<
 
     // Prepare data for pie chart
     setSelectedData([
-      { name: 'Selected', value: selectedCount },
-      { name: 'Not Selected', value: notSelected },
+      { name: "Selected", value: selectedCount },
+      { name: "Not Selected", value: notSelected },
     ]);
 
     // Process course distribution
@@ -198,8 +198,8 @@ const ApplicantStatsVisualization: React.FC<
 
     // Process availability data
     const availabilityCount: Record<string, number> = {
-      'Full Time': 0,
-      'Part Time': 0,
+      "Full Time": 0,
+      "Part Time": 0,
     };
 
     applications.forEach((app) => {
@@ -228,7 +228,7 @@ const ApplicantStatsVisualization: React.FC<
 
     return Object.entries(applicantSelectionCount)
       .map(([name, count]) => ({
-        name: name.split(' ')[0], // Use first name only for better display
+        name: name.split(" ")[0], // Use first name only for better display
         count,
       }))
       .sort((a, b) => b.count - a.count)
@@ -468,7 +468,7 @@ const ApplicantStatsVisualization: React.FC<
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ display: 'none' }} />
+                <Legend wrapperStyle={{ display: "none" }} />
                 <Bar dataKey="count" name="Selection Count" fill="#8884d8">
                   {getTopApplicantsData().map((entry, index) => (
                     <Cell
@@ -517,7 +517,7 @@ const ApplicantStatsVisualization: React.FC<
                 <XAxis type="number" />
                 <YAxis dataKey="name" type="category" width={80} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ display: 'none' }} />
+                <Legend wrapperStyle={{ display: "none" }} />
                 <Bar dataKey="count" name="Applicants" fill="#8884d8">
                   {courseDistribution.map((entry, index) => (
                     <Cell
@@ -616,7 +616,7 @@ const ApplicantStatsVisualization: React.FC<
                   ? `${Math.round(
                       (applicantStats.selectedCount / applications.length) * 100
                     )}% of applicants have been selected.`
-                  : 'No applications yet.'}
+                  : "No applications yet."}
                 {applicantStats.selectedCount > 0 &&
                   ` That's ${applicantStats.selectedCount} out of ${applications.length} total applicants.`}
               </p>
@@ -645,7 +645,7 @@ const ApplicantStatsVisualization: React.FC<
               <p>
                 {courseDistribution.length > 0
                   ? `Most popular course: ${courseDistribution[0].name} with ${courseDistribution[0].count} applications.`
-                  : 'No course applications yet.'}
+                  : "No course applications yet."}
               </p>
             </div>
           </div>
@@ -672,7 +672,7 @@ const ApplicantStatsVisualization: React.FC<
               <p>
                 {applicantStats.mostChosen
                   ? `${applicantStats.mostChosen.name} leads with ${applicantStats.mostChosen.count} selections.`
-                  : 'No selections made yet.'}
+                  : "No selections made yet."}
               </p>
             </div>
           </div>
@@ -700,10 +700,10 @@ const ApplicantStatsVisualization: React.FC<
                 {availabilityData.length > 0
                   ? `${
                       availabilityData[0].value > availabilityData[1].value
-                        ? 'Full-time'
-                        : 'Part-time'
+                        ? "Full-time"
+                        : "Part-time"
                     } availability is preferred by applicants.`
-                  : 'No availability data yet.'}
+                  : "No availability data yet."}
               </p>
             </div>
           </div>

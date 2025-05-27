@@ -1,16 +1,16 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\__tests__\components\layout\Header.spec.tsx
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import Header from '@/modules/core/components/layout/Header';
-import { useRouter } from 'next/router';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import Header from "@/modules/core/components/layout/Header";
+import { useRouter } from "next/router";
 
 // Mock next/router
-jest.mock('next/router', () => ({
+jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
 // Mock next/image
-jest.mock('next/image', () => ({
+jest.mock("next/image", () => ({
   __esModule: true,
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -19,13 +19,13 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock UserDropdown component
-jest.mock('@/modules/core/components/layout/UserDropdown', () => {
+jest.mock("@/modules/core/components/layout/UserDropdown", () => {
   return function MockUserDropdown() {
     return <div data-testid="user-dropdown" />;
   };
 });
 
-describe('Header Component', () => {
+describe("Header Component", () => {
   // Setup common mocks
   const mockPush = jest.fn();
   const mockLocalStorage = {
@@ -39,18 +39,18 @@ describe('Header Component', () => {
 
     // Setup mocks for each test
     (useRouter as jest.Mock).mockReturnValue({
-      pathname: '/',
+      pathname: "/",
       push: mockPush,
     });
 
     // Mock localStorage
-    Object.defineProperty(window, 'localStorage', {
+    Object.defineProperty(window, "localStorage", {
       value: mockLocalStorage,
       writable: true,
     });
 
     // Mock scrollY
-    Object.defineProperty(window, 'scrollY', {
+    Object.defineProperty(window, "scrollY", {
       value: 0,
       writable: true,
     });
@@ -64,107 +64,107 @@ describe('Header Component', () => {
     };
 
     jest
-      .spyOn(document.documentElement.classList, 'add')
+      .spyOn(document.documentElement.classList, "add")
       .mockImplementation(classListMock.add);
     jest
-      .spyOn(document.documentElement.classList, 'remove')
+      .spyOn(document.documentElement.classList, "remove")
       .mockImplementation(classListMock.remove);
     jest
-      .spyOn(document.documentElement.classList, 'contains')
+      .spyOn(document.documentElement.classList, "contains")
       .mockImplementation(classListMock.contains);
     jest
-      .spyOn(document.documentElement.classList, 'toggle')
+      .spyOn(document.documentElement.classList, "toggle")
       .mockImplementation(classListMock.toggle);
   });
 
   // Test 1: Header renders logo
-  test('renders the logo with correct link', () => {
+  test("renders the logo with correct link", () => {
     mockLocalStorage.getItem.mockReturnValueOnce(null); // Not logged in
 
     render(<Header />);
 
-    const logoLink = screen.getByRole('link', { name: /logo/i });
+    const logoLink = screen.getByRole("link", { name: /logo/i });
     expect(logoLink).toBeInTheDocument();
-    expect(logoLink).toHaveAttribute('href', '/');
+    expect(logoLink).toHaveAttribute("href", "/");
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
   });
 
   // Test 2: Header renders nav links when not logged in
-  test('renders all navigation links when not logged in', () => {
+  test("renders all navigation links when not logged in", () => {
     mockLocalStorage.getItem.mockReturnValueOnce(null); // Not logged in
 
     render(<Header />);
 
-    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /tutor/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /lecturer/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /tutor/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /lecturer/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /sign up/i })).toBeInTheDocument();
   });
 
   // Test 3: Header shows Sign In / Sign Up buttons when not logged in
-  test('shows auth buttons when not logged in', () => {
+  test("shows auth buttons when not logged in", () => {
     mockLocalStorage.getItem.mockReturnValueOnce(null); // Not logged in
 
     render(<Header />);
 
-    const signInButton = screen.getByRole('link', { name: /sign in/i });
-    const signUpButton = screen.getByRole('link', { name: /sign up/i });
+    const signInButton = screen.getByRole("link", { name: /sign in/i });
+    const signUpButton = screen.getByRole("link", { name: /sign up/i });
 
     expect(signInButton).toBeInTheDocument();
-    expect(signInButton).toHaveAttribute('href', '/signin');
+    expect(signInButton).toHaveAttribute("href", "/signin");
     expect(signUpButton).toBeInTheDocument();
-    expect(signUpButton).toHaveAttribute('href', '/signup');
+    expect(signUpButton).toHaveAttribute("href", "/signup");
   });
 
   // Test 4: Header renders user dropdown when logged in
-  test('renders user dropdown when logged in', () => {
+  test("renders user dropdown when logged in", () => {
     // Mock logged in user data
     const mockUserData = JSON.stringify({
-      id: '123',
-      email: 'test@example.com',
-      role: 'tutor',
-      fullName: 'Test User',
+      id: "123",
+      email: "test@example.com",
+      role: "tutor",
+      fullName: "Test User",
     });
 
     mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'currentUser') return mockUserData;
-      if (key === 'darkMode') return 'false';
+      if (key === "currentUser") return mockUserData;
+      if (key === "darkMode") return "false";
       return null;
     });
 
     render(<Header />);
 
-    expect(screen.getByTestId('user-dropdown')).toBeInTheDocument();
+    expect(screen.getByTestId("user-dropdown")).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /sign in/i })
+      screen.queryByRole("link", { name: /sign in/i })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /sign up/i })
+      screen.queryByRole("link", { name: /sign up/i })
     ).not.toBeInTheDocument();
   });
 
   // Test 5: Header toggles dark mode
-  test('toggles dark mode when button is clicked', () => {
+  test("toggles dark mode when button is clicked", () => {
     mockLocalStorage.getItem.mockReturnValueOnce(null); // Not logged in
-    mockLocalStorage.getItem.mockReturnValueOnce('false'); // Dark mode off
+    mockLocalStorage.getItem.mockReturnValueOnce("false"); // Dark mode off
 
     // Create a spy specifically for classList.add
-    const addSpy = jest.spyOn(document.documentElement.classList, 'add');
+    const addSpy = jest.spyOn(document.documentElement.classList, "add");
 
     render(<Header />);
 
-    const darkModeButton = screen.getByRole('button', {
+    const darkModeButton = screen.getByRole("button", {
       name: /toggle dark mode/i,
     });
     fireEvent.click(darkModeButton);
 
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith('darkMode', 'true');
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith("darkMode", "true");
     expect(addSpy).toHaveBeenCalled();
   });
 
   // Test 6: Header changes style on scroll
-  test('adds scrolled class when scrolled down', () => {
+  test("adds scrolled class when scrolled down", () => {
     mockLocalStorage.getItem.mockReturnValueOnce(null); // Not logged in
 
     render(<Header />);
@@ -173,33 +173,33 @@ describe('Header Component', () => {
     window.scrollY = 20;
     fireEvent.scroll(window);
 
-    const header = screen.getByRole('banner');
-    expect(header).toHaveClass('scrolled');
+    const header = screen.getByRole("banner");
+    expect(header).toHaveClass("scrolled");
   });
 
   // Test 7: Header shows correct links based on user role
-  test('shows correct navigation links based on user role', () => {
+  test("shows correct navigation links based on user role", () => {
     // Mock logged in user data as lecturer
     const mockLecturerData = JSON.stringify({
-      id: '456',
-      email: 'lecturer@example.com',
-      role: 'lecturer',
-      fullName: 'Lecturer User',
+      id: "456",
+      email: "lecturer@example.com",
+      role: "lecturer",
+      fullName: "Lecturer User",
     });
 
     mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'currentUser') return mockLecturerData;
-      if (key === 'darkMode') return 'false';
+      if (key === "currentUser") return mockLecturerData;
+      if (key === "darkMode") return "false";
       return null;
     });
 
     const { unmount } = render(<Header />);
 
     // Lecturer should see Home and Lecturer links but not Tutor
-    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /lecturer/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /lecturer/i })).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /tutor/i })
+      screen.queryByRole("link", { name: /tutor/i })
     ).not.toBeInTheDocument();
 
     // Unmount and reset mocks for the next render
@@ -208,15 +208,15 @@ describe('Header Component', () => {
 
     // Now test with tutor role
     const mockTutorData = JSON.stringify({
-      id: '789',
-      email: 'tutor@example.com',
-      role: 'tutor',
-      fullName: 'Tutor User',
+      id: "789",
+      email: "tutor@example.com",
+      role: "tutor",
+      fullName: "Tutor User",
     });
 
     mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'currentUser') return mockTutorData;
-      if (key === 'darkMode') return 'false';
+      if (key === "currentUser") return mockTutorData;
+      if (key === "darkMode") return "false";
       return null;
     });
 
@@ -224,10 +224,10 @@ describe('Header Component', () => {
     render(<Header />);
 
     // Tutor should see Home and Tutor links but not Lecturer
-    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /tutor/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /home/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /tutor/i })).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /lecturer/i })
+      screen.queryByRole("link", { name: /lecturer/i })
     ).not.toBeInTheDocument();
   });
 });

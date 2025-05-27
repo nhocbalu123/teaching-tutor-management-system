@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
-import Image from 'next/image';
-import Layout from '@/modules/core/components/layout/Layout';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Head from "next/head";
+import Image from "next/image";
+import Layout from "@/modules/core/components/layout/Layout";
 import {
   CourseWithDetails,
   getCoursesWithDetails,
-} from '@/modules/core/utils/coursesUtils';
+} from "@/modules/core/utils/coursesUtils";
 import {
   TutorApplication,
   saveApplication,
-} from '@/modules/tutor/utils/tutorUtils';
-import CourseCard from '@/modules/tutor/components/CourseCard';
-import ApplyModal from '@/modules/tutor/components/ApplyModal';
-import { motion } from 'framer-motion';
+} from "@/modules/tutor/utils/tutorUtils";
+import CourseCard from "@/modules/tutor/components/CourseCard";
+import ApplyModal from "@/modules/tutor/components/ApplyModal";
+import { motion } from "framer-motion";
 
 interface UserData {
   id: string;
@@ -27,17 +27,17 @@ const TutorPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] =
     useState<CourseWithDetails | null>(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [userData, setUserData] = useState<UserData | null>(null);
   const [existingApplications, setExistingApplications] = useState<string[]>(
     []
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
-    'all' | 'applied' | 'available'
-  >('all');
+    "all" | "applied" | "available"
+  >("all");
   const router = useRouter();
 
   // Animation variants
@@ -58,7 +58,7 @@ const TutorPage: React.FC = () => {
       y: 0,
       opacity: 1,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 24,
       },
@@ -67,8 +67,8 @@ const TutorPage: React.FC = () => {
 
   // Get current user from localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const userJson = localStorage.getItem('currentUser');
+    if (typeof window !== "undefined") {
+      const userJson = localStorage.getItem("currentUser");
       if (userJson) {
         try {
           const user = JSON.parse(userJson);
@@ -80,7 +80,7 @@ const TutorPage: React.FC = () => {
           });
 
           // Get user's existing applications
-          const applications = localStorage.getItem('applications');
+          const applications = localStorage.getItem("applications");
           if (applications) {
             const parsed = JSON.parse(applications);
             const userApplications = parsed
@@ -91,11 +91,11 @@ const TutorPage: React.FC = () => {
             setExistingApplications(userApplications);
           }
         } catch (error) {
-          console.error('Error parsing user data:', error);
+          console.error("Error parsing user data:", error);
         }
       } else {
         // User not logged in, redirect to sign in
-        router.push('/signin');
+        router.push("/signin");
       }
       setIsLoading(false);
     }
@@ -121,9 +121,9 @@ const TutorPage: React.FC = () => {
       const isApplied = existingApplications.includes(course.code);
       let matchesApplicationFilter = true;
 
-      if (activeFilter === 'applied') {
+      if (activeFilter === "applied") {
         matchesApplicationFilter = isApplied;
-      } else if (activeFilter === 'available') {
+      } else if (activeFilter === "available") {
         matchesApplicationFilter = !isApplied;
       }
 
@@ -134,7 +134,7 @@ const TutorPage: React.FC = () => {
   const openApplyModal = (course: CourseWithDetails) => {
     // Check if user is logged in
     if (!userData) {
-      setErrorMessage('You must be logged in to apply for courses.');
+      setErrorMessage("You must be logged in to apply for courses.");
       return;
     }
 
@@ -155,7 +155,7 @@ const TutorPage: React.FC = () => {
 
   const handleSubmitApplication = (applicationData: TutorApplication) => {
     if (!userData) {
-      setErrorMessage('You must be logged in to apply for courses.');
+      setErrorMessage("You must be logged in to apply for courses.");
       return;
     }
 
@@ -175,14 +175,14 @@ const TutorPage: React.FC = () => {
 
       // Show success message
       setIsModalOpen(false);
-      setSuccessMessage('Your application has been submitted successfully!');
+      setSuccessMessage("Your application has been submitted successfully!");
 
       // Clear the success message after 3 seconds
       setTimeout(() => {
-        setSuccessMessage('');
+        setSuccessMessage("");
       }, 5000);
     } catch (error) {
-      setErrorMessage('Failed to submit your application. Please try again.');
+      setErrorMessage("Failed to submit your application. Please try again.");
       console.error(error);
     }
   };
@@ -214,7 +214,7 @@ const TutorPage: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            Find Your Perfect <span className="hero-highlight">Teaching</span>{' '}
+            Find Your Perfect <span className="hero-highlight">Teaching</span>{" "}
             Opportunity
           </motion.h1>
           <motion.p
@@ -271,35 +271,35 @@ const TutorPage: React.FC = () => {
             exit={{ opacity: 0, x: -100 }}
             transition={{ duration: 0.3 }}
             style={{
-              position: 'fixed',
-              bottom: '20px',
-              left: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              minWidth: '320px',
-              maxWidth: '600px',
-              width: 'auto',
-              padding: '1rem',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 10px #00000020',
+              position: "fixed",
+              bottom: "20px",
+              left: "20px",
+              display: "flex",
+              alignItems: "center",
+              minWidth: "320px",
+              maxWidth: "600px",
+              width: "auto",
+              padding: "1rem",
+              borderRadius: "0.75rem",
+              boxShadow: "0 4px 10px #00000020",
               zIndex: 9999,
-              backgroundColor: '#ecfdf5',
-              border: '1px solid #10b981',
+              backgroundColor: "#ecfdf5",
+              border: "1px solid #10b981",
             }}
           >
             <div
               className="message-icon success"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                marginRight: '1rem',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                marginRight: "1rem",
                 flexShrink: 0,
-                backgroundColor: '#d1fae5',
-                color: '#10b981',
+                backgroundColor: "#d1fae5",
+                color: "#10b981",
               }}
             >
               <svg
@@ -321,29 +321,29 @@ const TutorPage: React.FC = () => {
               className="message-content"
               style={{
                 flex: 1,
-                color: '#111827',
-                marginRight: '1rem',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                color: "#111827",
+                marginRight: "1rem",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               <p>{successMessage}</p>
             </div>
             <button
               className="message-close"
-              onClick={() => setSuccessMessage('')}
+              onClick={() => setSuccessMessage("")}
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#6b7280',
-                cursor: 'pointer',
-                padding: '0.5rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: '1rem',
+                background: "none",
+                border: "none",
+                color: "#6b7280",
+                cursor: "pointer",
+                padding: "0.5rem",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: "1rem",
               }}
             >
               <svg
@@ -370,35 +370,35 @@ const TutorPage: React.FC = () => {
             exit={{ opacity: 0, x: -100 }}
             transition={{ duration: 0.3 }}
             style={{
-              position: 'fixed',
-              bottom: '20px',
-              left: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              minWidth: '320px',
-              maxWidth: '600px',
-              width: 'auto',
-              padding: '1rem',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 10px #00000020',
+              position: "fixed",
+              bottom: "20px",
+              left: "20px",
+              display: "flex",
+              alignItems: "center",
+              minWidth: "320px",
+              maxWidth: "600px",
+              width: "auto",
+              padding: "1rem",
+              borderRadius: "0.75rem",
+              boxShadow: "0 4px 10px #00000020",
               zIndex: 9999,
-              backgroundColor: '#fef2f2',
-              border: '1px solid #ef4444',
+              backgroundColor: "#fef2f2",
+              border: "1px solid #ef4444",
             }}
           >
             <div
               className="message-icon error"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                marginRight: '1rem',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                marginRight: "1rem",
                 flexShrink: 0,
-                backgroundColor: '#fee2e2',
-                color: '#ef4444',
+                backgroundColor: "#fee2e2",
+                color: "#ef4444",
               }}
             >
               <svg
@@ -420,29 +420,29 @@ const TutorPage: React.FC = () => {
               className="message-content"
               style={{
                 flex: 1,
-                color: '#111827',
-                marginRight: '1rem',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                color: "#111827",
+                marginRight: "1rem",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               <p>{errorMessage}</p>
             </div>
             <button
               className="message-close"
-              onClick={() => setErrorMessage('')}
+              onClick={() => setErrorMessage("")}
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#6b7280',
-                cursor: 'pointer',
-                padding: '0.5rem',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: '1rem',
+                background: "none",
+                border: "none",
+                color: "#6b7280",
+                cursor: "pointer",
+                padding: "0.5rem",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: "1rem",
               }}
             >
               <svg
@@ -494,7 +494,7 @@ const TutorPage: React.FC = () => {
             {searchQuery && (
               <button
                 className="search-clear"
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery("")}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -516,25 +516,25 @@ const TutorPage: React.FC = () => {
           <div className="filter-pills">
             <button
               className={`filter-pill ${
-                activeFilter === 'all' ? 'active' : ''
+                activeFilter === "all" ? "active" : ""
               }`}
-              onClick={() => setActiveFilter('all')}
+              onClick={() => setActiveFilter("all")}
             >
               All Courses
             </button>
             <button
               className={`filter-pill ${
-                activeFilter === 'available' ? 'active' : ''
+                activeFilter === "available" ? "active" : ""
               }`}
-              onClick={() => setActiveFilter('available')}
+              onClick={() => setActiveFilter("available")}
             >
               Available
             </button>
             <button
               className={`filter-pill ${
-                activeFilter === 'applied' ? 'active' : ''
+                activeFilter === "applied" ? "active" : ""
               }`}
-              onClick={() => setActiveFilter('applied')}
+              onClick={() => setActiveFilter("applied")}
             >
               Applied
             </button>
@@ -580,10 +580,10 @@ const TutorPage: React.FC = () => {
             <h3>No courses found</h3>
             <p>
               {searchQuery
-                ? 'Try adjusting your search or filters'
-                : activeFilter === 'applied'
+                ? "Try adjusting your search or filters"
+                : activeFilter === "applied"
                   ? "You haven't applied to any courses yet"
-                  : 'No available courses at the moment'}
+                  : "No available courses at the moment"}
             </p>
           </div>
         )}
@@ -595,7 +595,7 @@ const TutorPage: React.FC = () => {
         course={selectedCourse}
         onClose={closeApplyModal}
         onSubmit={handleSubmitApplication}
-        currentUserId={userData?.id || ''}
+        currentUserId={userData?.id || ""}
       />
     </Layout>
   );

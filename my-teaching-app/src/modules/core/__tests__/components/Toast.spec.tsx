@@ -1,10 +1,10 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\__tests__\components\Toast.spec.tsx
-import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import Toast from '@/modules/core/components/Toast';
+import React from "react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import Toast from "@/modules/core/components/Toast";
 
 // Mock framer-motion to prevent animation issues
-jest.mock('framer-motion', () => {
+jest.mock("framer-motion", () => {
   return {
     motion: {
       div: ({
@@ -23,9 +23,9 @@ jest.mock('framer-motion', () => {
   };
 });
 
-describe('Toast Component', () => {
+describe("Toast Component", () => {
   // Test 1: Component renders with correct message
-  test('renders with the provided message', () => {
+  test("renders with the provided message", () => {
     const mockOnClose = jest.fn();
 
     render(
@@ -37,11 +37,11 @@ describe('Toast Component', () => {
       />
     );
 
-    expect(screen.getByText('Test message')).toBeInTheDocument();
+    expect(screen.getByText("Test message")).toBeInTheDocument();
   });
 
   // Test 2: Different toast types display correctly
-  test('renders with different types (success, error, info)', () => {
+  test("renders with different types (success, error, info)", () => {
     const mockOnClose = jest.fn();
 
     const { rerender } = render(
@@ -53,7 +53,7 @@ describe('Toast Component', () => {
       />
     );
 
-    expect(document.querySelector('.toast-success')).toBeInTheDocument();
+    expect(document.querySelector(".toast-success")).toBeInTheDocument();
 
     rerender(
       <Toast
@@ -64,7 +64,7 @@ describe('Toast Component', () => {
       />
     );
 
-    expect(document.querySelector('.toast-error')).toBeInTheDocument();
+    expect(document.querySelector(".toast-error")).toBeInTheDocument();
 
     rerender(
       <Toast
@@ -75,22 +75,22 @@ describe('Toast Component', () => {
       />
     );
 
-    expect(document.querySelector('.toast-info')).toBeInTheDocument();
+    expect(document.querySelector(".toast-info")).toBeInTheDocument();
   });
 
   // Test 3: Toast not rendered when visible is false
-  test('does not render when visible is false', () => {
+  test("does not render when visible is false", () => {
     const mockOnClose = jest.fn();
 
     render(
       <Toast message="Test message" visible={false} onClose={mockOnClose} />
     );
 
-    expect(screen.queryByText('Test message')).not.toBeInTheDocument();
+    expect(screen.queryByText("Test message")).not.toBeInTheDocument();
   });
 
   // Test 4: Close button calls onClose function
-  test('calls onClose when close button is clicked', () => {
+  test("calls onClose when close button is clicked", () => {
     const mockOnClose = jest.fn();
 
     render(
@@ -98,7 +98,7 @@ describe('Toast Component', () => {
     );
 
     // Find the close button by looking for an element with the close class
-    const closeButton = document.querySelector('.toast-close');
+    const closeButton = document.querySelector(".toast-close");
     expect(closeButton).toBeInTheDocument();
 
     if (closeButton) {
@@ -109,20 +109,20 @@ describe('Toast Component', () => {
   });
 
   // Test 5: Default type is 'success' when not specified
-  test('has default type of success when not specified', () => {
+  test("has default type of success when not specified", () => {
     const mockOnClose = jest.fn();
 
     render(
       <Toast message="Test message" visible={true} onClose={mockOnClose} />
     );
 
-    expect(document.querySelector('.toast-success')).toBeInTheDocument();
-    expect(document.querySelector('.toast-error')).not.toBeInTheDocument();
-    expect(document.querySelector('.toast-info')).not.toBeInTheDocument();
+    expect(document.querySelector(".toast-success")).toBeInTheDocument();
+    expect(document.querySelector(".toast-error")).not.toBeInTheDocument();
+    expect(document.querySelector(".toast-info")).not.toBeInTheDocument();
   });
 
   // Test 6: Auto closes after timeout
-  test('automatically closes after timeout', () => {
+  test("automatically closes after timeout", () => {
     jest.useFakeTimers();
     const mockOnClose = jest.fn();
 
@@ -143,7 +143,7 @@ describe('Toast Component', () => {
   });
 
   // Test 7: Cleans up timer on unmount
-  test('cleans up timer when unmounted', () => {
+  test("cleans up timer when unmounted", () => {
     jest.useFakeTimers();
     const mockOnClose = jest.fn();
 
@@ -151,7 +151,7 @@ describe('Toast Component', () => {
       <Toast message="Test message" visible={true} onClose={mockOnClose} />
     );
 
-    const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
+    const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
 
     unmount();
 

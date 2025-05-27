@@ -12,14 +12,14 @@
   list-style: none;
   width: min(60rem, 90%);
   margin-inline: auto;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   position: relative;
   padding: 2rem 0;
 }
 
 /* Timeline center line */
 .timeline-container::before {
-  content: '';
+  content: "";
   grid-column: 2;
   grid-row: 1 / span 20;
   background: rgba(225, 225, 225, 0.5);
@@ -107,7 +107,7 @@
 
 /* Header flap */
 .timeline-title::before {
-  content: '';
+  content: "";
   width: var(--inlineP);
   aspect-ratio: 1;
   background: var(--color-primary);
@@ -128,7 +128,7 @@
 
 /* Circle dot */
 .timeline-title::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 1.75rem;
   aspect-ratio: 1;
@@ -187,7 +187,7 @@
 
 .timeline-description::before,
 .timeline-features::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

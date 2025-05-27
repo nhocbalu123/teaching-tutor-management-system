@@ -1,21 +1,21 @@
 // Predefined skills for tutors
 export const availableSkills = [
-  'Java',
-  'Python',
-  'JavaScript',
-  'TypeScript',
-  'React',
-  'Angular',
-  'Node.js',
-  'C/C++',
-  'HTML/CSS',
-  'SQL',
-  'MongoDB',
-  'Express.js',
-  'Git',
-  'Docker',
-  'AWS',
-  'Azure',
+  "Java",
+  "Python",
+  "JavaScript",
+  "TypeScript",
+  "React",
+  "Angular",
+  "Node.js",
+  "C/C++",
+  "HTML/CSS",
+  "SQL",
+  "MongoDB",
+  "Express.js",
+  "Git",
+  "Docker",
+  "AWS",
+  "Azure",
 ];
 
 // Function to get random skills (2-3)
@@ -32,7 +32,7 @@ export interface TutorApplication {
   fullName: string;
   courses: string[];
   previousRoles: string[];
-  availability: 'Full Time' | 'Part Time';
+  availability: "Full Time" | "Part Time";
   skills: string[];
   academicCredentials: string;
   dateApplied: string;
@@ -46,7 +46,7 @@ export interface TutorApplication {
 
 // Reset all applications to unselected status
 export const resetAllApplicationsToUnselected = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     const updatedApplications = applications.map((app) => ({
       ...app,
@@ -57,15 +57,15 @@ export const resetAllApplicationsToUnselected = () => {
       rank: undefined,
       comment: undefined, // Remove all lecturer comments by default
     }));
-    localStorage.setItem('applications', JSON.stringify(updatedApplications));
+    localStorage.setItem("applications", JSON.stringify(updatedApplications));
   }
 };
 
 // Initialize empty applications in localStorage if not exist
 export const initializeApplications = () => {
-  if (typeof window !== 'undefined') {
-    if (!localStorage.getItem('applications')) {
-      localStorage.setItem('applications', JSON.stringify([]));
+  if (typeof window !== "undefined") {
+    if (!localStorage.getItem("applications")) {
+      localStorage.setItem("applications", JSON.stringify([]));
     } else {
       // Reset all applications to unselected status
       resetAllApplicationsToUnselected();
@@ -75,8 +75,8 @@ export const initializeApplications = () => {
 
 // Get all applications
 export const getApplications = (): TutorApplication[] => {
-  if (typeof window !== 'undefined') {
-    const applications = localStorage.getItem('applications');
+  if (typeof window !== "undefined") {
+    const applications = localStorage.getItem("applications");
     return applications ? JSON.parse(applications) : [];
   }
   return [];
@@ -84,7 +84,7 @@ export const getApplications = (): TutorApplication[] => {
 
 // Move tutors without assigned subjects to unselected status
 export const moveUnassignedTutorsToUnselected = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     let hasChanges = false;
 
@@ -102,21 +102,21 @@ export const moveUnassignedTutorsToUnselected = () => {
           selectedDate: undefined,
           selectedForCourses: undefined,
           comment:
-            app.comment || 'Moved to unselected due to no assigned subjects',
+            app.comment || "Moved to unselected due to no assigned subjects",
         };
       }
       return app;
     });
 
     if (hasChanges) {
-      localStorage.setItem('applications', JSON.stringify(updatedApplications));
+      localStorage.setItem("applications", JSON.stringify(updatedApplications));
     }
   }
 };
 
 // Save application
 export const saveApplication = (application: TutorApplication) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
 
     // Check if application with this ID already exists
@@ -130,7 +130,7 @@ export const saveApplication = (application: TutorApplication) => {
     } else {
       // Add new application with current date
       if (!application.dateApplied) {
-        application.dateApplied = new Date().toISOString().split('T')[0];
+        application.dateApplied = new Date().toISOString().split("T")[0];
       }
       // Ensure new applications are unselected and unranked by default
       const newApplication = {
@@ -145,10 +145,10 @@ export const saveApplication = (application: TutorApplication) => {
       applications.push(newApplication);
     }
 
-    localStorage.setItem('applications', JSON.stringify(applications));
+    localStorage.setItem("applications", JSON.stringify(applications));
 
     // Trigger a custom event to notify other components
-    const event = new CustomEvent('applicationUpdated', {
+    const event = new CustomEvent("applicationUpdated", {
       detail: application,
     });
     window.dispatchEvent(event);
@@ -159,7 +159,7 @@ export const saveApplication = (application: TutorApplication) => {
 
 // Get application by user ID
 export const getApplicationByUserId = (userId: string): TutorApplication[] => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     return applications.filter((app) => app.userId === userId);
   }
@@ -170,7 +170,7 @@ export const getApplicationByUserId = (userId: string): TutorApplication[] => {
 export const getApplicationById = (
   id: string
 ): TutorApplication | undefined => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     return applications.find((app) => app.id === id);
   }
@@ -179,7 +179,7 @@ export const getApplicationById = (
 
 // Get selected applications
 export const getSelectedApplications = (): TutorApplication[] => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     return applications.filter((app) => app.selected === true);
   }
@@ -190,7 +190,7 @@ export const getSelectedApplications = (): TutorApplication[] => {
 export const getApplicationsByCourse = (
   courseCode: string
 ): TutorApplication[] => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     return applications.filter((app) => app.courses.includes(courseCode));
   }
@@ -199,13 +199,13 @@ export const getApplicationsByCourse = (
 
 // Initialize detailed applications with mock data for demo purposes
 export const initializeDetailedApplications = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const applications = getApplications();
     if (applications.length === 0) {
       const mockApplications: TutorApplication[] = [];
 
       // Save empty applications to localStorage
-      localStorage.setItem('applications', JSON.stringify(mockApplications));
+      localStorage.setItem("applications", JSON.stringify(mockApplications));
     }
   }
 };

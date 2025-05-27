@@ -1,18 +1,18 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\Toast.tsx
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ToastProps {
   message: string;
   visible: boolean;
-  type?: 'success' | 'error' | 'info';
+  type?: "success" | "error" | "info";
   onClose: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({
   message,
   visible,
-  type = 'success',
+  type = "success",
   onClose,
 }) => {
   // Automatically close the toast after 3 seconds
@@ -88,21 +88,21 @@ const Toast: React.FC<ToastProps> = ({
           transition={{ duration: 0.3 }}
           style={{
             backgroundColor:
-              type === 'success'
-                ? '#ecfdf5'
-                : type === 'error'
-                  ? '#fef2f2'
-                  : type === 'info'
-                    ? '#eff6ff'
-                    : '#ffffff',
+              type === "success"
+                ? "#ecfdf5"
+                : type === "error"
+                  ? "#fef2f2"
+                  : type === "info"
+                    ? "#eff6ff"
+                    : "#ffffff",
             border: `1px solid ${
-              type === 'success'
-                ? '#10b981'
-                : type === 'error'
-                  ? '#ef4444'
-                  : type === 'info'
-                    ? '#3b82f6'
-                    : '#e5e7eb'
+              type === "success"
+                ? "#10b981"
+                : type === "error"
+                  ? "#ef4444"
+                  : type === "info"
+                    ? "#3b82f6"
+                    : "#e5e7eb"
             }`,
           }}
         >
@@ -110,32 +110,32 @@ const Toast: React.FC<ToastProps> = ({
             className="toast-icon"
             style={{
               backgroundColor:
-                type === 'success'
-                  ? '#d1fae5'
-                  : type === 'error'
-                    ? '#fee2e2'
-                    : type === 'info'
-                      ? '#dbeafe'
-                      : '#f3f4f6',
+                type === "success"
+                  ? "#d1fae5"
+                  : type === "error"
+                    ? "#fee2e2"
+                    : type === "info"
+                      ? "#dbeafe"
+                      : "#f3f4f6",
               color:
-                type === 'success'
-                  ? '#10b981'
-                  : type === 'error'
-                    ? '#ef4444'
-                    : type === 'info'
-                      ? '#3b82f6'
-                      : '#6b7280',
+                type === "success"
+                  ? "#10b981"
+                  : type === "error"
+                    ? "#ef4444"
+                    : type === "info"
+                      ? "#3b82f6"
+                      : "#6b7280",
             }}
           >
             {icons[type]}
           </div>
-          <div className="toast-content" style={{ color: '#111827' }}>
+          <div className="toast-content" style={{ color: "#111827" }}>
             {message}
           </div>
           <button
             className="toast-close"
             onClick={onClose}
-            style={{ color: '#6b7280' }}
+            style={{ color: "#6b7280" }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

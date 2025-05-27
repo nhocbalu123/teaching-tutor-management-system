@@ -1,6 +1,6 @@
-import React from 'react';
-import { TutorApplication } from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { motion } from 'framer-motion';
+import React from "react";
+import { TutorApplication } from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { motion } from "framer-motion";
 
 interface VisualStatsSummaryProps {
   applications: TutorApplication[];
@@ -27,9 +27,9 @@ const VisualStatsSummary: React.FC<VisualStatsSummaryProps> = ({
     }
   });
 
-  let mostSelectedName = '';
+  let mostSelectedName = "";
   let mostSelectedCount = 0;
-  let leastSelectedName = '';
+  let leastSelectedName = "";
   let leastSelectedCount = Infinity;
 
   Object.entries(applicantSelectionCounts).forEach(([name, count]) => {
@@ -45,8 +45,8 @@ const VisualStatsSummary: React.FC<VisualStatsSummaryProps> = ({
 
   // If no one is selected yet
   if (mostSelectedCount === 0) {
-    mostSelectedName = 'None';
-    leastSelectedName = 'None';
+    mostSelectedName = "None";
+    leastSelectedName = "None";
     leastSelectedCount = 0;
   }
 
@@ -59,7 +59,7 @@ const VisualStatsSummary: React.FC<VisualStatsSummaryProps> = ({
   });
 
   // Find most popular course
-  let popularCourse = '';
+  let popularCourse = "";
   let popularCourseCount = 0;
 
   Object.entries(courseDistribution).forEach(([course, count]) => {
@@ -147,23 +147,23 @@ const VisualStatsSummary: React.FC<VisualStatsSummaryProps> = ({
           <h4 className="stat-card-title">Most Selected</h4>
           <div className="stat-card-content">
             <div className="stat-applicant-avatar">
-              {mostSelectedName !== 'None'
+              {mostSelectedName !== "None"
                 ? mostSelectedName
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .toUpperCase()
-                : 'N/A'}
+                : "N/A"}
             </div>
             <div className="stat-details">
               <p className="stat-name">
-                {mostSelectedName !== 'None'
-                  ? mostSelectedName.split(' ')[0]
-                  : 'None'}
+                {mostSelectedName !== "None"
+                  ? mostSelectedName.split(" ")[0]
+                  : "None"}
               </p>
               <p className="stat-count">
                 {mostSelectedCount} selection
-                {mostSelectedCount !== 1 ? 's' : ''}
+                {mostSelectedCount !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
@@ -173,23 +173,23 @@ const VisualStatsSummary: React.FC<VisualStatsSummaryProps> = ({
           <h4 className="stat-card-title">Least Selected</h4>
           <div className="stat-card-content">
             <div className="stat-applicant-avatar blue">
-              {leastSelectedName !== 'None'
+              {leastSelectedName !== "None"
                 ? leastSelectedName
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .toUpperCase()
-                : 'N/A'}
+                : "N/A"}
             </div>
             <div className="stat-details">
               <p className="stat-name">
-                {leastSelectedName !== 'None'
-                  ? leastSelectedName.split(' ')[0]
-                  : 'None'}
+                {leastSelectedName !== "None"
+                  ? leastSelectedName.split(" ")[0]
+                  : "None"}
               </p>
               <p className="stat-count">
                 {leastSelectedCount} selection
-                {leastSelectedCount !== 1 ? 's' : ''}
+                {leastSelectedCount !== 1 ? "s" : ""}
               </p>
             </div>
           </div>

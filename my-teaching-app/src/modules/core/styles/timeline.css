@@ -30,14 +30,14 @@
   list-style: none;
   width: min(60rem, 90%);
   margin-inline: auto;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   position: relative;
   padding: 2rem 0;
 }
 
 /* Timeline center line */
 .timeline-container::before {
-  content: '';
+  content: "";
   grid-column: 2;
   grid-row: 1 / span 20;
   background: var(--timeline-line-color);
@@ -120,7 +120,7 @@
 
 /* Header flap */
 .timeline-title::before {
-  content: '';
+  content: "";
   width: var(--inlineP);
   aspect-ratio: 1;
   background: var(--accent-color-1);
@@ -141,7 +141,7 @@
 
 /* Circle dot */
 .timeline-title::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 1.75rem;
   aspect-ratio: 1;
@@ -208,7 +208,7 @@
 /* Card shadows */
 .timeline-description::before,
 .timeline-features::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 90%;
   height: 0.5rem;

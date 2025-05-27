@@ -1,7 +1,7 @@
-import React from 'react';
-import { CourseWithDetails } from '@/modules/core/utils/coursesUtils';
-import { availableSkills } from '@/modules/tutor/utils/tutorUtils';
-import { motion } from 'framer-motion';
+import React from "react";
+import { CourseWithDetails } from "@/modules/core/utils/coursesUtils";
+import { availableSkills } from "@/modules/tutor/utils/tutorUtils";
+import { motion } from "framer-motion";
 
 interface CourseCardProps {
   course: CourseWithDetails;
@@ -18,22 +18,22 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const getStatusInfo = () => {
     if (hasApplied) {
       return {
-        label: 'Applied',
-        bgColor: 'bg-green-100 dark:bg-green-900/30',
-        textColor: 'text-green-800 dark:text-green-300',
+        label: "Applied",
+        bgColor: "bg-green-100 dark:bg-green-900/30",
+        textColor: "text-green-800 dark:text-green-300",
       };
     }
 
     return {
       label: course.availability,
       bgColor:
-        course.availability === 'Full Time'
-          ? 'bg-blue-100 dark:bg-blue-900/30'
-          : 'bg-purple-100 dark:bg-purple-900/30',
+        course.availability === "Full Time"
+          ? "bg-blue-100 dark:bg-blue-900/30"
+          : "bg-purple-100 dark:bg-purple-900/30",
       textColor:
-        course.availability === 'Full Time'
-          ? 'text-blue-800 dark:text-blue-300'
-          : 'text-purple-800 dark:text-purple-300',
+        course.availability === "Full Time"
+          ? "text-blue-800 dark:text-blue-300"
+          : "text-purple-800 dark:text-purple-300",
     };
   };
 
@@ -74,10 +74,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <div className="role-tag">
           <div
             className={`role-icon ${
-              course.role === 'Tutor' ? 'tutor-role' : 'assistant-role'
+              course.role === "Tutor" ? "tutor-role" : "assistant-role"
             }`}
           >
-            {course.role === 'Tutor' ? (
+            {course.role === "Tutor" ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"

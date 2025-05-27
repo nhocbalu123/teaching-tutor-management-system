@@ -1,10 +1,10 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\home\pages\HomePage.tsx
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import Layout from '@/modules/core/components/layout/Layout'; // Updated import path
-import Head from 'next/head';
-import { lecturers } from '@/modules/lecturer/utils/lecturerUtils'; // Updated import path
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import Layout from "@/modules/core/components/layout/Layout"; // Updated import path
+import Head from "next/head";
+import { lecturers } from "@/modules/lecturer/utils/lecturerUtils"; // Updated import path
 
 export default function HomePage() {
   // Renamed component
@@ -14,8 +14,8 @@ export default function HomePage() {
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      if (typeof window !== 'undefined') {
-        const user = localStorage.getItem('currentUser');
+      if (typeof window !== "undefined") {
+        const user = localStorage.getItem("currentUser");
         if (user) {
           const userData = JSON.parse(user);
           setIsLoggedIn(true);
@@ -32,17 +32,17 @@ export default function HomePage() {
 
   const openModal = (lecturerId: string): void => {
     setActiveModal(lecturerId);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = (): void => {
     setActiveModal(null);
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   };
 
   // Close modal when clicking outside
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-    if ((e.target as HTMLElement).classList.contains('modal-overlay')) {
+    if ((e.target as HTMLElement).classList.contains("modal-overlay")) {
       closeModal();
     }
   };
@@ -50,14 +50,14 @@ export default function HomePage() {
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModal();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
@@ -176,7 +176,7 @@ export default function HomePage() {
                       <p
                         className="text-gray-800 dark:text-gray-300 font-medium"
                         style={{
-                          color: 'var(--color-text-primary)',
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         Active Users
@@ -249,19 +249,19 @@ export default function HomePage() {
         <section
           className="section py-16"
           id="tutors-info"
-          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+          style={{ backgroundColor: "var(--color-bg-secondary)" }}
         >
           <div className="container mx-auto">
             <div className="max-w-5xl mx-auto">
               <h2
                 className="text-4xl font-bold mb-4 text-center"
-                style={{ color: 'var(--color-primary)' }}
+                style={{ color: "var(--color-primary)" }}
               >
                 For Tutor Applicants
               </h2>
               <p
                 className="text-center text-lg mb-12 max-w-3xl mx-auto"
-                style={{ color: 'var(--color-text-primary)' }}
+                style={{ color: "var(--color-text-primary)" }}
               >
                 Join our team of exceptional tutors and help shape the next
                 generation of computer science professionals. Follow these
@@ -347,7 +347,7 @@ export default function HomePage() {
                     >
                       Apply as a Tutor
                     </Link>
-                  ) : userRole === 'tutor' ? (
+                  ) : userRole === "tutor" ? (
                     <Link
                       href="/tutor"
                       className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg"
@@ -364,7 +364,7 @@ export default function HomePage() {
         {/* Lecturer Section */}
         <section
           className="section py-16"
-          style={{ backgroundColor: 'var(--color-bg-primary)' }}
+          style={{ backgroundColor: "var(--color-bg-primary)" }}
         >
           <div className="container mx-auto">
             <div className="max-w-6xl mx-auto">
@@ -416,7 +416,7 @@ export default function HomePage() {
                 <div
                   key={`${lecturer.id}-modal`}
                   className={`modal-overlay ${
-                    activeModal === lecturer.id ? 'active' : ''
+                    activeModal === lecturer.id ? "active" : ""
                   }`}
                   onClick={handleOverlayClick}
                 >

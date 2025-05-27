@@ -1,67 +1,67 @@
 // filepath: c:\\s3978302\\Full Stack Development\\s3959931-s3978302-a2\\my-teaching-app\\src\\modules\\lecturer\\pages\\LecturerPage.tsx
 // src/pages/lecturer/index.tsx
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Layout from '@/modules/core/components/layout/Layout'; // Updated import path
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Layout from "@/modules/core/components/layout/Layout"; // Updated import path
 import {
   TutorApplication,
   getApplications,
   saveApplication,
   initializeDetailedApplications,
-} from '@/modules/tutor/utils/tutorUtils'; // Updated import path
-import { availableCourses } from '@/modules/core/utils/coursesUtils'; // Updated import path
-import Head from 'next/head';
-import ApplicantList from '@/modules/lecturer/components/ApplicantList'; // Updated import path
-import ApplicantDetails from '@/modules/lecturer/components/ApplicantDetails'; // Updated import path
-import RankedCandidates from '@/modules/lecturer/components/RankedCandidates'; // Updated import path
-import ApplicantStatsVisualization from '@/modules/lecturer/components/ApplicantStatsVisualization'; // Updated import path
-import Toast from '@/modules/core/components/Toast';
-import { motion } from 'framer-motion';
+} from "@/modules/tutor/utils/tutorUtils"; // Updated import path
+import { availableCourses } from "@/modules/core/utils/coursesUtils"; // Updated import path
+import Head from "next/head";
+import ApplicantList from "@/modules/lecturer/components/ApplicantList"; // Updated import path
+import ApplicantDetails from "@/modules/lecturer/components/ApplicantDetails"; // Updated import path
+import RankedCandidates from "@/modules/lecturer/components/RankedCandidates"; // Updated import path
+import ApplicantStatsVisualization from "@/modules/lecturer/components/ApplicantStatsVisualization"; // Updated import path
+import Toast from "@/modules/core/components/Toast";
+import { motion } from "framer-motion";
 
 export default function LecturerPage() {
   // Existing state and hooks
   const router = useRouter();
   const [applications, setApplications] = useState<TutorApplication[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<string>('');
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [selectedApplication, setSelectedApplication] =
     useState<TutorApplication | null>(null);
-  const [comment, setComment] = useState<string>('');
+  const [comment, setComment] = useState<string>("");
   const [rankedApplications, setRankedApplications] = useState<
     TutorApplication[]
   >([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortBy, setSortBy] = useState<string>('none');
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("none");
   const [activeTab, setActiveTab] = useState<
-    'applications' | 'rankings' | 'stats'
-  >('applications');
-  const [lecturerName, setLecturerName] = useState<string>('');
-  const [currentLecturerId, setCurrentLecturerId] = useState<string>('');
+    "applications" | "rankings" | "stats"
+  >("applications");
+  const [lecturerName, setLecturerName] = useState<string>("");
+  const [currentLecturerId, setCurrentLecturerId] = useState<string>("");
 
   // Toast notification state
   const [toast, setToast] = useState({
     visible: false,
-    message: '',
-    type: 'success' as 'success' | 'error' | 'info',
+    message: "",
+    type: "success" as "success" | "error" | "info",
   });
 
   // Check if user is logged in and has lecturer role
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('currentUser');
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("currentUser");
 
       if (!user) {
-        router.push('/signin');
+        router.push("/signin");
         return;
       }
 
       const userData = JSON.parse(user);
 
-      if (userData.role !== 'lecturer') {
-        router.push('/signin');
+      if (userData.role !== "lecturer") {
+        router.push("/signin");
         return;
       }
 
-      setLecturerName(userData.fullName || 'Lecturer');
+      setLecturerName(userData.fullName || "Lecturer");
 
       // Initialize applications
       initializeDetailedApplications();
@@ -80,7 +80,7 @@ export default function LecturerPage() {
 
     // Listen for storage events (when another tab makes changes)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'applications') {
+      if (e.key === "applications") {
         loadApplications();
       }
     };
@@ -90,15 +90,15 @@ export default function LecturerPage() {
       loadApplications();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('applicationUpdated', handleApplicationUpdate);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("applicationUpdated", handleApplicationUpdate);
 
     // Check for updates periodically (every 5 seconds)
     const intervalId = setInterval(loadApplications, 5000);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('applicationUpdated', handleApplicationUpdate);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("applicationUpdated", handleApplicationUpdate);
       clearInterval(intervalId);
     };
   }, []);
@@ -107,7 +107,7 @@ export default function LecturerPage() {
   useEffect(() => {
     // If switching to rankings tab and no course is selected, select the first available course
     if (
-      activeTab === 'rankings' &&
+      activeTab === "rankings" &&
       !selectedCourse &&
       availableCourses.length > 0
     ) {
@@ -118,7 +118,7 @@ export default function LecturerPage() {
   // Show toast notification
   const showToast = (
     message: string,
-    type: 'success' | 'error' | 'info' = 'success'
+    type: "success" | "error" | "info" = "success"
   ) => {
     setToast({
       visible: true,
@@ -179,11 +179,11 @@ export default function LecturerPage() {
 
   // Sort filtered applications
   const sortedApplications = [...filteredApplications].sort((a, b) => {
-    if (sortBy === 'none') return 0;
-    if (sortBy === 'name') return a.fullName.localeCompare(b.fullName);
-    if (sortBy === 'availability')
+    if (sortBy === "none") return 0;
+    if (sortBy === "name") return a.fullName.localeCompare(b.fullName);
+    if (sortBy === "availability")
       return a.availability.localeCompare(b.availability);
-    if (sortBy === 'date') {
+    if (sortBy === "date") {
       return (
         new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime()
       );
@@ -193,7 +193,7 @@ export default function LecturerPage() {
 
   const handleSelectApplication = (application: TutorApplication) => {
     setSelectedApplication(application);
-    setComment(application.comment || '');
+    setComment(application.comment || "");
   };
 
   const handleSaveComment = (/* selectedCourses: string[] */) => {
@@ -206,7 +206,7 @@ export default function LecturerPage() {
       saveApplication(updatedApplication);
       setApplications(getApplications()); // Refresh applications list
       setSelectedApplication(updatedApplication); // Update the selected application state
-      showToast('Comment saved!', 'success'); // Add a toast for comment saving
+      showToast("Comment saved!", "success"); // Add a toast for comment saving
     }
   };
 
@@ -214,13 +214,13 @@ export default function LecturerPage() {
     if (selectedApplication) {
       const updatedApplication = {
         ...selectedApplication,
-        comment: '',
+        comment: "",
       };
       saveApplication(updatedApplication);
       setApplications(getApplications()); // Refresh applications list
       setSelectedApplication(updatedApplication); // Update the selected application state
-      setComment(''); // Clear comment in the input field
-      showToast('Comment deleted!', 'success');
+      setComment(""); // Clear comment in the input field
+      showToast("Comment deleted!", "success");
     }
   };
 
@@ -230,14 +230,14 @@ export default function LecturerPage() {
         ...selectedApplication,
         selected: true,
         selectedBy: currentLecturerId,
-        selectedDate: new Date().toISOString().split('T')[0],
+        selectedDate: new Date().toISOString().split("T")[0],
         selectedForCourses: selectedCourses,
         // comment: comment, // Comment is now saved by handleSaveComment
       };
       saveApplication(updatedApplication);
       setApplications(getApplications());
       setSelectedApplication(updatedApplication);
-      showToast('Applicant selected successfully!', 'success');
+      showToast("Applicant selected successfully!", "success");
     }
   };
 
@@ -254,7 +254,7 @@ export default function LecturerPage() {
       saveApplication(updatedApplication);
       setApplications(getApplications());
       setSelectedApplication(updatedApplication);
-      showToast('Applicant unselected successfully!', 'success');
+      showToast("Applicant unselected successfully!", "success");
     }
   };
 
@@ -264,16 +264,16 @@ export default function LecturerPage() {
     // Check if a comment has been made and saved
     if (!selectedApplication.comment) {
       showToast(
-        'Please add and save a comment before adding to ranking.',
-        'error'
+        "Please add and save a comment before adding to ranking.",
+        "error"
       );
       return;
     }
 
     // Check if there's an unsaved comment (current comment differs from saved comment)
-    const hasUnsavedComment = comment !== (selectedApplication.comment || '');
+    const hasUnsavedComment = comment !== (selectedApplication.comment || "");
     if (hasUnsavedComment) {
-      showToast('Please save your comment before adding to ranking.', 'error');
+      showToast("Please save your comment before adding to ranking.", "error");
       return;
     }
 
@@ -294,7 +294,7 @@ export default function LecturerPage() {
     loadApplications();
 
     // Show toast notification
-    showToast('Applicant added to ranking successfully!');
+    showToast("Applicant added to ranking successfully!");
   };
 
   const handleMoveUp = (application: TutorApplication) => {
@@ -372,7 +372,7 @@ export default function LecturerPage() {
     loadApplications();
 
     // Show toast notification
-    showToast(`Removed ${application.fullName} from rankings`, 'info');
+    showToast(`Removed ${application.fullName} from rankings`, "info");
   };
 
   // Dashboard stats
@@ -500,9 +500,9 @@ export default function LecturerPage() {
           <div className="dashboard-tabs">
             <button
               className={`tab-button ${
-                activeTab === 'applications' ? 'active' : ''
+                activeTab === "applications" ? "active" : ""
               }`}
-              onClick={() => setActiveTab('applications')}
+              onClick={() => setActiveTab("applications")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -522,9 +522,9 @@ export default function LecturerPage() {
             </button>
             <button
               className={`tab-button ${
-                activeTab === 'rankings' ? 'active' : ''
+                activeTab === "rankings" ? "active" : ""
               }`}
-              onClick={() => setActiveTab('rankings')}
+              onClick={() => setActiveTab("rankings")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -543,8 +543,8 @@ export default function LecturerPage() {
               Rankings
             </button>
             <button
-              className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
-              onClick={() => setActiveTab('stats')}
+              className={`tab-button ${activeTab === "stats" ? "active" : ""}`}
+              onClick={() => setActiveTab("stats")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -567,7 +567,7 @@ export default function LecturerPage() {
           {/* Tab Content */}
           <div className="dashboard-content">
             {/* Applications Tab */}
-            {activeTab === 'applications' && (
+            {activeTab === "applications" && (
               <motion.div
                 className="applications-tab"
                 initial={{ opacity: 0 }}
@@ -603,7 +603,7 @@ export default function LecturerPage() {
                       {searchQuery && (
                         <button
                           className="search-clear"
-                          onClick={() => setSearchQuery('')}
+                          onClick={() => setSearchQuery("")}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -685,7 +685,7 @@ export default function LecturerPage() {
             )}
 
             {/* Rankings Tab */}
-            {activeTab === 'rankings' && (
+            {activeTab === "rankings" && (
               <motion.div
                 className="rankings-tab"
                 initial={{ opacity: 0 }}
@@ -746,7 +746,7 @@ export default function LecturerPage() {
             )}
 
             {/* Analytics Tab */}
-            {activeTab === 'stats' && (
+            {activeTab === "stats" && (
               <motion.div
                 className="analytics-tab"
                 initial={{ opacity: 0 }}

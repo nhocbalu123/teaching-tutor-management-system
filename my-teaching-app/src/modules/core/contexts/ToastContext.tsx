@@ -1,18 +1,18 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\contexts\ToastContext.tsx
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ToastProps {
   message: string;
   visible: boolean;
-  type?: 'success' | 'error' | 'info';
+  type?: "success" | "error" | "info";
   onClose: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({
   message,
   visible,
-  type = 'success',
+  type = "success",
   onClose,
 }) => {
   // Automatically close the toast after 3 seconds
@@ -85,7 +85,7 @@ const Toast: React.FC<ToastProps> = ({
           initial={{ opacity: 0, y: 50, x: -50 }}
           animate={{ opacity: 1, y: 0, x: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
         >
           <div className="toast-icon">{icons[type]}</div>
           <div className="toast-content">{message}</div>
