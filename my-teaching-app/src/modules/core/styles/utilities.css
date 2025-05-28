@@ -117,7 +117,7 @@
   color: var(--color-primary);
 }
 
-/* Footer link styles */
+/* Footer link styles Commented out as they are not used by the current Footer.tsx
 .hover-link {
   color: var(--color-text-secondary);
   transition: color 0.2s ease;
@@ -126,3 +126,4 @@
 .hover-link:hover {
   color: var(--color-primary);
 }
+*/

@@ -1,16 +1,9 @@
-// filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\layout\Footer.tsx
 import React from "react";
+import styles from "./footer.module.css";
 
 const Footer = () => {
   return (
-    <footer
-      className="py-12 mt-auto"
-      style={{
-        backgroundColor: "var(--color-bg-secondary)",
-        color: "var(--color-text-secondary)",
-        borderTop: "1px solid var(--color-border)",
-      }}
-    >
+    <footer className={`${styles.footer} py-12 mt-auto`}>
       <div className="container mx-auto px-6">
         {/* Main Navigation Links */}
         <div className="flex flex-wrap justify-center space-x-6 mb-6">

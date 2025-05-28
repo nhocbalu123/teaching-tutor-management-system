@@ -1,3 +1,7 @@
+import "@/shared/styles/globals.css";
+import Header from "@/shared/components/layout/header/header";
+import Footer from "@/shared/components/layout/footer/footer";
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +9,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* <GlobalContextProvider> */}
+        <Header />
+        {children}
+        <Footer />
+        {/* </GlobalContextProvider> */}
+      </body>
     </html>
   );
 }

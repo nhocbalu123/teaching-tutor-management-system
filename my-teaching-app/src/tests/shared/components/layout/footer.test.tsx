@@ -1,7 +1,7 @@
-// filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\__tests__\components\layout\Footer.spec.tsx
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Footer from "@/modules/core/components/layout/Footer";
+import Footer from "@/shared/components/layout/footer/footer"; // Updated import path
+import styles from "@/shared/components/layout/footer/footer.module.css"; // Import CSS module
 
 describe("Footer Component", () => {
   // Test 1: Footer renders with main navigation links
@@ -41,16 +41,16 @@ describe("Footer Component", () => {
     ).toBeInTheDocument();
   });
 
-  // Test 4: Footer container has correct styling props
-  test("footer has correct styling props", () => {
+  // Test 4: Footer container has correct base class from CSS module
+  test("footer has correct base class", () => {
     render(<Footer />);
-
     const footerElement = screen.getByRole("contentinfo");
-    expect(footerElement).toHaveStyle({
-      backgroundColor: "var(--color-bg-secondary)",
-      color: "var(--color-text-secondary)",
-      borderTop: "1px solid var(--color-border)",
-    });
+    // Check if the specific class from footer.module.css is applied.
+    // This assumes Jest is configured to handle CSS module imports (e.g., mapping them to class names).
+    expect(footerElement).toHaveClass(styles.footer);
+    // We can also keep checks for Tailwind classes if they are part of the base structure
+    expect(footerElement).toHaveClass("py-12"); // Example: if py-12 is always expected
+    expect(footerElement).toHaveClass("mt-auto"); // Example: if mt-auto is always expected
   });
 
   // Test 5: Social media links have SVG icons
