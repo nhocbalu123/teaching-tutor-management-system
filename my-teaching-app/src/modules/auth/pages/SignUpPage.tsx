@@ -2,7 +2,6 @@
 // src/pages/signup.tsx
 import React from "react";
 import Link from "next/link";
-import Layout from "@/modules/core/components/layout/Layout";
 import Head from "next/head";
 
 export default function SignUpPage() {
@@ -11,7 +10,7 @@ export default function SignUpPage() {
       <Head>
         <title>TeachTeam - Sign Up</title>
       </Head>
-      <Layout>
+      <main className="flex-grow pt-24">
         <div className="flex items-center justify-center py-16">
           <div className="circle-form">
             <div className="alert alert-info bg-blue-100 border border-blue-500 text-blue-800">
@@ -101,7 +100,7 @@ export default function SignUpPage() {
             </form>
           </div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 }

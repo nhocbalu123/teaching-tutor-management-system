@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
-import UserDropdown from "@/modules/core/components/layout/UserDropdown";
+import UserDropdown from "../user-dropdown";
 import styles from "./header.module.css";
 
 // Define a proper type for user data

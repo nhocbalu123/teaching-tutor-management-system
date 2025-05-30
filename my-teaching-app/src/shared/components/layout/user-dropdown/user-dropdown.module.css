@@ -1,29 +1,29 @@
-/* User Dropdown Styles */
-.user-dropdown-container {
+/* User Dropdown Container */
+.userDropdownContainer {
   position: relative;
   z-index: 50;
 }
 
 /* Avatar Button */
-.avatar-button {
+.avatarButton {
   cursor: pointer;
   position: relative;
 }
 
-.avatar-wrapper {
+.avatarWrapper {
   position: relative;
 }
 
-.avatar-content {
+.avatarContent {
   position: relative;
   transition: transform 0.3s ease;
 }
 
-.avatar-button:hover .avatar-content {
+.avatarButton:hover .avatarContent {
   transform: scale(1.05);
 }
 
-.avatar-image {
+.avatarImage {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -33,14 +33,14 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.avatar-button:hover .avatar-image {
+.avatarButton:hover .avatarImage {
   border-color: var(--color-secondary);
   box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
   animation: pulse 1.5s infinite;
 }
 
 /* Avatar connector */
-.avatar-connector {
+.avatarConnector {
   position: absolute;
   bottom: calc(35px / 2 * (-1));
   left: 50%;
@@ -54,7 +54,7 @@
   opacity: 1;
 }
 
-.avatar-connector-2 {
+.avatarConnector2 {
   position: absolute;
   bottom: calc(35px / 2 * (-1));
   left: 50%;
@@ -68,25 +68,16 @@
 }
 
 /* Dark mode support for the connector */
-.dark .avatar-connector {
+:global(.dark) .avatarConnector {
   border-bottom-color: #403432;
 }
 
-.dark .avatar-connector-2 {
+:global(.dark) .avatarConnector2 {
   border-bottom-color: #374151;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 /* Dropdown Menu */
-.user-dropdown-menu {
+.userDropdownMenu {
   position: absolute;
   top: 55px;
   right: -10px;
@@ -97,10 +88,12 @@
   border: 1px solid var(--color-border);
   overflow: hidden;
   z-index: 50;
+  opacity: 0;
+  animation: fadeIn 0.2s ease forwards;
 }
 
 /* Dropdown Header */
-.dropdown-header {
+.dropdownHeader {
   position: relative;
   display: flex;
   align-items: center;
@@ -113,7 +106,7 @@
   );
 }
 
-.dropdown-avatar {
+.dropdownAvatar {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -123,12 +116,12 @@
   margin-right: 16px;
 }
 
-.user-info {
+.userInfo {
   flex: 1;
   min-width: 0;
 }
 
-.user-name {
+.userName {
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0 0 2px 0;
@@ -138,15 +131,15 @@
   text-overflow: ellipsis;
 }
 
-.first-name {
+.firstName {
   color: var(--color-primary);
 }
 
-.last-name {
+.lastName {
   color: var(--color-text-primary);
 }
 
-.user-email {
+.userEmail {
   font-size: 0.85rem;
   color: var(--color-text-secondary);
   margin: 0 0 4px 0;
@@ -155,7 +148,7 @@
   text-overflow: ellipsis;
 }
 
-.user-role {
+.userRole {
   display: inline-block;
   font-size: 0.7rem;
   padding: 2px 8px;
@@ -165,7 +158,7 @@
   text-transform: capitalize;
 }
 
-.close-button {
+.closeButton {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -181,18 +174,23 @@
   transition: all 0.2s ease;
 }
 
-.close-button:hover {
+.closeButton:hover {
   background-color: rgba(0, 0, 0, 0.05);
   color: var(--color-text-primary);
 }
 
+.closeIcon {
+  width: 20px;
+  height: 20px;
+}
+
 /* Dropdown Content */
-.dropdown-content {
+.dropdownContent {
   padding: 16px;
 }
 
 /* Actions Row - Dark Mode and Sign Out on same row */
-.actions-row {
+.actionsRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -200,7 +198,7 @@
 }
 
 /* Theme Toggle */
-.theme-toggle-container {
+.themeToggleContainer {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -212,40 +210,29 @@
   animation: fadeInUp 0.3s ease;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.theme-toggle-label {
+.themeToggleLabel {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.theme-icon {
+.themeIcon {
   width: 20px;
   height: 20px;
   color: var(--color-text-secondary);
 }
 
-.theme-icon.light {
+.lightIcon {
   color: #fbbf24;
   stroke: #fbbf24;
 }
 
-.theme-icon.dark {
+.darkIcon {
   display: none;
   color: #6366f1;
 }
 
-.theme-toggle {
+.themeToggle {
   position: relative;
   width: 44px;
   height: 22px;
@@ -255,11 +242,11 @@
   transition: background-color 0.3s ease;
 }
 
-.theme-toggle.active {
+.themeToggle.active {
   background-color: #6366f1;
 }
 
-.toggle-handle {
+.toggleHandle {
   position: absolute;
   top: 2px;
   left: 2px;
@@ -270,25 +257,25 @@
   transition: transform 0.3s ease;
 }
 
-.theme-toggle.active .toggle-handle {
+.themeToggle.active .toggleHandle {
   transform: translateX(22px);
 }
 
 /* Dark mode adjustments for toggle */
-.dark .theme-icon.light {
+:global(.dark) .lightIcon {
   display: none;
 }
 
-.dark .theme-icon.dark {
+:global(.dark) .darkIcon {
   display: block;
 }
 
-.dark .theme-toggle-container {
+:global(.dark) .themeToggleContainer {
   background-color: #2d3748;
 }
 
 /* Sign Out Button */
-.sign-out-button {
+.signOutButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,24 +291,24 @@
   flex: 1;
 }
 
-.sign-out-button:hover {
+.signOutButton:hover {
   background-color: rgba(239, 68, 68, 0.2);
   transform: translateY(-2px);
 }
 
-.action-icon {
+.actionIcon {
   width: 18px;
   height: 18px;
   margin-right: 8px;
 }
 
 /* Dark mode adjustments */
-.dark .user-dropdown-menu {
+:global(.dark) .userDropdownMenu {
   background-color: var(--color-bg-primary);
   border-color: var(--color-border);
 }
 
-.dark .dropdown-header {
+:global(.dark) .dropdownHeader {
   background: linear-gradient(
     135deg,
     rgba(249, 115, 22, 0.05) 0%,
@@ -330,19 +317,41 @@
   border-color: var(--color-border);
 }
 
-.dark .close-button:hover {
+:global(.dark) .closeButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.dark .sign-out-button {
+:global(.dark) .signOutButton {
   background-color: rgba(239, 68, 68, 0.15);
 }
 
-.dark .sign-out-button:hover {
+:global(.dark) .signOutButton:hover {
   background-color: rgba(239, 68, 68, 0.25);
 }
 
-/* Animation for avatar */
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
@@ -353,28 +362,4 @@
   100% {
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
   }
-}
-
-.avatar-button:hover .avatar-image {
-  border-color: var(--color-secondary);
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-}
-
-/* Base state for moon icon */
-.theme-icon.moon {
-  transform: rotate(30deg) scale(0);
-  opacity: 0;
-  color: #6366f1;
-}
-
-/* Show moon icon when in dark mode */
-.dark .theme-icon.moon:not(.hidden) {
-  transform: rotate(0) scale(1);
-  opacity: 1;
-}
-
-/* Hide moon icon when hidden class is applied */
-.theme-icon.moon.hidden {
-  transform: rotate(90deg) scale(0);
-  opacity: 0;
 }

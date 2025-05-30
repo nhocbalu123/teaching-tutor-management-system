@@ -22,17 +22,6 @@ jest.mock("next/head", () => {
   };
 });
 
-// Mock layout component
-jest.mock("@/modules/core/components/layout/Layout", () => {
-  // Updated import path
-  return {
-    __esModule: true,
-    default: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="layout">{children}</div>
-    ),
-  };
-});
-
 // Mock lecturer utils
 jest.mock("@/modules/lecturer/utils/lecturerUtils", () => ({
   // Updated import path
@@ -194,15 +183,16 @@ describe("HomePage", () => {
     }
   });
 
-  // Test 7: Layout component is used as wrapper
-  test("uses Layout component as wrapper", () => {
+  // Test 7: Renders main content wrapper correctly
+  test("renders main content wrapper with correct styling", () => {
     render(<HomePage />);
 
-    // Check if the layout component is rendered
-    expect(screen.getByTestId("layout")).toBeInTheDocument();
+    // Check if the main element is rendered with correct classes
+    const mainElement = screen.getByRole("main");
+    expect(mainElement).toBeInTheDocument();
+    expect(mainElement).toHaveClass("flex-grow", "pt-24");
 
-    // Check if the content is inside the layout
-    const layout = screen.getByTestId("layout");
-    expect(layout).toContainElement(screen.getByText(/Apply & Join/i));
+    // Check if the content is inside the main element
+    expect(mainElement).toContainElement(screen.getByText(/Apply & Join/i));
   });
 });

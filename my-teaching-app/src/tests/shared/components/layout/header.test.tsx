@@ -2,11 +2,11 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Header from "@/shared/components/layout/header/header";
-import { useRouter } from "next/router";
 
-// Mock next/router
-jest.mock("next/router", () => ({
+// Mock next/navigation for App Router
+jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
+  usePathname: jest.fn(),
 }));
 
 // Mock next/image
@@ -19,11 +19,20 @@ jest.mock("next/image", () => ({
 }));
 
 // Mock UserDropdown component
-jest.mock("@/shared/components/layout/UserDropdown", () => {
-  return function MockUserDropdown() {
-    return <div data-testid="user-dropdown" />;
-  };
-});
+jest.mock(
+  "../../../../shared/components/layout/user-dropdown/user-dropdown",
+  () => {
+    return {
+      __esModule: true,
+      default: function MockUserDropdown() {
+        return <div data-testid="user-dropdown" />;
+      },
+    };
+  }
+);
+
+// Import the mocked functions
+import { useRouter, usePathname } from "next/navigation";
 
 describe("Header Component", () => {
   // Setup common mocks
@@ -39,9 +48,10 @@ describe("Header Component", () => {
 
     // Setup mocks for each test
     (useRouter as jest.Mock).mockReturnValue({
-      pathname: "/",
       push: mockPush,
     });
+
+    (usePathname as jest.Mock).mockReturnValue("/");
 
     // Mock localStorage
     Object.defineProperty(window, "localStorage", {

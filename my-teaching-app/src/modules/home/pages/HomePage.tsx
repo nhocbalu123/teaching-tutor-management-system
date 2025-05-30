@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Layout from "@/modules/core/components/layout/Layout"; // Updated import path
 import Head from "next/head";
 import { lecturers } from "@/modules/lecturer/utils/lecturerUtils"; // Updated import path
 
@@ -66,7 +65,7 @@ export default function HomePage() {
       <Head>
         <title>TeachTeam - Home | Find Tutor Positions</title>
       </Head>
-      <Layout>
+      <main className="flex-grow pt-24">
         {/* Hero Section */}
         <section className="hero-section" id="hero">
           <div className="container mx-auto relative z-10">
@@ -486,7 +485,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-      </Layout>
+      </main>
     </>
   );
 }

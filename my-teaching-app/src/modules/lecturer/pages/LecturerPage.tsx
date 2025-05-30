@@ -2,7 +2,6 @@
 // src/pages/lecturer/index.tsx
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Layout from "@/modules/core/components/layout/Layout"; // Updated import path
 import {
   TutorApplication,
   getApplications,
@@ -389,9 +388,9 @@ export default function LecturerPage() {
   return (
     <>
       <Head>
-        <title>TeachTeam - Lecturer Dashboard</title>
+        <title>TeachTeam - Lecturer Portal</title>
       </Head>
-      <Layout>
+      <main className="flex-grow pt-24">
         <div className="lecturer-dashboard">
           {/* Dashboard Header */}
           <motion.div
@@ -763,15 +762,15 @@ export default function LecturerPage() {
             )}
           </div>
         </div>
+      </main>
 
-        {/* Toast notification */}
-        <Toast
-          message={toast.message}
-          visible={toast.visible}
-          type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
-        />
-      </Layout>
+      {/* Toast notification */}
+      <Toast
+        message={toast.message}
+        visible={toast.visible}
+        type={toast.type}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
     </>
   );
 }

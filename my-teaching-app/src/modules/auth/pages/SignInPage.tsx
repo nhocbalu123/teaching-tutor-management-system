@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Layout from "@/modules/core/components/layout/Layout";
 import Head from "next/head";
 import { initializeUserAccounts } from "@/modules/auth/utils/userAccounts";
 import { initializeDetailedApplications } from "@/modules/tutor/utils/tutorUtils";
@@ -238,7 +237,7 @@ export default function SignInPage() {
       <Head>
         <title>TeachTeam - Sign In</title>
       </Head>
-      <Layout>
+      <main className="flex-grow pt-24">
         <div className="flex items-center justify-center py-16">
           <div className="circle-form">
             {error && <div className="alert alert-error">{error}</div>}
@@ -422,7 +421,7 @@ export default function SignInPage() {
             </form>
           </div>
         </div>
-      </Layout>
+      </main>
     </>
   );
 }
