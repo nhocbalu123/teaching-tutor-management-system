@@ -2,7 +2,6 @@
 // filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\home\pages\HomePage.tsx
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { lecturers } from "@/modules/lecturer/utils/lecturerDisplay.utils";
 import styles from "./HomePage.module.css";
 import TimelineSection from "../components/timeline-section/TimelineSection";
@@ -60,126 +59,6 @@ export default function HomePage() {
           lecturers={lecturers}
           onOpenLecturerModal={handleOpenLecturerModal}
         />
-
-        {/* Tutor Section */}
-        <section
-          className={`${styles.section} py-16`}
-          id="tutors-info"
-          style={{ backgroundColor: "var(--color-bg-secondary)" }}
-        >
-          <div className="container mx-auto">
-            <div className="max-w-5xl mx-auto">
-              <h2
-                className="text-4xl font-bold mb-4 text-center"
-                style={{ color: "var(--color-primary)" }}
-              >
-                For Tutor Applicants
-              </h2>
-              <p
-                className="text-center text-lg mb-12 max-w-3xl mx-auto"
-                style={{ color: "var(--color-text-primary)" }}
-              >
-                Join our team of exceptional tutors and help shape the next
-                generation of computer science professionals. Follow these
-                simple steps to get started.
-              </p>
-
-              {/* Timeline Design */}
-              <div className={styles.timelineContainer}>
-                <div className={styles.timelineItem}>
-                  <div className={styles.timelineTitle}>
-                    Create Your Profile
-                  </div>
-                  <div className={styles.timelineDescription}>
-                    Showcase your skills, academic credentials, and previous
-                    teaching experience to stand out from other applicants.
-                  </div>
-                  <ul className={styles.timelineFeatures}>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Academic qualifications visibility</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Skills showcase with verification</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Teaching experience highlights</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className={styles.timelineItem}>
-                  <div className={styles.timelineTitle}>
-                    Apply for Positions
-                  </div>
-                  <div className={styles.timelineDescription}>
-                    Browse available courses and apply for tutor and
-                    lab-assistant roles that match your expertise and
-                    availability.
-                  </div>
-                  <ul className={styles.timelineFeatures}>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Course-specific applications</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Flexible scheduling options</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Tailored cover letters</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className={styles.timelineItem}>
-                  <div className={styles.timelineTitle}>Get Selected</div>
-                  <div className={styles.timelineDescription}>
-                    Lecturers review your profile and select candidates that
-                    best fit their course requirements.
-                  </div>
-                  <ul className={styles.timelineFeatures}>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Real-time application status</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Direct communication with lecturers</span>
-                    </li>
-                    <li>
-                      <span className={styles.featureIcon}>✓</span>
-                      <span>Personalized feedback on applications</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="text-center mt-12">
-                {
-                  !isLoggedIn ? (
-                    <Link
-                      href="/signin"
-                      className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg"
-                    >
-                      Apply as a Tutor
-                    </Link>
-                  ) : userRole === "tutor" ? (
-                    <Link
-                      href="/tutor"
-                      className="btn-primary px-8 py-3 rounded-lg text-lg font-medium inline-block transition-all hover:shadow-lg"
-                    >
-                      Go to Tutor Dashboard
-                    </Link>
-                  ) : null /* Lecturer sees nothing */
-                }
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Lecturer Section */}
         <section
@@ -251,9 +130,11 @@ export default function HomePage() {
                       `/lecturers/lecturer-${activeLecturerImageIndex + 1}.jpg`
                     }
                     alt={currentLecturerDetails.name}
-                    fill
-                    style={{ objectFit: "cover" }}
+                    width={300}
+                    height={300}
+                    className={styles.modalImage}
                   />
+                  <div className={styles.modalDecoration}></div>
                 </div>
               </div>
               <div className={styles.modalContentSpecific}>
@@ -261,50 +142,41 @@ export default function HomePage() {
                   {currentLecturerDetails.name}
                 </h3>
                 <p className={styles.modalSubtitle}>
-                  {currentLecturerDetails.title} in{" "}
-                  {currentLecturerDetails.specialization}
+                  {currentLecturerDetails.title}
                 </p>
                 <p className={styles.modalText}>{currentLecturerDetails.bio}</p>
                 <ul className={styles.modalInfoList}>
                   <li className={styles.modalInfoItem}>
-                    <span className={styles.modalInfoIcon}>📚</span>
-                    <span>Teaches: {currentLecturerDetails.courses}</span>
+                    <span className={styles.modalInfoIcon}>🎯</span>
+                    <span>
+                      <strong>Specialization:</strong>{" "}
+                      {currentLecturerDetails.specialization}
+                    </span>
                   </li>
-                  {currentLecturerDetails.awards && (
-                    <li className={styles.modalInfoItem}>
-                      <span className={styles.modalInfoIcon}>🏆</span>
-                      <span>Awards: {currentLecturerDetails.awards}</span>
-                    </li>
-                  )}
-                  {currentLecturerDetails.experience && (
-                    <li className={styles.modalInfoItem}>
-                      <span className={styles.modalInfoIcon}>🏢</span>
-                      <span>
-                        Industry Experience: {currentLecturerDetails.experience}
-                      </span>
-                    </li>
-                  )}
-                  {currentLecturerDetails.certifications && (
-                    <li className={styles.modalInfoItem}>
-                      <span className={styles.modalInfoIcon}>🔰</span>
-                      <span>
-                        Certifications: {currentLecturerDetails.certifications}
-                      </span>
-                    </li>
-                  )}
-                  {currentLecturerDetails.publications && (
-                    <li className={styles.modalInfoItem}>
-                      <span className={styles.modalInfoIcon}>📖</span>
-                      <span>
-                        Publications: {currentLecturerDetails.publications}
-                      </span>
-                    </li>
-                  )}
+                  <li className={styles.modalInfoItem}>
+                    <span className={styles.modalInfoIcon}>📚</span>
+                    <span>
+                      <strong>Experience:</strong>{" "}
+                      {currentLecturerDetails.experience}
+                    </span>
+                  </li>
+                  <li className={styles.modalInfoItem}>
+                    <span className={styles.modalInfoIcon}>🏆</span>
+                    <span>
+                      <strong>Awards:</strong>{" "}
+                      {currentLecturerDetails.awards || "N/A"}
+                    </span>
+                  </li>
                   <li className={styles.modalInfoItem}>
                     <span className={styles.modalInfoIcon}>📧</span>
-                    <span>Contact: {currentLecturerDetails.contact}</span>
+                    <span>
+                      <strong>Contact:</strong> {currentLecturerDetails.contact}
+                    </span>
                   </li>
                 </ul>
+                <button className={styles.modalContactBtn}>
+                  Contact Lecturer
+                </button>
               </div>
             </div>
           </Modal>
