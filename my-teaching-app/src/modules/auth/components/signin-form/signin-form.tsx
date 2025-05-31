@@ -201,14 +201,9 @@ export default function SignInForm() {
           </div>
         )}
 
-        <h2
-          className="text-center text-2xl font-bold mb-6"
-          style={{ color: "var(--color-primary)" }}
-        >
-          Welcome Back
-        </h2>
+        <h2 className={styles.title}>Welcome Back</h2>
 
-        <div className="mb-4">
+        <div className={styles.inputContainer}>
           <input
             type="email"
             placeholder="Email Address"
@@ -219,7 +214,7 @@ export default function SignInForm() {
           />
         </div>
 
-        <div className="mb-4 relative">
+        <div className={styles.passwordContainer}>
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
@@ -230,14 +225,14 @@ export default function SignInForm() {
           />
           <button
             type="button"
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className={styles.passwordToggle}
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -251,7 +246,7 @@ export default function SignInForm() {
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -284,8 +279,8 @@ export default function SignInForm() {
           </>
         )}
 
-        <div className="mb-6">
-          <p className="text-sm mb-2 font-medium">Sign in as:</p>
+        <div className={styles.roleSection}>
+          <p className={styles.roleLabel}>Sign in as:</p>
           <div className={styles.roleToggleContainer}>
             <button
               type="button"
@@ -312,13 +307,10 @@ export default function SignInForm() {
           {isLoading ? "Signing in..." : "Sign In"}
         </button>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+        <div className={styles.linkSection}>
+          <p className={styles.linkText}>
             Do not have an account?{" "}
-            <Link
-              href="/signup"
-              className="text-primary font-medium hover:underline"
-            >
+            <Link href="/signup" className={styles.link}>
               Sign up
             </Link>
           </p>

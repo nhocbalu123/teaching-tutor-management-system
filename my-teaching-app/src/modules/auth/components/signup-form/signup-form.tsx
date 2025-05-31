@@ -33,13 +33,8 @@ export default function SignUpForm() {
         {/* <div className={`${styles.alert} ${styles.alertInfo}`}> // Commenting out placeholder message
           <p>Sign up functionality will be implemented soon.</p>
         </div> */}
-        <h2
-          className="text-center text-2xl font-bold mb-6"
-          style={{ color: "var(--color-primary)" }}
-        >
-          Create Account
-        </h2>
-        <div className="mb-4">
+        <h2 className={styles.title}>Create Account</h2>
+        <div className={styles.inputContainer}>
           <input
             type="text"
             placeholder="Full Name"
@@ -49,7 +44,7 @@ export default function SignUpForm() {
             className={styles.inputField}
           />
         </div>
-        <div className="mb-4">
+        <div className={styles.inputContainer}>
           <input
             type="email"
             placeholder="Email Address"
@@ -59,7 +54,7 @@ export default function SignUpForm() {
             className={styles.inputField}
           />
         </div>
-        <div className="mb-4 relative">
+        <div className={styles.passwordContainer}>
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
@@ -71,14 +66,14 @@ export default function SignUpForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className={styles.passwordToggle}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {/* SVG for show/hide password icon - can be conditional */}
             {showPassword ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -92,7 +87,7 @@ export default function SignUpForm() {
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -109,8 +104,7 @@ export default function SignUpForm() {
         {/* Placeholder for password strength meter - logic not implemented */}
         {/* <div className={`${styles.passwordStrengthMeter} ${styles.strong}`}> ... </div> */}
         {/* <div className={`${styles.passwordStrengthText} ${styles.strongText}`}> ... </div> */}
-        <div className="mb-4"></div> {/* Vertical space */}
-        <div className="mb-4 relative">
+        <div className={styles.passwordContainer}>
           <input
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
@@ -122,13 +116,13 @@ export default function SignUpForm() {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+            className={styles.passwordToggle}
             aria-label={showConfirmPassword ? "Hide password" : "Show password"}
           >
             {showConfirmPassword ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -142,7 +136,7 @@ export default function SignUpForm() {
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={styles.icon}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -156,8 +150,8 @@ export default function SignUpForm() {
             )}
           </button>
         </div>
-        <div className="mb-6">
-          <p className="text-sm mb-2 font-medium">I am a:</p>
+        <div className={styles.roleSection}>
+          <p className={styles.roleLabel}>I am a:</p>
           <div className={styles.roleToggleContainer}>
             <button
               type="button"
@@ -175,18 +169,15 @@ export default function SignUpForm() {
             </button>
           </div>
         </div>
-        <div className="text-center mt-8">
-          <button
-            type="submit"
-            className={`${styles.submitButton} inline-block`}
-          >
+        <div className={styles.submitContainer}>
+          <button type="submit" className={styles.submitButton}>
             Sign Up
           </button>
         </div>
-        <div className="text-center mt-4">
-          <p className="text-sm">
+        <div className={styles.linkSection}>
+          <p className={styles.linkText}>
             Already have an account?{" "}
-            <Link href="/signin" className={styles.signInLink}>
+            <Link href="/signin" className={styles.link}>
               Sign In
             </Link>
           </p>
