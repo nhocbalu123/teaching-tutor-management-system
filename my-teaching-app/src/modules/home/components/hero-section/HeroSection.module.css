@@ -1,7 +1,7 @@
 /* ======== HERO SECTION STYLES ======== */
 .heroSection {
   background-color: var(--color-bg-secondary);
-  padding: 5rem 0 8rem 0;
+  padding: 10rem 0 8rem 0;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -76,6 +76,7 @@
   font-weight: 500;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  white-space: nowrap;
 }
 
 .heroBtn:hover {
@@ -85,6 +86,15 @@
 }
 
 .heroBtn svg {
+  margin-left: 0.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: currentColor;
+}
+
+.heroBtnIcon {
+  width: 1.25rem;
+  height: 1.25rem;
   margin-left: 0.5rem;
 }
 
@@ -143,6 +153,27 @@
   gap: 0.5rem;
 }
 
+.floatingCardText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.floatingCardTop {
+  position: absolute;
+  top: 2.5rem; /* equivalent to top-10 */
+  right: -1.25rem; /* equivalent to -right-5 */
+  z-index: 20;
+}
+
+.floatingCardBottom {
+  position: absolute;
+  bottom: -0.5rem; /* equivalent to -bottom-2 */
+  left: -5rem; /* equivalent to -left-20 */
+  z-index: 20;
+}
+
 .floatingIconGreen,
 .floatingIconBlue {
   width: 2rem;
@@ -151,6 +182,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.floatingIconSvg {
+  width: 1.3rem;
+  height: 1.3rem;
+  color: white;
 }
 
 .floatingIconGreen {
@@ -269,6 +306,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.25rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
 }
 
 .moreButton:hover {
@@ -287,7 +331,16 @@
   top: 0;
   margin-top: 0;
   margin-bottom: 0;
+  margin-left: 0.25rem;
   vertical-align: middle;
+  width: 1rem;
+  height: 1rem;
+}
+
+.moreButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.25rem;
 }
 
 .moreText {
@@ -377,6 +430,17 @@
   .heroImageContainer {
     max-width: 400px;
     margin: 0 auto; /* Center on mobile only */
+  }
+
+  /* Adjust floating card positions for mobile */
+  .floatingCardTop {
+    top: 1rem;
+    right: -0.5rem;
+  }
+
+  .floatingCardBottom {
+    bottom: -0.25rem;
+    left: -2rem;
   }
 
   .decorationGradientCircle {
