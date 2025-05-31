@@ -3,7 +3,7 @@ import styles from "./footer.module.css";
 
 const Footer = () => {
   return (
-    <footer className={`${styles.footer} py-12 mt-auto`}>
+    <footer className={`${styles.footer} py-16 mt-auto`}>
       <div className="container mx-auto px-6">
         <div className={styles.footerLinksContainer}>
           <a href="#!" className={styles.footerLinkItem}>

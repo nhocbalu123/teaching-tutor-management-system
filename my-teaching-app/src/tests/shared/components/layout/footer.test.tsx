@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import Footer from "@/shared/components/layout/Footer/Footer"; // Corrected Casing
+import Footer from "@/shared/components/layout/footer/footer"; // Fixed import path to lowercase
 import styles from "@/shared/components/layout/footer/footer.module.css"; // Import CSS module
 
 describe("Footer Component", () => {
@@ -25,9 +25,9 @@ describe("Footer Component", () => {
     expect(screen.getByText("GitHub")).toBeInTheDocument();
     expect(screen.getByText("Website")).toBeInTheDocument();
 
-    // Check for sr-only class for accessibility
+    // Check for sr-only class for accessibility (now using CSS module class)
     const facebookLink = screen.getByText("Facebook").closest("span");
-    expect(facebookLink).toHaveClass("sr-only");
+    expect(facebookLink).toHaveClass(styles.srOnly);
   });
 
   // Test 3: Footer renders copyright text
@@ -49,7 +49,7 @@ describe("Footer Component", () => {
     // This assumes Jest is configured to handle CSS module imports (e.g., mapping them to class names).
     expect(footerElement).toHaveClass(styles.footer);
     // We can also keep checks for Tailwind classes if they are part of the base structure
-    expect(footerElement).toHaveClass("py-12"); // Example: if py-12 is always expected
+    expect(footerElement).toHaveClass("py-16"); // Example: if py-16 is always expected
     expect(footerElement).toHaveClass("mt-auto"); // Example: if mt-auto is always expected
   });
 
@@ -63,8 +63,7 @@ describe("Footer Component", () => {
 
     expect(svgInFacebook).toBeInTheDocument();
     expect(svgInFacebook).toHaveAttribute("fill", "currentColor");
-    expect(svgInFacebook).toHaveClass("h-6");
-    expect(svgInFacebook).toHaveClass("w-6");
+    expect(svgInFacebook).toHaveClass(styles.socialIconSvg);
   });
 
   // Test 6: Footer has proper container classes
@@ -72,7 +71,7 @@ describe("Footer Component", () => {
     render(<Footer />);
 
     const footerElement = screen.getByRole("contentinfo");
-    expect(footerElement).toHaveClass("py-12");
+    expect(footerElement).toHaveClass("py-16");
     expect(footerElement).toHaveClass("mt-auto");
 
     const containerDiv = footerElement.querySelector(".container");
@@ -87,7 +86,7 @@ describe("Footer Component", () => {
     const navLinks = screen.getAllByText(/About|Blog|Team|Contact|Terms/);
 
     navLinks.forEach((link) => {
-      expect(link.closest("a")).toHaveClass("hover:text-gray-500");
+      expect(link.closest("a")).toHaveClass(styles.footerLinkItem);
     });
   });
 });

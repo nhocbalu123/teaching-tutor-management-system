@@ -14,7 +14,7 @@ const LecturerShowcase: React.FC<LecturerShowcaseProps> = ({
 }) => {
   return (
     <section
-      className={`py-16`}
+      className={`py-24`}
       style={{ backgroundColor: "var(--color-bg-primary)" }}
     >
       <div className="container mx-auto">
