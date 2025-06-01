@@ -245,7 +245,7 @@
 }
 
 :global(.dark) .theme-icon.moon {
-  transform: translate(-50%, -50%) translateY(0) rotate(0) scale(1);
+  transform: translateY(0);
   opacity: 1;
 }
 
@@ -319,65 +319,9 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Auth buttons */
-.auth-button {
-  padding: 0.6rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.auth-button.outline {
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background-color: transparent;
-}
-
-.auth-button.outline:hover {
-  background-color: rgba(249, 115, 22, 0.1);
-  transform: translateY(-2px);
-}
-
-.auth-button.primary {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 6px rgba(249, 115, 22, 0.2);
-}
-
-.auth-button.primary:hover {
-  background-color: var(--color-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(249, 115, 22, 0.25);
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .header-grid {
-    gap: 1rem;
-  }
-
-  .nav-links {
-    gap: 1.5rem;
-  }
-
-  .auth-button {
-    padding: 0.5rem 1.2rem;
-  }
-
-  .logo-text {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .main-header {
-    padding: 0.8rem 1rem;
-  }
-
-  .header-grid {
-    grid-template-columns: auto 1fr auto;
     gap: 0.5rem;
   }
 
@@ -388,9 +332,23 @@
   .nav-link {
     font-size: 1rem;
   }
+}
 
-  .auth-button {
-    padding: 0.4rem 1rem;
+@media (max-width: 640px) {
+  .main-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .header-grid {
+    gap: 0.75rem;
+  }
+
+  .nav-links {
+    gap: 0.875rem;
+  }
+
+  .nav-link {
     font-size: 0.9rem;
   }
 }
@@ -484,64 +442,17 @@
   color: var(--color-primary);
 }
 
-/* .logo-prefix class was in the reconciled version, but not explicitly in this old CSS section for .header-logo-text */
-/* Re-adding a basic one if it was intended, or ensure Header.tsx uses .header-logo-text directly */
-
-/* .nav-link was defined above, this section seems to redefine/add to it */
-/* The .nav-link definition from lines 77-99 seems more complete for hover effects */
-/* This .nav-link only has basic styles */
-/* Merging this with the one above, or deciding which one takes precedence. */
-/* The one above (lines 77-99) will be kept for now as it's more detailed */
-
 .nav-link-active {
-  /* This is used in the old CSS, ensure Header.tsx can use it or adapt to .nav-link.active */
   color: var(--color-primary);
 }
 
-/* .nav-link::after was defined above (lines 90-99), this section is similar */
-/* The one above (lines 90-99) will be kept. */
-
 .nav-link-active:hover::after {
-  /* Specific hover for active link */
   content: "";
   opacity: 1;
   animation: none;
 }
 
-/* Button components from the global CSS provided earlier */
-/* These should ideally live in Button.module.css and be used by the Button component */
-/* If Header.tsx uses the Button component, these might not be needed directly in Header.module.css */
-.btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  color: white;
-  background-color: var(--color-primary);
-  box-shadow: 0 4px 6px -1px var(--color-shadow);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-secondary);
-}
-
-.btn-outline {
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-}
-
-.btn-outline:hover {
-  background-color: rgba(249, 115, 22, 0.1);
-}
-
-/* Dark mode toggle from the global CSS provided earlier */
-/* Styles for .dark-mode-toggle, .toggle-icon-container, .toggle-icon etc. */
-/* These are similar to .theme-toggle-btn and .theme-icon-wrapper above. */
-/* Will keep the .theme-toggle-btn structure from lines 114-158 for now. */
-
+/* Dark mode toggle styles */
 .dark-mode-toggle {
   padding: 0.5rem;
   border-radius: 9999px;

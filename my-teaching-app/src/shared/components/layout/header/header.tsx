@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import UserDropdown from "../user-dropdown";
+import buttonStyles from "../../common/Button/Button.module.css";
 import styles from "./header.module.css";
 
 interface UserData {
@@ -245,13 +246,13 @@ const Header: React.FC = () => {
             <>
               <Link
                 href="/signin"
-                className={`${styles["auth-button"]} ${styles.outline}`}
+                className={`${buttonStyles.btn} ${buttonStyles.btnOutline}`}
               >
                 Sign In
               </Link>
               <Link
                 href="/signup"
-                className={`${styles["auth-button"]} ${styles.primary}`}
+                className={`${buttonStyles.btn} ${buttonStyles.btnPrimary}`}
               >
                 Sign Up
               </Link>
