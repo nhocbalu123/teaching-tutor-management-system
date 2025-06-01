@@ -80,7 +80,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             {course.role === "Tutor" ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -89,7 +88,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >

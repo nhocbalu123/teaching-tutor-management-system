@@ -3,7 +3,7 @@
 /* Hero Section */
 .tutorHeroSection {
   position: relative;
-  padding: 8rem 2rem 6rem;
+  padding: 8rem 0 6rem;
   background: linear-gradient(
     135deg,
     var(--color-bg-secondary) 0%,
@@ -19,6 +19,7 @@
   text-align: center;
   position: relative;
   z-index: 10;
+  padding: 0 2rem;
 }
 
 .tutorHeroTitle {
@@ -775,7 +776,11 @@
 
 @media (max-width: 640px) {
   .tutorHeroSection {
-    padding: 6rem 1.5rem 4rem;
+    padding: 6rem 0 4rem;
+  }
+
+  .tutorHeroContent {
+    padding: 0 1rem;
   }
 
   .tutorHeroTitle {
@@ -787,7 +792,7 @@
   }
 
   .searchInput {
-    padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+    padding: 0.75rem 2.5rem;
   }
 
   .cardTop,
@@ -797,6 +802,6 @@
   }
 
   .courseTitle {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
   }
 }

@@ -110,6 +110,12 @@
   margin-right: 0.5rem;
 }
 
+.roleIcon svg {
+  width: 17px !important;
+  height: 17px !important;
+  flex-shrink: 0;
+}
+
 .roleIconTutor {
   background-color: rgba(16, 185, 129, 0.1);
   color: #10b981;

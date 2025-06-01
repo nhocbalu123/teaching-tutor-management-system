@@ -133,7 +133,6 @@
   outline: none !important;
   border-color: #f97316 !important;
   background-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1) !important;
 }
 
 :global(.dark) .applyModalInput:focus {
@@ -235,7 +234,6 @@
   outline: none !important;
   border-color: #f97316 !important;
   background-color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1) !important;
 }
 
 :global(.dark) .applyModalSkillInputField:focus {
@@ -273,6 +271,14 @@
   padding: 0.5rem 0 !important;
   font-weight: 500 !important;
   cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.applyModalAddSkillsButton svg {
+  width: 1.9rem !important;
+  height: 1.9rem !important;
+  margin-right: 0.25rem !important;
+  flex-shrink: 0 !important;
 }
 
 .applyModalAddSkillsButton:hover {
