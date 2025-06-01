@@ -163,62 +163,6 @@
   margin-bottom: 2rem;
 }
 
-.searchBar {
-  position: relative;
-  margin-bottom: 1.25rem;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-secondary);
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 0.75rem 3rem 0.75rem 3rem;
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  transition: all 0.3s ease;
-}
-
-.searchInput:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-}
-
-.searchClear {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: transparent;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  opacity: 0.7;
-  transition: all 0.2s ease;
-}
-
-.searchClear:hover {
-  opacity: 1;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
 .filterPills {
   display: flex;
   flex-wrap: wrap;
@@ -320,75 +264,6 @@
   }
 }
 
-/* Messages */
-.message {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-  min-width: 320px;
-  max-width: 600px;
-  width: auto;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 9999;
-}
-
-.successMessage {
-  background-color: #ecfdf5;
-  border: 1px solid #10b981;
-}
-
-.errorMessage {
-  background-color: #fef2f2;
-  border: 1px solid #ef4444;
-}
-
-.messageIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 1rem;
-  flex-shrink: 0;
-}
-
-.messageIconSuccess {
-  background-color: #d1fae5;
-  color: #10b981;
-}
-
-.messageIconError {
-  background-color: #fee2e2;
-  color: #ef4444;
-}
-
-.messageContent {
-  flex: 1;
-  color: #111827;
-  margin-right: 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.messageClose {
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 1rem;
-}
-
 /* Dark Mode Adjustments */
 :global(.dark) .tutorHeroSection {
   background: linear-gradient(
@@ -402,7 +277,6 @@
   background-color: rgba(249, 115, 22, 0.3);
 }
 
-:global(.dark) .searchClear:hover,
 :global(.dark) .filterPill:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
@@ -789,10 +663,6 @@
 
   .tutorContainer {
     padding: 1.5rem 1rem;
-  }
-
-  .searchInput {
-    padding: 0.75rem 2.5rem;
   }
 
   .cardTop,

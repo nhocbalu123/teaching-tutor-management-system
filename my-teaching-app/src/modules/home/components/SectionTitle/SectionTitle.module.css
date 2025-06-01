@@ -1,10 +1,11 @@
-.section-title-container {
+.sectionTitleContainer {
   display: flex;
   align-items: center;
   margin-bottom: 3rem;
+  padding-top: 3rem;
 }
 
-.section-title-bar {
+.sectionTitleBar {
   width: 6px;
   height: 124px;
   background-color: var(--color-primary);
@@ -13,14 +14,14 @@
   margin-top: 12px;
 }
 
-.section-title-content h2 {
+.sectionTitleContent h2 {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: var(--color-text-primary);
 }
 
-.section-title-content p {
+.sectionTitleContent p {
   font-size: 1.2rem;
   color: var(--color-text-primary);
   opacity: 0.8;

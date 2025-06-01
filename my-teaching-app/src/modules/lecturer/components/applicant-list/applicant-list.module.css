@@ -79,6 +79,24 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Default size for list context */
+  font-size: 1rem;
+  /* Allow override for larger detail views */
+  transition: color 0.3s ease;
+}
+
+/* Variant for large applicant names in detail views */
+.applicantName.large {
+  font-size: 1.5rem;
+  font-weight: 700;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Dark mode support for applicant names */
+.dark .applicantName {
+  color: #ffffff;
 }
 
 .applicantDetails {
@@ -138,8 +156,8 @@
   /* Renamed from .applicant-ranked */
   position: absolute;
   top: 0.75rem;
-  right: 2.5rem; /* Adjust if needed based on layout */
-  color: #8b5cf6; /* Tailwind purple-500 */
+  right: 2.5rem; /* Position it to the left of the selected icon */
+  color: #8b5cf6; /* Purple color for the crown */
 }
 
 .rankedIconItself {
@@ -147,6 +165,7 @@
   width: 18px;
   height: 18px;
   fill: currentColor;
+  stroke: none;
 }
 
 .appliedDate {
@@ -172,4 +191,33 @@
 
 .dark .skillBadge {
   background-color: rgba(249, 115, 22, 0.2);
+}
+
+/* Panel wrapper styles moved from dashboard */
+.applicantListPanel {
+  background-color: var(--color-bg-primary);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+  height: fit-content;
+}
+
+.panelTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* Dark mode for panel styles */
+.dark .applicantListPanel {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+}
+
+.dark .panelTitle {
+  color: var(--color-text-primary);
 }

@@ -13,13 +13,14 @@ import {
   // getCoursesWithDetails, // Removed as unused
 } from "@/modules/course/utils/courseDisplay.utils"; // Updated & added
 // import Head from "next/head"; // Head component is handled by App Router layout
-import ApplicantList from "@/modules/lecturer/components/applicant-list/applicant-list";
-import ApplicantDetails from "@/modules/lecturer/components/applicant-details/applicant-details";
-import RankedCandidates from "@/modules/lecturer/components/ranked-candidates/ranked-candidates";
-import ApplicantStatsVisualization from "@/modules/lecturer/components/applicant-stats-visualization/applicant-stats-visualization";
-import Toast from "@/shared/components/common/toast/toast"; // Updated path to shared Toast
+import ApplicantList from "../components/applicant-list/applicant-list";
+import ApplicantDetails from "../components/applicant-details/applicant-details";
+import RankedCandidates from "../components/ranked-candidates/ranked-candidates";
+import ApplicantStatsVisualization from "../components/applicant-stats-visualization/applicant-stats-visualization";
+import Toast from "../../../shared/components/common/toast/toast";
+import SearchInput from "@/shared/components/common/search-input/SearchInput";
 import { motion } from "framer-motion";
-import stylesLecturer from "../styles/lecturer-dashboard-layout.module.css"; // Import CSS module
+import styles from "./lecturer-dashboard-page.module.css";
 
 // TODO: Refactor localStorage logic to use services/API calls
 // TODO: Refactor navigation (router.push) to use Next.js 13+ App Router navigation (e.g. redirect, Link, or navigation hooks)
@@ -199,7 +200,7 @@ export default function LecturerDashboardPage() {
         selectedForCourses: selectedCourses,
       };
       saveApplication(updatedApplication);
-      loadApplications(); // Refresh applications list
+      loadApplications();
       setSelectedApplication(updatedApplication);
       showToast("Applicant selected successfully!", "success");
     }
@@ -216,81 +217,98 @@ export default function LecturerDashboardPage() {
         rank: undefined,
       };
       saveApplication(updatedApplication);
-      loadApplications(); // Refresh applications list
+      loadApplications();
       setSelectedApplication(updatedApplication);
       showToast("Applicant unselected successfully!", "success");
     }
   };
 
   const handleAddToRanking = () => {
-    if (!selectedApplication) return;
-    if (!selectedApplication.comment) {
-      showToast(
-        "Please add and save a comment before adding to ranking.",
-        "error"
-      );
-      return;
+    if (selectedApplication) {
+      const rankedAppsForCourse = rankedApplications.filter((app) => {
+        const courses =
+          selectedApplication.selectedForCourses || selectedApplication.courses;
+        return courses.some(
+          (course) =>
+            app.selectedForCourses?.includes(course) ||
+            app.courses.includes(course)
+        );
+      });
+      const newRank = rankedAppsForCourse.length + 1;
+      const updatedApplication = {
+        ...selectedApplication,
+        rank: newRank,
+      };
+      saveApplication(updatedApplication);
+      loadApplications();
+      setSelectedApplication(updatedApplication);
+      showToast("Applicant added to ranking!", "success");
     }
-    const hasUnsavedComment = comment !== (selectedApplication.comment || "");
-    if (hasUnsavedComment) {
-      showToast("Please save your comment before adding to ranking.", "error");
-      return;
-    }
-    const nextRank = rankedApplications.length + 1;
-    const updatedApplication = { ...selectedApplication, rank: nextRank };
-    saveApplication(updatedApplication);
-    setSelectedApplication(updatedApplication);
-    loadApplications();
-    showToast("Applicant added to ranking successfully!");
   };
 
   const handleMoveUp = (application: TutorApplication) => {
-    const currentRank = application.rank;
-    if (!currentRank) return;
-    const prevRankApp = rankedApplications.find(
-      (app) => app.rank === currentRank - 1
-    );
-    if (prevRankApp && prevRankApp.rank) {
-      const updatedApp = { ...application, rank: currentRank - 1 };
-      const updatedPrevApp = { ...prevRankApp, rank: prevRankApp.rank + 1 };
-      saveApplication(updatedApp);
-      saveApplication(updatedPrevApp);
-      loadApplications();
-      showToast(`Moved ${application.fullName} up in rankings`);
+    if (application.rank && application.rank > 1) {
+      const appsToSwap = applications.filter(
+        (app) => app.rank === application.rank! - 1
+      );
+      if (appsToSwap.length > 0) {
+        const appToMoveDown = appsToSwap[0];
+        const updatedMovingUp = { ...application, rank: application.rank - 1 };
+        const updatedMovingDown = {
+          ...appToMoveDown,
+          rank: appToMoveDown.rank! + 1,
+        };
+        saveApplication(updatedMovingUp);
+        saveApplication(updatedMovingDown);
+        loadApplications();
+        showToast("Ranking updated!", "success");
+      }
     }
   };
 
   const handleMoveDown = (application: TutorApplication) => {
-    const currentRank = application.rank;
-    if (!currentRank) return;
-    const nextRankApp = rankedApplications.find(
-      (app) => app.rank === currentRank + 1
-    );
-    if (nextRankApp && nextRankApp.rank) {
-      const updatedApp = { ...application, rank: currentRank + 1 };
-      const updatedNextApp = { ...nextRankApp, rank: nextRankApp.rank - 1 };
-      saveApplication(updatedApp);
-      saveApplication(updatedNextApp);
-      loadApplications();
-      showToast(`Moved ${application.fullName} down in rankings`);
+    const maxRank = Math.max(...rankedApplications.map((app) => app.rank || 0));
+    if (application.rank && application.rank < maxRank) {
+      const appsToSwap = applications.filter(
+        (app) => app.rank === application.rank! + 1
+      );
+      if (appsToSwap.length > 0) {
+        const appToMoveUp = appsToSwap[0];
+        const updatedMovingDown = {
+          ...application,
+          rank: application.rank + 1,
+        };
+        const updatedMovingUp = { ...appToMoveUp, rank: appToMoveUp.rank! - 1 };
+        saveApplication(updatedMovingDown);
+        saveApplication(updatedMovingUp);
+        loadApplications();
+        showToast("Ranking updated!", "success");
+      }
     }
   };
 
   const handleRemoveFromRanking = (applicationId: string) => {
     const application = applications.find((app) => app.id === applicationId);
-    if (!application) return;
-    const updatedApplication = { ...application, rank: undefined };
-    saveApplication(updatedApplication);
-    loadApplications();
-    showToast(`Removed ${application.fullName} from rankings`, "info");
+    if (application && application.rank) {
+      const currentRank = application.rank;
+      const updatedApplication = { ...application, rank: undefined };
+      saveApplication(updatedApplication);
+      const appsToUpdate = applications
+        .filter((app) => app.rank && app.rank > currentRank)
+        .map((app) => ({ ...app, rank: app.rank! - 1 }));
+      appsToUpdate.forEach((app) => saveApplication(app));
+      loadApplications();
+      showToast("Applicant removed from ranking!", "success");
+    }
   };
 
   const totalApplications = applications.length;
   const selectedTutorApplications = applications.filter(
     (app) => app.selected
   ).length;
-  const pendingTutorApplications =
-    totalApplications - selectedTutorApplications;
+  const pendingTutorApplications = applications.filter(
+    (app) => !app.selected
+  ).length;
   const selectionRate =
     totalApplications > 0
       ? Math.round((selectedTutorApplications / totalApplications) * 100)
@@ -301,39 +319,29 @@ export default function LecturerDashboardPage() {
       {/* <Head> // Removed Head
         <title>TeachTeam - Lecturer Portal</title>
       </Head> */}
-      <main
-        className={`flex-grow pt-24 ${stylesLecturer.lecturerDashboardContainer}`}
-      >
+      <main className={`flex-grow pt-24 ${styles.lecturerDashboardContainer}`}>
         {/* Existing JSX structure, class names will be updated with CSS modules later */}
         <div>
           {" "}
           {/* Removed lecturer-dashboard, container handles padding */}
           <motion.div
-            className={stylesLecturer.dashboardHeader}
+            className={styles.dashboardHeader}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className={stylesLecturer.headerContent}>
+            <div className={styles.headerContent}>
               {" "}
-              <h1 className={stylesLecturer.dashboardTitle}>
-                Lecturer Dashboard
-              </h1>{" "}
-              <p className={stylesLecturer.dashboardSubtitle}>
+              <h1 className={styles.dashboardTitle}>Lecturer Dashboard</h1>{" "}
+              <p className={styles.dashboardSubtitle}>
                 Welcome back, {lecturerName}
               </p>{" "}
             </div>
-            <div className={stylesLecturer.quickStats}>
-              {" "}
-              <div className={stylesLecturer.statCard}>
-                {" "}
-                <div
-                  className={`${stylesLecturer.summaryIcon} ${stylesLecturer.totalIcon}`}
-                >
-                  {" "}
+            <div className={styles.quickStats}>
+              <div className={styles.statCard}>
+                <div className={`${styles.statIcon} ${styles.totalIcon}`}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -346,25 +354,16 @@ export default function LecturerDashboardPage() {
                     />
                   </svg>
                 </div>
-                <div className={stylesLecturer.statDetails}>
-                  {" "}
-                  <span className={stylesLecturer.statLabel}>
-                    Total Applications
-                  </span>{" "}
-                  <span className={stylesLecturer.statValue}>
-                    {totalApplications}
-                  </span>{" "}
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>Total Applications</span>
+                  <span className={styles.statValue}>{totalApplications}</span>
                 </div>
               </div>
-              <div className={stylesLecturer.statCard}>
-                {" "}
-                <div
-                  className={`${stylesLecturer.summaryIcon} ${stylesLecturer.selectedIcon}`}
-                >
-                  {" "}
+
+              <div className={styles.statCard}>
+                <div className={`${styles.statIcon} ${styles.selectedIcon}`}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -377,23 +376,18 @@ export default function LecturerDashboardPage() {
                     />
                   </svg>
                 </div>
-                <div className={stylesLecturer.statDetails}>
-                  {" "}
-                  <span className={stylesLecturer.statLabel}>Selected</span>
-                  <span className={stylesLecturer.statValue}>
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>Selected</span>
+                  <span className={styles.statValue}>
                     {selectedTutorApplications}
                   </span>
                 </div>
               </div>
-              <div className={stylesLecturer.statCard}>
-                {" "}
-                <div
-                  className={`${stylesLecturer.summaryIcon} ${stylesLecturer.pendingIcon}`}
-                >
-                  {" "}
+
+              <div className={styles.statCard}>
+                <div className={`${styles.statIcon} ${styles.pendingIcon}`}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -406,23 +400,18 @@ export default function LecturerDashboardPage() {
                     />
                   </svg>
                 </div>
-                <div className={stylesLecturer.statDetails}>
-                  {" "}
-                  <span className={stylesLecturer.statLabel}>Pending</span>
-                  <span className={stylesLecturer.statValue}>
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>Pending</span>
+                  <span className={styles.statValue}>
                     {pendingTutorApplications}
-                  </span>{" "}
+                  </span>
                 </div>
               </div>
-              <div className={stylesLecturer.statCard}>
-                {" "}
-                <div
-                  className={`${stylesLecturer.summaryIcon} ${stylesLecturer.rateIcon}`}
-                >
-                  {" "}
+
+              <div className={styles.statCard}>
+                <div className={`${styles.statIcon} ${styles.rateIcon}`}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -435,27 +424,24 @@ export default function LecturerDashboardPage() {
                     />
                   </svg>
                 </div>
-                <div className={stylesLecturer.statDetails}>
-                  {" "}
-                  <span className={stylesLecturer.statLabel}>
-                    Selection Rate
-                  </span>{" "}
-                  <span className={stylesLecturer.statValue}>
-                    {selectionRate}%
-                  </span>{" "}
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>Selection Rate</span>
+                  <span
+                    className={styles.statValue}
+                  >{`${selectionRate}%`}</span>
                 </div>
               </div>
             </div>
           </motion.div>
-          <div className={stylesLecturer.dashboardTabs}>
+          <div className={styles.dashboardTabs}>
             {" "}
             <button
-              className={`${stylesLecturer.tabButton} ${activeTab === "applications" ? stylesLecturer.tabButtonActive : ""}`}
+              className={`${styles.tabButton} ${activeTab === "applications" ? styles.tabButtonActive : ""}`}
               onClick={() => setActiveTab("applications")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={stylesLecturer.tabIcon}
+                className={styles.tabIcon}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -470,12 +456,12 @@ export default function LecturerDashboardPage() {
               Applications
             </button>
             <button
-              className={`${stylesLecturer.tabButton} ${activeTab === "rankings" ? stylesLecturer.tabButtonActive : ""}`}
+              className={`${styles.tabButton} ${activeTab === "rankings" ? styles.tabButtonActive : ""}`}
               onClick={() => setActiveTab("rankings")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={stylesLecturer.tabIcon}
+                className={styles.tabIcon}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -490,12 +476,12 @@ export default function LecturerDashboardPage() {
               Rankings
             </button>
             <button
-              className={`${stylesLecturer.tabButton} ${activeTab === "stats" ? stylesLecturer.tabButtonActive : ""}`}
+              className={`${styles.tabButton} ${activeTab === "stats" ? styles.tabButtonActive : ""}`}
               onClick={() => setActiveTab("stats")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={stylesLecturer.tabIcon}
+                className={styles.tabIcon}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -510,75 +496,38 @@ export default function LecturerDashboardPage() {
               Analytics
             </button>
           </div>
-          <div className={stylesLecturer.dashboardContent}>
+          <div className={styles.dashboardContent}>
             {" "}
             {activeTab === "applications" && (
               <motion.div
-                className={stylesLecturer.applicationsTab}
+                className={styles.applicationsTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className={stylesLecturer.filterTools}>
+                <div className={styles.filterTools}>
                   {" "}
-                  <div className={stylesLecturer.filterGroup}>
+                  <div className={styles.filterGroup}>
                     {" "}
-                    <label htmlFor="searchInput">Search:</label>
-                    <div className={stylesLecturer.searchInputContainer}>
-                      {" "}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={stylesLecturer.searchIcon}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                      <input
-                        id="searchInput"
-                        type="text"
-                        placeholder="Search by name, course, availability, or skills..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className={stylesLecturer.searchInput}
-                      />
-                      {searchQuery && (
-                        <button
-                          className={stylesLecturer.searchClear}
-                          onClick={() => setSearchQuery("")}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
+                    <SearchInput
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      placeholder="Search by name, course, availability, or skills..."
+                      label="Search"
+                      showLabel={true}
+                      variant="default"
+                    />
                   </div>
-                  <div className={stylesLecturer.filterSelects}>
+                  <div className={styles.filterSelects}>
                     {" "}
-                    <div className={stylesLecturer.filterGroup}>
+                    <div className={styles.filterGroup}>
                       {" "}
                       <label htmlFor="courseFilter">Course:</label>
                       <select
                         id="courseFilter"
                         value={selectedCourse}
                         onChange={(e) => setSelectedCourse(e.target.value)}
-                        className={stylesLecturer.filterSelect}
+                        className={styles.filterSelect}
                       >
                         <option value="">All Courses</option>
                         {availableCourses.map(
@@ -590,14 +539,14 @@ export default function LecturerDashboardPage() {
                         )}
                       </select>
                     </div>
-                    <div className={stylesLecturer.filterGroup}>
+                    <div className={styles.filterGroup}>
                       {" "}
                       <label htmlFor="sortBy">Sort by:</label>
                       <select
                         id="sortBy"
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className={stylesLecturer.filterSelect}
+                        className={styles.filterSelect}
                       >
                         <option value="none">Default</option>
                         <option value="name">Name</option>
@@ -607,123 +556,53 @@ export default function LecturerDashboardPage() {
                     </div>
                   </div>
                 </div>
-                <div className={stylesLecturer.applicationPanels}>
-                  {" "}
-                  <div className={stylesLecturer.applicantListPanel}>
-                    {" "}
-                    <h2 className={stylesLecturer.panelTitle}>
-                      Applicants
-                    </h2>{" "}
-                    <ApplicantList
-                      applications={sortedApplications}
-                      selectedApplication={selectedApplication}
-                      onSelectApplication={handleSelectApplication}
-                    />
-                  </div>
-                  <div className={stylesLecturer.applicantDetailsPanel}>
-                    {" "}
-                    <h2 className={stylesLecturer.panelTitle}>
-                      Applicant Details
-                    </h2>{" "}
-                    <ApplicantDetails
-                      application={selectedApplication}
-                      comment={comment}
-                      setComment={setComment}
-                      onSelectApplicant={handleSelectApplicantButton}
-                      onSaveComment={handleSaveComment}
-                      onDeleteComment={handleDeleteComment}
-                      onUnselectApplicant={handleUnselectApplicant}
-                      onAddToRanking={handleAddToRanking}
-                      showToast={showToast}
-                    />
-                  </div>
+                <div className={styles.applicationPanels}>
+                  <ApplicantList
+                    applications={sortedApplications}
+                    selectedApplication={selectedApplication}
+                    onSelectApplication={handleSelectApplication}
+                  />
+                  <ApplicantDetails
+                    application={selectedApplication}
+                    comment={comment}
+                    setComment={setComment}
+                    onSelectApplicant={handleSelectApplicantButton}
+                    onSaveComment={handleSaveComment}
+                    onDeleteComment={handleDeleteComment}
+                    onUnselectApplicant={handleUnselectApplicant}
+                    onAddToRanking={handleAddToRanking}
+                    showToast={showToast}
+                  />
                 </div>
               </motion.div>
             )}
             {activeTab === "rankings" && (
               <motion.div
-                className={stylesLecturer.rankingsTab}
+                className={styles.rankingsTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className={stylesLecturer.rankingsContainer}>
-                  {" "}
-                  <h2 className={stylesLecturer.rankingsTitle}>
-                    Ranked Candidates
-                  </h2>{" "}
-                  <div
-                    className={`${stylesLecturer.filterGroup} ${stylesLecturer.courseFilter}`}
-                  >
-                    {" "}
-                    <label htmlFor="rankingCourseFilter">
-                      Filter by Course:
-                    </label>
-                    <select
-                      id="rankingCourseFilter"
-                      value={selectedCourse}
-                      onChange={(e) => setSelectedCourse(e.target.value)}
-                      className={stylesLecturer.filterSelect}
-                    >
-                      {availableCourses.map(
-                        (course: { code: string; name: string }) => (
-                          <option key={course.code} value={course.code}>
-                            {course.code} - {course.name}
-                          </option>
-                        )
-                      )}
-                    </select>
-                    <p className={stylesLecturer.filterNote}>
-                      {" "}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={stylesLecturer.noteIcon}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      Rankings are course-specific to avoid confusion with
-                      candidates who may have the same rank for different
-                      courses.
-                    </p>
-                  </div>
-                  <div className={stylesLecturer.rankingsList}>
-                    {" "}
-                    <RankedCandidates
-                      rankedApplications={rankedApplications}
-                      selectedCourse={selectedCourse}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                      onRemove={handleRemoveFromRanking}
-                    />
-                  </div>
-                </div>
+                <RankedCandidates
+                  rankedApplications={rankedApplications}
+                  selectedCourse={selectedCourse}
+                  onMoveUp={handleMoveUp}
+                  onMoveDown={handleMoveDown}
+                  onRemove={handleRemoveFromRanking}
+                  showCourseFilter={true}
+                  onCourseChange={setSelectedCourse}
+                  availableCourses={availableCourses}
+                />
               </motion.div>
             )}
             {activeTab === "stats" && (
               <motion.div
-                className={stylesLecturer.analyticsTab}
+                className={styles.analyticsTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className={stylesLecturer.analyticsContainer}>
-                  {" "}
-                  <h2 className={stylesLecturer.analyticsTitle}>
-                    Application Analytics
-                  </h2>{" "}
-                  <div className={stylesLecturer.analyticsContent}>
-                    {" "}
-                    <ApplicantStatsVisualization applications={applications} />
-                  </div>
-                </div>
+                <ApplicantStatsVisualization applications={applications} />
               </motion.div>
             )}
           </div>

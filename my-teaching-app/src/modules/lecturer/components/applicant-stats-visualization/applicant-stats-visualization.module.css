@@ -60,28 +60,60 @@
 .summaryIcon {
   width: 48px;
   height: 48px;
+  min-width: 48px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
   margin-right: 1rem;
+  transition: all 0.3s ease;
+}
+
+.summaryIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.summaryIcon.totalIcon {
+  background-color: var(--stat-icon-total-bg);
+  color: var(--stat-icon-total-color);
 }
 
 .totalIcon {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
+  background-color: var(--stat-icon-total-bg);
+  color: var(--stat-icon-total-color);
 }
+
+.summaryIcon.selectedIcon {
+  background-color: var(--stat-icon-selected-bg);
+  color: var(--stat-icon-selected-color);
+}
+
 .selectedIcon {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
+  background-color: var(--stat-icon-selected-bg);
+  color: var(--stat-icon-selected-color);
 }
+
+.summaryIcon.pendingIcon {
+  background-color: var(--stat-icon-pending-bg);
+  color: var(--stat-icon-pending-color);
+}
+
 .pendingIcon {
-  background-color: var(--color-warning-light);
-  color: var(--color-warning);
+  background-color: var(--stat-icon-pending-bg);
+  color: var(--stat-icon-pending-color);
 }
+
+.summaryIcon.rateIcon {
+  background-color: var(--stat-icon-rate-bg);
+  color: var(--stat-icon-rate-color);
+}
+
 .rateIcon {
-  background-color: var(--color-info-light);
-  color: var(--color-info);
+  background-color: var(--stat-icon-rate-bg);
+  color: var(--stat-icon-rate-color);
 }
 
 .summaryContent {
@@ -315,6 +347,11 @@
   flex-shrink: 0;
 }
 
+.insightIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .insightText {
   font-size: 0.875rem;
   color: var(--color-text-primary);
@@ -363,4 +400,93 @@
     width: 100%;
     max-width: 200px;
   }
+}
+
+.lineChartContainer {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.skillsListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.skillStatItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+}
+
+.skillStatItem:hover {
+  background-color: var(--color-bg-hover);
+  transform: translateY(-1px);
+}
+
+.skillName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.skillCount {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 80px;
+}
+
+.skillCount span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  min-width: 20px;
+  text-align: right;
+}
+
+.skillBar {
+  height: 4px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+  min-width: 40px;
+  transition: width 0.3s ease;
+}
+
+/* Container styles moved from dashboard */
+.analyticsContainer {
+  background-color: var(--color-bg-primary);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
+}
+
+.analyticsTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.analyticsContent {
+  min-height: 300px;
+}
+
+/* Dark mode for container styles */
+.dark .analyticsContainer {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+}
+
+.dark .analyticsTitle {
+  color: var(--color-text-primary);
 }

@@ -8,6 +8,9 @@ import type { Application as TutorApplication } from "@/shared/types/application
 import { saveApplicationToStorage } from "@/modules/tutor/utils/applicationDisplay.utils";
 import CourseCard from "@/modules/course/components/course-card/course-card";
 import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
+import SearchInput from "@/shared/components/common/search-input/SearchInput";
+import Toast from "@/shared/components/common/toast/toast";
+import { useToast } from "@/shared/hooks/useNotification";
 import { motion } from "framer-motion";
 import styles from "@/modules/tutor/styles/tutor-dashboard-layout.module.css";
 
@@ -24,8 +27,14 @@ const TutorDashboardPage: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<CourseDetails | null>(
     null
   );
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const {
+    toast: successToast,
+    showSuccess,
+    hideToast: hideSuccess,
+  } = useToast();
+
+  const { toast: errorToast, showError, hideToast: hideError } = useToast();
+
   const [userData, setUserData] = useState<UserData | null>(null);
   const [existingApplications, setExistingApplications] = useState<string[]>(
     []
@@ -145,14 +154,14 @@ const TutorDashboardPage: React.FC = () => {
     // Check if user is logged in
     if (!userData) {
       console.log("Error: User not logged in");
-      setErrorMessage("You must be logged in to apply for courses.");
+      showError("You must be logged in to apply for courses.");
       return;
     }
 
     // Check if user has already applied for this course
     if (existingApplications.includes(course.code)) {
       console.log("Error: Already applied to this course");
-      setErrorMessage(`You have already applied for ${course.code}.`);
+      showError(`You have already applied for ${course.code}.`);
       return;
     }
 
@@ -168,7 +177,7 @@ const TutorDashboardPage: React.FC = () => {
 
   const handleSubmitApplication = (applicationData: TutorApplication) => {
     if (!userData) {
-      setErrorMessage("You must be logged in to apply for courses.");
+      showError("You must be logged in to apply for courses.");
       return;
     }
 
@@ -188,14 +197,14 @@ const TutorDashboardPage: React.FC = () => {
 
       // Show success message
       setIsModalOpen(false);
-      setSuccessMessage("Your application has been submitted successfully!");
+      showSuccess("Your application has been submitted successfully!");
 
       // Clear the success message after 5 seconds
       setTimeout(() => {
-        setSuccessMessage("");
+        hideSuccess();
       }, 5000);
     } catch (error) {
-      setErrorMessage("Failed to submit your application. Please try again.");
+      showError("Failed to submit your application. Please try again.");
       console.error(error);
     }
   };
@@ -275,101 +284,24 @@ const TutorDashboardPage: React.FC = () => {
       {/* Main Content */}
       <main className={`flex-grow pt-0 ${styles.tutorContainer}`}>
         {/* Success/Error Messages */}
-        {successMessage && (
-          <motion.div
-            className={`${styles.message} ${styles.successMessage}`}
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div
-              className={`${styles.messageIcon} ${styles.messageIconSuccess}`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.messageContent}>
-              <p>{successMessage}</p>
-            </div>
-            <button
-              className={styles.messageClose}
-              onClick={() => setSuccessMessage("")}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </motion.div>
-        )}
+        <Toast
+          message={successToast.message}
+          type={successToast.type}
+          visible={successToast.visible}
+          onClose={hideSuccess}
+          variant="inline"
+          autoClose={true}
+          autoCloseDelay={5000}
+        />
 
-        {errorMessage && (
-          <motion.div
-            className={`${styles.message} ${styles.errorMessage}`}
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className={`${styles.messageIcon} ${styles.messageIconError}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.messageContent}>
-              <p>{errorMessage}</p>
-            </div>
-            <button
-              className={styles.messageClose}
-              onClick={() => setErrorMessage("")}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </motion.div>
-        )}
+        <Toast
+          message={errorToast.message}
+          type={errorToast.type}
+          visible={errorToast.visible}
+          onClose={hideError}
+          variant="inline"
+          autoClose={false}
+        />
 
         {/* Search and Filters */}
         <motion.div
@@ -379,48 +311,13 @@ const TutorDashboardPage: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           {/* Search Bar */}
-          <div className={styles.searchBar}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={styles.searchIcon}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search courses, skills, or roles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
-            />
-            {searchQuery && (
-              <button
-                className={styles.searchClear}
-                onClick={() => setSearchQuery("")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search courses, skills, or roles..."
+            showLabel={false}
+            variant="rounded"
+          />
 
           {/* Filter Pills */}
           <div className={styles.filterPills}>

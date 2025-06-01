@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./LecturerShowcase.module.css";
 import LecturerCard from "../lecturer-card/LecturerCard";
+import SectionTitle from "../SectionTitle/SectionTitle";
 import type { Lecturer } from "@/shared/types/lecturer";
 
 interface LecturerShowcaseProps {
@@ -19,17 +20,10 @@ const LecturerShowcase: React.FC<LecturerShowcaseProps> = ({
     >
       <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
-          <div className={styles.sectionTitleContainer}>
-            <div className={styles.sectionTitleBar}></div>
-            <div className={styles.sectionTitleContent}>
-              <h2>Meet Our Lecturers</h2>
-              <p>
-                Meet our exceptional team of computer science lecturers who
-                bring real-world experience and academic excellence to our
-                programs.
-              </p>
-            </div>
-          </div>
+          <SectionTitle
+            title="Meet Our Lecturers"
+            subtitle="Meet our exceptional team of computer science lecturers who bring real-world experience and academic excellence to our programs."
+          />
           <div className={styles.lecturerGrid}>
             {lecturers.map((lecturer, index) => (
               <LecturerCard

@@ -20,6 +20,7 @@ import styles from "./applicant-stats-visualization.module.css";
 
 interface ApplicantStatsVisualizationProps {
   applications: TutorApplication[];
+  title?: string;
 }
 
 interface CustomTooltipProps {
@@ -34,7 +35,7 @@ interface CustomTooltipProps {
 
 const ApplicantStatsVisualization: React.FC<
   ApplicantStatsVisualizationProps
-> = ({ applications }) => {
+> = ({ applications, title = "Application Analytics" }) => {
   const [selectedData, setSelectedData] = useState<
     { name: string; value: number }[]
   >([]);
@@ -82,7 +83,7 @@ const ApplicantStatsVisualization: React.FC<
     "#FF5252",
     "#9C27B0",
   ];
-  const SELECTION_COLORS = ["#00C49F", "#FF8042"];
+  const SELECTION_COLORS = ["#16a34a", "#f59e0b", "#dc2626"];
 
   const processTimelineData = (apps: TutorApplication[]) => {
     const timeline: Record<string, number> = {};
@@ -190,7 +191,9 @@ const ApplicantStatsVisualization: React.FC<
     if (active && payload && payload.length) {
       return (
         <div className={styles.customTooltip}>
-          <p className={styles.tooltipValue}>{`${payload[0].value}`}</p>
+          <p className={styles.tooltipLabel}>
+            {`${payload[0].name}: ${payload[0].value}`}
+          </p>
         </div>
       );
     }
@@ -203,7 +206,6 @@ const ApplicantStatsVisualization: React.FC<
         <div className={styles.emptyStatsIcon}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -227,404 +229,440 @@ const ApplicantStatsVisualization: React.FC<
   }
 
   return (
-    <motion.div
-      className={styles.statsVisualizationContainer}
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-    >
-      <motion.div className={styles.statsHeader} variants={itemVariants}>
-        <div className={styles.statsSummaryCards}>
-          <div className={styles.summaryCard}>
-            <div className={`${styles.summaryIcon} ${styles.totalIcon}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.summaryContent}>
-              <div className={styles.summaryLabel}>Total Applications</div>
-              <div className={styles.summaryValue}>{applications.length}</div>
-              <div className={styles.summaryDesc}>
-                All submitted applications
-              </div>
-            </div>
-          </div>
-          <div className={styles.summaryCard}>
-            <div className={`${styles.summaryIcon} ${styles.selectedIcon}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.summaryContent}>
-              <div className={styles.summaryLabel}>Selected</div>
-              <div className={styles.summaryValue}>
-                {applicantStats.selectedCount}
-              </div>
-              <div className={styles.summaryDesc}>Approved applicants</div>
-            </div>
-          </div>
-          <div className={styles.summaryCard}>
-            <div className={`${styles.summaryIcon} ${styles.pendingIcon}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.summaryContent}>
-              <div className={styles.summaryLabel}>Pending</div>
-              <div className={styles.summaryValue}>
-                {applicantStats.notSelected}
-              </div>
-              <div className={styles.summaryDesc}>Awaiting review</div>
-            </div>
-          </div>
-          <div className={styles.summaryCard}>
-            <div className={`${styles.summaryIcon} ${styles.rateIcon}`}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-            <div className={styles.summaryContent}>
-              <div className={styles.summaryLabel}>Selection Rate</div>
-              <div className={styles.summaryValue}>
-                {applications.length > 0
-                  ? Math.round(
-                      (applicantStats.selectedCount / applications.length) * 100
-                    )
-                  : 0}
-                %
-              </div>
-              <div className={styles.summaryDesc}>Overall acceptance rate</div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      <div className={styles.statsChartsContainer}>
-        <motion.div className={styles.statsChartCard} variants={itemVariants}>
-          <h3 className={styles.chartTitle}>Selection Status</h3>
-          <div className={styles.pieChartContainer}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={selectedData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {selectedData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={SELECTION_COLORS[index % SELECTION_COLORS.length]}
+    <div className={styles.analyticsContainer}>
+      <h2 className={styles.analyticsTitle}>{title}</h2>
+      <div className={styles.analyticsContent}>
+        <motion.div
+          className={styles.statsVisualizationContainer}
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div className={styles.statsHeader} variants={itemVariants}>
+            <div className={styles.statsSummaryCards}>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryIcon} ${styles.totalIcon}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                     />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltipRecharts />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className={styles.chartStats}>
-            <div className={`${styles.chartStatItem} ${styles.selected}`}>
-              <div className={styles.statTitle}>Selected</div>
-              <div className={styles.statValue}>
-                {applicantStats.selectedCount}
+                  </svg>
+                </div>
+                <div className={styles.summaryContent}>
+                  <div className={styles.summaryLabel}>Total Applications</div>
+                  <div className={styles.summaryValue}>
+                    {applications.length}
+                  </div>
+                  <div className={styles.summaryDesc}>
+                    All submitted applications
+                  </div>
+                </div>
               </div>
-              <div className={styles.statDesc}>Confirmed positions</div>
-            </div>
-            <div className={`${styles.chartStatItem} ${styles.pending}`}>
-              <div className={styles.statTitle}>Pending</div>
-              <div className={styles.statValue}>
-                {applicantStats.notSelected}
-              </div>
-              <div className={styles.statDesc}>Under review</div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div className={styles.statsChartCard} variants={itemVariants}>
-          <h3 className={styles.chartTitle}>Top Selected Applicants</h3>
-          <div className={styles.barChartContainer}>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart
-                data={getTopApplicantsData()}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip content={<CustomTooltipRecharts />} />
-                <Legend wrapperStyle={{ display: "none" }} />
-                <Bar dataKey="count" name="Selection Count" fill="#8884d8">
-                  {getTopApplicantsData().map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryIcon} ${styles.selectedIcon}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className={styles.chartInfo}>
-            {applicantStats.mostChosen ? (
-              <div className={styles.topApplicant}>
-                <span className={styles.infoLabel}>Most Selected: </span>
-                <span className={styles.infoValue}>
-                  {applicantStats.mostChosen.name}
-                </span>
-                <span className={styles.infoCount}>
-                  {" "}
-                  ({applicantStats.mostChosen.count} selections)
-                </span>
+                  </svg>
+                </div>
+                <div className={styles.summaryContent}>
+                  <div className={styles.summaryLabel}>Selected</div>
+                  <div className={styles.summaryValue}>
+                    {applicantStats.selectedCount}
+                  </div>
+                  <div className={styles.summaryDesc}>Approved applicants</div>
+                </div>
               </div>
-            ) : (
-              <div className={styles.noData}>No selection data available</div>
-            )}
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryIcon} ${styles.pendingIcon}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.summaryContent}>
+                  <div className={styles.summaryLabel}>Pending</div>
+                  <div className={styles.summaryValue}>
+                    {applicantStats.notSelected}
+                  </div>
+                  <div className={styles.summaryDesc}>Awaiting review</div>
+                </div>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={`${styles.summaryIcon} ${styles.rateIcon}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.summaryContent}>
+                  <div className={styles.summaryLabel}>Selection Rate</div>
+                  <div className={styles.summaryValue}>
+                    {applications.length > 0
+                      ? Math.round(
+                          (applicantStats.selectedCount / applications.length) *
+                            100
+                        )
+                      : 0}
+                    %
+                  </div>
+                  <div className={styles.summaryDesc}>
+                    Overall acceptance rate
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className={styles.statsChartsContainer}>
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Selection Status</h3>
+              <div className={styles.pieChartContainer}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={selectedData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {selectedData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            SELECTION_COLORS[index % SELECTION_COLORS.length]
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltipRecharts />} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className={styles.chartStats}>
+                <div className={`${styles.chartStatItem} ${styles.selected}`}>
+                  <div className={styles.statTitle}>Selected</div>
+                  <div className={styles.statValue}>
+                    {applicantStats.selectedCount}
+                  </div>
+                  <div className={styles.statDesc}>Confirmed positions</div>
+                </div>
+                <div className={`${styles.chartStatItem} ${styles.pending}`}>
+                  <div className={styles.statTitle}>Pending</div>
+                  <div className={styles.statValue}>
+                    {applicantStats.notSelected}
+                  </div>
+                  <div className={styles.statDesc}>Under review</div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Top Selected Applicants</h3>
+              <div className={styles.barChartContainer}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart
+                    data={getTopApplicantsData()}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip content={<CustomTooltipRecharts />} />
+                    <Bar dataKey="count" fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Course Distribution</h3>
+              <div className={styles.barChartContainer}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart
+                    data={courseDistribution}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    layout="vertical"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" width={80} />
+                    <Tooltip content={<CustomTooltipRecharts />} />
+                    <Legend wrapperStyle={{ display: "none" }} />
+                    <Bar dataKey="count" name="Applicants" fill="#8884d8">
+                      {courseDistribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Availability Distribution</h3>
+              <div className={styles.pieChartContainer}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={availabilityData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {availabilityData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            SELECTION_COLORS[index % SELECTION_COLORS.length]
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltipRecharts />} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Application Timeline</h3>
+              <div className={styles.lineChartContainer}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart
+                    data={timelineData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip content={<CustomTooltipRecharts />} />
+                    <Line type="monotone" dataKey="count" stroke="#f59e0b" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className={styles.statsChartCard}
+              variants={itemVariants}
+            >
+              <h3 className={styles.chartTitle}>Top Skills</h3>
+              <div className={styles.skillsListContainer}>
+                {applicantStats.skillDistribution.slice(0, 8).map((skill) => (
+                  <div key={skill.skill} className={styles.skillStatItem}>
+                    <div className={styles.skillName}>{skill.skill}</div>
+                    <div className={styles.skillCount}>
+                      <span>{skill.count}</span>
+                      <div
+                        className={styles.skillBar}
+                        style={{
+                          width: `${(skill.count / applicantStats.skillDistribution[0].count) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
+
+          <motion.div className={styles.statsInsights} variants={itemVariants}>
+            <h3 className={styles.insightsTitle}>Key Insights</h3>
+            <div className={styles.insightsContent}>
+              <div className={styles.trendChart}>
+                <h4>Application Trends</h4>
+                <ResponsiveContainer width="100%" height={100}>
+                  <LineChart data={timelineData}>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="count" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className={styles.skillsDistribution}>
+                <h4>Top Skills</h4>
+                <ResponsiveContainer width="100%" height={100}>
+                  <BarChart
+                    data={applicantStats.skillDistribution}
+                    layout="vertical"
+                  >
+                    <XAxis type="number" />
+                    <YAxis dataKey="skill" type="category" width={100} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#82ca9d" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className={styles.insightItem}>
+                <div className={styles.insightIcon}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.insightContent}>
+                  <h4>Selection Rate</h4>
+                  <p>
+                    {applications.length > 0
+                      ? `${Math.round((applicantStats.selectedCount / applications.length) * 100)}% of applicants have been selected.`
+                      : "No applications yet."}{" "}
+                    {applicantStats.selectedCount > 0 &&
+                      ` That's ${applicantStats.selectedCount} out of ${applications.length} total applicants.`}
+                  </p>
+                </div>
+              </div>
+              <div className={styles.insightItem}>
+                <div className={styles.insightIcon}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.insightContent}>
+                  <h4>Course Distribution</h4>
+                  <p>
+                    {courseDistribution.length > 0
+                      ? `Most popular course: ${courseDistribution[0].name} with ${courseDistribution[0].count} applications.`
+                      : "No course applications yet."}
+                  </p>
+                </div>
+              </div>
+              <div className={styles.insightItem}>
+                <div className={styles.insightIcon}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.insightContent}>
+                  <h4>Top Performer</h4>
+                  <p>
+                    {applicantStats.mostChosen
+                      ? `${applicantStats.mostChosen.name} leads with ${applicantStats.mostChosen.count} selections.`
+                      : "No selections made yet."}
+                  </p>
+                </div>
+              </div>
+              <div className={styles.insightItem}>
+                <div className={styles.insightIcon}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <div className={styles.insightContent}>
+                  <h4>Availability Trend</h4>
+                  <p>
+                    {availabilityData.length > 0
+                      ? `${availabilityData[0].value > availabilityData[1].value ? "Full-time" : "Part-time"} availability is preferred by applicants.`
+                      : "No availability data yet."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
-
-      <div className={styles.statsChartsContainer}>
-        <motion.div className={styles.statsChartCard} variants={itemVariants}>
-          <h3 className={styles.chartTitle}>Course Distribution</h3>
-          <div className={styles.barChartContainer}>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart
-                data={courseDistribution}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={80} />
-                <Tooltip content={<CustomTooltipRecharts />} />
-                <Legend wrapperStyle={{ display: "none" }} />
-                <Bar dataKey="count" name="Applicants" fill="#8884d8">
-                  {courseDistribution.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-
-        <motion.div className={styles.statsChartCard} variants={itemVariants}>
-          <h3 className={styles.chartTitle}>Availability Distribution</h3>
-          <div className={styles.pieChartContainer}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={availabilityData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {availabilityData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index + (2 % COLORS.length)]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltipRecharts />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-      </div>
-
-      <motion.div className={styles.statsInsights} variants={itemVariants}>
-        <h3 className={styles.insightsTitle}>Key Insights</h3>
-        <div className={styles.insightsContent}>
-          <div className={styles.trendChart}>
-            <h4>Application Trends</h4>
-            <ResponsiveContainer width="100%" height={100}>
-              <LineChart data={timelineData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className={styles.skillsDistribution}>
-            <h4>Top Skills</h4>
-            <ResponsiveContainer width="100%" height={100}>
-              <BarChart
-                data={applicantStats.skillDistribution}
-                layout="vertical"
-              >
-                <XAxis type="number" />
-                <YAxis dataKey="skill" type="category" width={100} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className={styles.insightItem}>
-            <div className={styles.insightIcon}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-            <div className={styles.insightContent}>
-              <h4>Selection Rate</h4>
-              <p>
-                {applications.length > 0
-                  ? `${Math.round((applicantStats.selectedCount / applications.length) * 100)}% of applicants have been selected.`
-                  : "No applications yet."}{" "}
-                {applicantStats.selectedCount > 0 &&
-                  ` That's ${applicantStats.selectedCount} out of ${applications.length} total applicants.`}
-              </p>
-            </div>
-          </div>
-          <div className={styles.insightItem}>
-            <div className={styles.insightIcon}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.insightContent}>
-              <h4>Course Distribution</h4>
-              <p>
-                {courseDistribution.length > 0
-                  ? `Most popular course: ${courseDistribution[0].name} with ${courseDistribution[0].count} applications.`
-                  : "No course applications yet."}
-              </p>
-            </div>
-          </div>
-          <div className={styles.insightItem}>
-            <div className={styles.insightIcon}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className={styles.insightContent}>
-              <h4>Top Performer</h4>
-              <p>
-                {applicantStats.mostChosen
-                  ? `${applicantStats.mostChosen.name} leads with ${applicantStats.mostChosen.count} selections.`
-                  : "No selections made yet."}
-              </p>
-            </div>
-          </div>
-          <div className={styles.insightItem}>
-            <div className={styles.insightIcon}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <div className={styles.insightContent}>
-              <h4>Availability Trend</h4>
-              <p>
-                {availabilityData.length > 0
-                  ? `${availabilityData[0].value > availabilityData[1].value ? "Full-time" : "Part-time"} availability is preferred by applicants.`
-                  : "No availability data yet."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+    </div>
   );
 };
 

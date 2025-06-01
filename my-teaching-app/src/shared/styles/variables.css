@@ -15,6 +15,16 @@
   --color-orange-400: #f97316;
   --color-orange-500: #ea580c;
 
+  /* Stat Icon Color Schemes */
+  --stat-icon-total-bg: rgba(79, 70, 229, 0.1);
+  --stat-icon-total-color: #4f46e5;
+  --stat-icon-selected-bg: rgba(16, 185, 129, 0.1);
+  --stat-icon-selected-color: #10b981;
+  --stat-icon-pending-bg: rgba(245, 158, 11, 0.1);
+  --stat-icon-pending-color: #f59e0b;
+  --stat-icon-rate-bg: rgba(239, 68, 68, 0.1);
+  --stat-icon-rate-color: #ef4444;
+
   /* Text colors */
   --color-text-primary: #111827;
   --color-text-secondary: #4b5563;
@@ -66,6 +76,12 @@
 
 /* Dark mode variables */
 [data-theme="dark"] {
+  /* Stat Icon Color Schemes - Dark Mode */
+  --stat-icon-total-bg: rgba(79, 70, 229, 0.15);
+  --stat-icon-selected-bg: rgba(16, 185, 129, 0.15);
+  --stat-icon-pending-bg: rgba(245, 158, 11, 0.15);
+  --stat-icon-rate-bg: rgba(239, 68, 68, 0.15);
+
   /* Text colors */
   --color-text-primary: #f9fafb;
   --color-text-secondary: #e5e7eb;

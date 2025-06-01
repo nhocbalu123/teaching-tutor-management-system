@@ -249,30 +249,30 @@
   }
 
   /* Section title responsive - center on mobile */
-  .section-title-container {
+  .sectionTitleContainer {
     flex-direction: column !important;
     text-align: center !important;
     align-items: center !important;
     margin-bottom: 2rem !important;
   }
 
-  .section-title-bar {
+  .sectionTitleBar {
     width: 4px !important;
     height: 80px !important;
     margin-right: 0 !important;
     margin-bottom: 1rem !important;
   }
 
-  .section-title-content {
+  .sectionTitleContent {
     text-align: center !important;
   }
 
-  .section-title-content h2 {
+  .sectionTitleContent h2 {
     font-size: 2rem !important;
     text-align: center !important;
   }
 
-  .section-title-content p {
+  .sectionTitleContent p {
     font-size: 1rem !important;
     text-align: center !important;
     max-width: 100% !important;
@@ -336,15 +336,15 @@
     padding-inline: 0.75rem !important;
   }
 
-  .section-title-content h2 {
+  .sectionTitleContent h2 {
     font-size: 1.5rem !important;
   }
 
-  .section-title-content p {
+  .sectionTitleContent p {
     font-size: 0.9rem !important;
   }
 
-  .section-title-bar {
+  .sectionTitleBar {
     height: 60px !important;
   }
 }
