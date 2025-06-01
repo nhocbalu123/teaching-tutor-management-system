@@ -122,6 +122,10 @@ export default function SignInForm() {
             avatarPath: avatarPath,
           })
         );
+
+        // Dispatch custom event to notify other components of auth state change
+        window.dispatchEvent(new Event("auth-change"));
+
         setSuccess("Sign in successful! Redirecting...");
         setTimeout(() => {
           // TODO: Refactor routing

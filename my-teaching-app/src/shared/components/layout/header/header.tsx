@@ -1,53 +1,65 @@
 "use client";
-// filepath: c:\s3978302\Full Stack Development\s3959931-s3978302-a2\my-teaching-app\src\modules\core\components\layout\Header.tsx
-// src\components\layout\Header.tsx
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import UserDropdown from "../user-dropdown/user-dropdown";
-import styles from "./Header.module.css";
+import UserDropdown from "../user-dropdown";
+import styles from "./header.module.css";
 
-// Define a proper type for user data
 interface UserData {
   id: string;
   email: string;
-  role: "tutor" | "lecturer";
+  role: "tutor" | "lecturer" | "user"; // Added user for default case
   fullName: string;
   bio?: string;
   skills?: string[];
   academicCredentials?: string;
-  avatarPath?: string; // Added avatarPath property
+  avatarPath?: string;
 }
 
 const Header: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<
+    "tutor" | "lecturer" | "user" | null
+  >(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  // State to manage animation for theme toggle
   const [isThemeToggleRemoving, setIsThemeToggleRemoving] = useState(false);
   const [isThemeToggleAdding, setIsThemeToggleAdding] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in
+  // Function to check and update authentication state
+  const checkAuthState = () => {
     if (typeof window !== "undefined") {
       const user = localStorage.getItem("currentUser");
-
       if (user) {
-        const userDataParsed = JSON.parse(user);
-        setIsLoggedIn(true);
-        setUserRole(userDataParsed.role);
-        setUserData(userDataParsed);
+        try {
+          const userDataParsed = JSON.parse(user);
+          setIsLoggedIn(true);
+          setUserRole(userDataParsed.role || "user");
+          setUserData(userDataParsed);
+        } catch (e) {
+          console.error("Failed to parse user data from localStorage:", e);
+          setIsLoggedIn(false);
+          setUserRole(null);
+          setUserData(null);
+          localStorage.removeItem("currentUser"); // Clear corrupted data
+        }
       } else {
         setIsLoggedIn(false);
         setUserRole(null);
+        setUserData(null);
       }
+    }
+  };
 
-      // Check for dark mode preference
+  useEffect(() => {
+    // Initial check on component mount
+    checkAuthState();
+
+    if (typeof window !== "undefined") {
       const darkModePreference = localStorage.getItem("darkMode") === "true";
       setIsDarkMode(darkModePreference);
       if (darkModePreference) {
@@ -57,36 +69,46 @@ const Header: React.FC = () => {
       }
     }
 
-    // Scroll event listener for sticky header effect
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    // Listen for storage events (fired when localStorage changes in other tabs/windows)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "currentUser") {
+        checkAuthState();
       }
     };
 
+    // Listen for custom events (for same-window localStorage changes)
+    const handleAuthChange = () => {
+      checkAuthState();
+    };
+
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("auth-change", handleAuthChange);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("auth-change", handleAuthChange);
     };
   }, []);
 
-  // Function to handle sign out
   const handleSignOut = () => {
     localStorage.removeItem("currentUser");
     setIsLoggedIn(false);
     setUserRole(null);
+    setUserData(null);
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event("auth-change"));
     router.push("/");
   };
 
-  // Function to toggle dark mode
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-
-    // Apply dark mode changes to document
     if (newDarkMode) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("darkMode", "true");
@@ -96,33 +118,24 @@ const Header: React.FC = () => {
     }
   };
 
-  // Animate theme toggle when login state changes
   useEffect(() => {
     if (isLoggedIn) {
       setIsThemeToggleRemoving(true);
-      // After removal animation completes, we reset the state
-      setTimeout(() => {
-        setIsThemeToggleRemoving(false);
-      }, 300); // Match this timing with the CSS transition
+      setTimeout(() => setIsThemeToggleRemoving(false), 300);
     } else {
       setIsThemeToggleAdding(true);
-      setTimeout(() => {
-        setIsThemeToggleAdding(false);
-      }, 300);
+      setTimeout(() => setIsThemeToggleAdding(false), 300);
     }
   }, [isLoggedIn]);
 
-  // Determine which navigation links to show
-  const showTutorLink = !isLoggedIn || (isLoggedIn && userRole === "tutor");
-  const showLecturerLink =
-    !isLoggedIn || (isLoggedIn && userRole === "lecturer");
+  const showTutorLink = !isLoggedIn || userRole === "tutor";
+  const showLecturerLink = !isLoggedIn || userRole === "lecturer";
 
   return (
     <header
       className={`${styles["main-header"]} ${isScrolled ? styles.scrolled : ""}`}
     >
       <div className={`${styles.container} mx-auto ${styles["header-grid"]}`}>
-        {/* Logo with proper alignment */}
         <div className={styles["logo-wrapper"]}>
           <Link href="/" className={styles["logo-link"]}>
             <div className={styles["logo-container"]}>
@@ -142,7 +155,6 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* Center Navigation */}
         <nav className={styles["main-nav"]}>
           <div className={styles["nav-links"]}>
             <Link
@@ -153,7 +165,6 @@ const Header: React.FC = () => {
             >
               Home
             </Link>
-
             {showTutorLink && (
               <Link
                 href="/tutor"
@@ -164,7 +175,6 @@ const Header: React.FC = () => {
                 Tutor
               </Link>
             )}
-
             {showLecturerLink && (
               <Link
                 href="/lecturer"
@@ -178,19 +188,18 @@ const Header: React.FC = () => {
           </div>
         </nav>
 
-        {/* Right Side Actions */}
         <div className={styles["header-actions"]}>
-          {/* Theme Toggle Button - Only visible when not logged in */}
           {!isLoggedIn && (
             <button
               onClick={toggleDarkMode}
-              className={`${styles["theme-toggle-btn"]} ${styles["header-theme-toggle"]} ${
+              className={`${styles["theme-toggle-btn"]} ${
+                styles["header-theme-toggle"]
+              } ${
                 isThemeToggleAdding ? styles.adding : ""
               } ${isThemeToggleRemoving ? styles.removing : ""}`}
               aria-label="Toggle dark mode"
             >
               <div className={styles["theme-icon-wrapper"]}>
-                {/* Sun icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`${styles["theme-icon"]} ${styles.sun}`}
@@ -205,7 +214,6 @@ const Header: React.FC = () => {
                     d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
                   />
                 </svg>
-                {/* Moon icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`${styles["theme-icon"]} ${styles.moon}`}
@@ -223,8 +231,17 @@ const Header: React.FC = () => {
               </div>
             </button>
           )}
-
-          {!isLoggedIn ? (
+          {isLoggedIn && userData ? (
+            <UserDropdown
+              user={{
+                ...userData,
+                role: userData.role || "user", // Ensure role is not null
+              }}
+              onSignOut={handleSignOut}
+              onToggleDarkMode={toggleDarkMode}
+              isDarkMode={isDarkMode}
+            />
+          ) : (
             <>
               <Link
                 href="/signin"
@@ -239,18 +256,6 @@ const Header: React.FC = () => {
                 Sign Up
               </Link>
             </>
-          ) : (
-            <UserDropdown
-              user={{
-                fullName: userData?.fullName || "User",
-                email: userData?.email || "",
-                role: userData?.role || "user",
-                avatarPath: userData?.avatarPath,
-              }}
-              onSignOut={handleSignOut}
-              onToggleDarkMode={toggleDarkMode}
-              isDarkMode={isDarkMode}
-            />
           )}
         </div>
       </div>
