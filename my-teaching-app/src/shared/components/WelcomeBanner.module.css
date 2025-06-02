@@ -1,0 +1,153 @@
+/* Welcome Banner Styles */
+.welcomeBanner {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #ea580c 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  margin-bottom: 0;
+  position: fixed;
+  top: 64px; /* Right below header height */
+  left: 0;
+  right: 0;
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  animation: slideInFromTop 0.5s ease-out;
+}
+
+/* Adding dark mode support */
+:global(.dark) .welcomeBanner {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #dc2626 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.welcomeBanner.hiding {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.welcomeContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  position: relative;
+}
+
+.welcomeMessage {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.025em;
+}
+
+.welcomeSubtitle {
+  font-size: 0.95rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Close Button */
+.closeButton {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .welcomeBanner {
+    padding: 1rem 1.5rem;
+    text-align: center;
+    top: 56px; /* Adjusted for smaller header on tablets */
+  }
+
+  .welcomeContent {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .welcomeMessage {
+    font-size: 1.5rem;
+  }
+
+  .welcomeSubtitle {
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .closeButton {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcomeBanner {
+    padding: 0.875rem 1rem;
+    top: 52px; /* Adjusted for smaller header on mobile */
+  }
+
+  .welcomeMessage {
+    font-size: 1.375rem;
+  }
+
+  .welcomeSubtitle {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animations */
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Fade out animation */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}

@@ -154,12 +154,7 @@ export default function SignUpForm() {
         // Use the AuthContext login method to properly set authentication state
         login(response.data.user, response.data.token);
 
-        // Show success message
-        alert(
-          `Welcome ${response.data.user.firstName}! Account created successfully.`
-        );
-
-        // Redirect to profile or dashboard
+        // Redirect to profile or dashboard - welcome banner will show automatically
         router.push("/profile");
       } else {
         // Handle API errors
