@@ -1,16 +1,3 @@
-.section {
-  width: 100%;
-}
-
-.container {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  max-width: 1280px;
-}
-
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-in-out;
 }

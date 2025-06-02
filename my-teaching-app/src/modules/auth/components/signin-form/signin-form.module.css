@@ -271,15 +271,3 @@
     opacity: 0.25;
   }
 }
-
-/* Keyframe animation for fadeIn */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}

@@ -6,7 +6,7 @@
 
 /* Core Foundation */
 @import "./variables.css"; /* CSS custom properties */
-@import "./global/base.css";
+@import "./base.css"; /* Consolidated base styles, animations, and layout components */
 @import "./global/animations.css";
 @import "./global/utilities.css";
 

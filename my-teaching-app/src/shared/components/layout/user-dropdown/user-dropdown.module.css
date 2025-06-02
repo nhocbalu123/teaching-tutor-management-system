@@ -79,17 +79,16 @@
 /* Dropdown Menu */
 .userDropdownMenu {
   position: absolute;
-  top: 55px;
-  right: -10px;
+  top: calc(100% + 8px);
+  right: 0;
   width: 320px;
   background-color: var(--color-bg-primary);
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
   overflow: hidden;
-  z-index: 50;
-  opacity: 0;
-  animation: fadeIn 0.2s ease forwards;
+  animation: dropdownFadeIn 0.2s ease-out;
 }
 
 /* Dropdown Header */
@@ -330,7 +329,7 @@
 }
 
 /* Animations */
-@keyframes fadeIn {
+@keyframes dropdownFadeIn {
   from {
     opacity: 0;
     transform: translateY(-10px) scale(0.95);

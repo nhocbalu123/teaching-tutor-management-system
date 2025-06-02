@@ -1,19 +1,5 @@
 /* Redundant grid styles removed, relying on kebab-case versions below. */
 
-/* Container - if not globally defined and styles.container is used in Header.tsx */
-/* Check if your global styles (utilities.css) have a .container already */
-/* If Header.tsx uses <div className={`${styles.container} mx-auto ...`}>, 
-   and mx-auto is a global Tailwind-like utility for centering, 
-   then this .container might just need width/padding. */
-.container {
-  width: 100%;
-  max-width: 1280px; /* Example max-width, adjust as needed */
-  margin-left: auto; /* If not using global mx-auto */
-  margin-right: auto; /* If not using global mx-auto */
-  /* padding-left: 1.5rem; */ /* Already in headerGrid or mainHeader */
-  /* padding-right: 1.5rem; */ /* Already in headerGrid or mainHeader */
-}
-
 /* Main Header Styles */
 .main-header {
   position: fixed;

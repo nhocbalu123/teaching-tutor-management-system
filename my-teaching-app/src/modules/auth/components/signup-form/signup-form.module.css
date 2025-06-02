@@ -262,6 +262,7 @@
   color: #1d4ed8;
 }
 
+/* Enhanced keyframe animation for pulse */
 @keyframes pulse-slow {
   0%,
   100% {
