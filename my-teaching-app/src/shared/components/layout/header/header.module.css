@@ -30,6 +30,7 @@
 
 .logo-wrapper {
   justify-self: start;
+  margin-left: 12rem;
 }
 
 .main-nav {
@@ -56,11 +57,9 @@
 }
 
 .logo-image-container {
-  /* Added for the div wrapping the logo Image */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Add any specific sizing or margins if needed, otherwise it will just contain the image */
 }
 
 .logo-image {
@@ -159,6 +158,75 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* Auth Buttons Styles */
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.authButton {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: 2.25rem;
+  box-sizing: border-box;
+  line-height: 1.25;
+}
+
+.authButtonPrimary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  transform: translateY(-1px);
+  box-sizing: border-box;
+}
+
+.authButtonPrimary:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+}
+
+.authButtonPrimary.active {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+}
+
+.authButtonSecondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  transform: translateY(-1px);
+  box-sizing: border-box;
+}
+
+.authButtonSecondary:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
+}
+
+.authButtonSecondary.active {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2);
 }
 
 /* Theme Toggle Button (in header) */

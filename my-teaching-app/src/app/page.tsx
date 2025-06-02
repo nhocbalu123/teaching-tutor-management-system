@@ -9,16 +9,16 @@ import LecturerShowcase from "@/modules/home/components/lecturer-showcase/Lectur
 import Modal from "@/shared/components/common/modal/Modal";
 import type { Lecturer } from "@/shared/types/lecturer";
 import HeroSection from "@/modules/home/components/hero-section/HeroSection";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 export default function HomePage() {
   const [activeLecturer, setActiveLecturer] = useState<Lecturer | null>(null);
 
-  // Use centralized auth
-  const { userData, isLoggedIn } = useAuth();
+  // Use new centralized AuthContext
+  const { user, isAuthenticated } = useAuth();
 
-  // Derive user role from centralized auth
-  const userRole = userData?.role || null;
+  // Convert user type to role for compatibility with existing components
+  const userRole = user?.userType || null;
 
   const handleOpenLecturerModal = (lecturerId: string): void => {
     const lecturer = lecturers.find((l) => l.id === lecturerId);
@@ -37,83 +37,81 @@ export default function HomePage() {
     : -1;
 
   return (
-    <>
-      <main className="flex-grow pt-24">
-        <HeroSection />
+    <main className={`flex-grow ${isAuthenticated ? "pt-0" : "pt-24"}`}>
+      <HeroSection />
 
-        <TimelineSection isLoggedIn={isLoggedIn} userRole={userRole} />
+      <TimelineSection isLoggedIn={isAuthenticated} userRole={userRole} />
 
-        <LecturerShowcase
-          lecturers={lecturers}
-          onOpenLecturerModal={handleOpenLecturerModal}
-        />
+      <LecturerShowcase
+        lecturers={lecturers}
+        onOpenLecturerModal={handleOpenLecturerModal}
+      />
 
-        {currentLecturerDetails && (
-          <Modal
-            isOpen={!!activeLecturer}
-            onClose={handleCloseModal}
-            maxWidth="800px"
-          >
-            <div className={modalStyles.modalImageSection}>
-              <div className={modalStyles.modalImageContainer}>
-                <Image
-                  src={
-                    currentLecturerDetails.avatarPath ||
-                    `/lecturers/lecturer-${activeLecturerImageIndex + 1}.jpg`
-                  }
-                  alt={currentLecturerDetails.name}
-                  width={300}
-                  height={300}
-                  className={modalStyles.lecturerImage}
-                />
-              </div>
+      {currentLecturerDetails && (
+        <Modal
+          isOpen={!!activeLecturer}
+          onClose={handleCloseModal}
+          maxWidth="800px"
+        >
+          <div className={modalStyles.modalImageSection}>
+            <div className={modalStyles.modalImageContainer}>
+              <Image
+                src={
+                  currentLecturerDetails.avatarPath ||
+                  `/lecturers/lecturer-${activeLecturerImageIndex + 1}.jpg`
+                }
+                alt={currentLecturerDetails.name}
+                width={300}
+                height={300}
+                className={modalStyles.lecturerImage}
+              />
             </div>
-            <div className={modalStyles.modalContent}>
-              <h3 className={modalStyles.modalTitle}>
-                {currentLecturerDetails.name}
-              </h3>
-              <p className={modalStyles.modalSubtitle}>
-                {currentLecturerDetails.title} in{" "}
-                {currentLecturerDetails.specialization}
-              </p>
-              <p className={modalStyles.modalText}>
-                {currentLecturerDetails.bio}
-              </p>
-              <ul className={modalStyles.modalInfoList}>
+          </div>
+          <div className={modalStyles.modalContent}>
+            <h3 className={modalStyles.modalTitle}>
+              {currentLecturerDetails.name}
+            </h3>
+            <p className={modalStyles.modalSubtitle}>
+              {currentLecturerDetails.title} in{" "}
+              {currentLecturerDetails.specialization}
+            </p>
+            <p className={modalStyles.modalText}>
+              {currentLecturerDetails.bio}
+            </p>
+            <ul className={modalStyles.modalInfoList}>
+              <li className={modalStyles.modalInfoItem}>
+                <span className={modalStyles.modalInfoIcon}>📚</span>
+                <span>
+                  <strong>Teaches:</strong> {currentLecturerDetails.courses}
+                </span>
+              </li>
+              {currentLecturerDetails.certifications && (
                 <li className={modalStyles.modalInfoItem}>
-                  <span className={modalStyles.modalInfoIcon}>📚</span>
+                  <span className={modalStyles.modalInfoIcon}>🎓</span>
                   <span>
-                    <strong>Teaches:</strong> {currentLecturerDetails.courses}
+                    <strong>Certifications:</strong>{" "}
+                    {currentLecturerDetails.certifications}
                   </span>
                 </li>
-                {currentLecturerDetails.certifications && (
-                  <li className={modalStyles.modalInfoItem}>
-                    <span className={modalStyles.modalInfoIcon}>🎓</span>
-                    <span>
-                      <strong>Certifications:</strong>{" "}
-                      {currentLecturerDetails.certifications}
-                    </span>
-                  </li>
-                )}
-                {currentLecturerDetails.awards && (
-                  <li className={modalStyles.modalInfoItem}>
-                    <span className={modalStyles.modalInfoIcon}>🏆</span>
-                    <span>
-                      <strong>Awards:</strong> {currentLecturerDetails.awards}
-                    </span>
-                  </li>
-                )}
+              )}
+              {currentLecturerDetails.awards && (
                 <li className={modalStyles.modalInfoItem}>
-                  <span className={modalStyles.modalInfoIcon}>📧</span>
+                  <span className={modalStyles.modalInfoIcon}>🏆</span>
                   <span>
-                    <strong>Contact:</strong> {currentLecturerDetails.contact}
+                    <strong>Awards:</strong> {currentLecturerDetails.awards}
                   </span>
                 </li>
-              </ul>
-            </div>
-          </Modal>
-        )}
-      </main>
-    </>
+              )}
+              <li className={modalStyles.modalInfoItem}>
+                <span className={modalStyles.modalInfoIcon}>📧</span>
+                <span>
+                  <strong>Contact:</strong> {currentLecturerDetails.contact}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </Modal>
+      )}
+    </main>
   );
 }
