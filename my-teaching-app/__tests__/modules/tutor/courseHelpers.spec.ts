@@ -3,8 +3,10 @@ import { getCourseByCode, searchCourses } from "@/shared/utils/courseUtils";
 import {
   getRandomRole,
   getRandomAvailability,
+  getRandomSkills,
   getCoursesWithDetails,
 } from "@/modules/tutor/utils/courseHelpers";
+import { availableSkills } from "@/modules/tutor/utils/applicationDisplay.utils";
 
 describe("Tutor Course Helpers", () => {
   // Test 1: Confirm availableCourses contains the expected data
@@ -57,29 +59,58 @@ describe("Tutor Course Helpers", () => {
     Math.random = originalRandom;
   });
 
-  // Test 4: getCoursesWithDetails returns courses with role and availability
-  test("getCoursesWithDetails returns courses with role and availability for tutor context", () => {
+  // Test 4: getRandomSkills returns 2-4 skills from availableSkills
+  test("getRandomSkills returns 2-4 skills from availableSkills", () => {
+    const skills = getRandomSkills();
+
+    // Should return between 2-4 skills
+    expect(skills.length).toBeGreaterThanOrEqual(2);
+    expect(skills.length).toBeLessThanOrEqual(4);
+
+    // All returned skills should be from availableSkills
+    skills.forEach((skill) => {
+      expect(availableSkills).toContain(skill);
+    });
+
+    // Should not have duplicate skills
+    const uniqueSkills = [...new Set(skills)];
+    expect(uniqueSkills.length).toBe(skills.length);
+  });
+
+  // Test 5: getCoursesWithDetails returns courses with role, availability, and skills
+  test("getCoursesWithDetails returns courses with role, availability, and skills for tutor context", () => {
     const coursesWithDetails = getCoursesWithDetails();
 
     // Should have same length as availableCourses
     expect(coursesWithDetails.length).toBe(availableCourses.length);
 
-    // Each course should have role and availability properties
+    // Each course should have role, availability, and skills properties
     coursesWithDetails.forEach((course) => {
       expect(course).toHaveProperty("code");
       expect(course).toHaveProperty("name");
       expect(course).toHaveProperty("role");
       expect(course).toHaveProperty("availability");
+      expect(course).toHaveProperty("skills");
 
       // Check that role is either Tutor or Lab-Assistant
       expect(["Tutor", "Lab-Assistant"]).toContain(course.role);
 
       // Check that availability is either Part Time or Full Time
       expect(["Part Time", "Full Time"]).toContain(course.availability);
+
+      // Check that skills is an array with 2-4 items
+      expect(Array.isArray(course.skills)).toBe(true);
+      expect(course.skills!.length).toBeGreaterThanOrEqual(2);
+      expect(course.skills!.length).toBeLessThanOrEqual(4);
+
+      // All skills should be from availableSkills
+      course.skills!.forEach((skill) => {
+        expect(availableSkills).toContain(skill);
+      });
     });
   });
 
-  // Test 5: getCourseByCode returns correct course for valid code
+  // Test 6: getCourseByCode returns correct course for valid code
   test("getCourseByCode returns correct course for valid code", () => {
     const course = getCourseByCode("COSC1111");
 
@@ -88,13 +119,13 @@ describe("Tutor Course Helpers", () => {
     expect(course?.name).toBe("Computing Technology And Programming");
   });
 
-  // Test 6: getCourseByCode returns undefined for invalid code
+  // Test 7: getCourseByCode returns undefined for invalid code
   test("getCourseByCode returns undefined for invalid code", () => {
     const course = getCourseByCode("NONEXISTENT");
     expect(course).toBeUndefined();
   });
 
-  // Test 7: searchCourses finds courses by code or name
+  // Test 8: searchCourses finds courses by code or name
   test("searchCourses finds courses by code or name", () => {
     // Search by code
     const resultsByCode = searchCourses("COSC1111");

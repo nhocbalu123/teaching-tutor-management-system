@@ -1,6 +1,5 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import type { CourseDetails } from "@/shared/types/courseTypes";
 import CourseCard from "../course-card/course-card";
 import styles from "./CourseGrid.module.css";
@@ -67,12 +66,6 @@ const CourseGrid: React.FC<CourseGridProps> = ({
   if (filteredCourses.length === 0) {
     return (
       <div className={styles.noCourses}>
-        <Image
-          src="/empty-box.svg"
-          alt="No courses found"
-          width={150}
-          height={150}
-        />
         <h3>No courses found</h3>
         <p>
           {searchQuery

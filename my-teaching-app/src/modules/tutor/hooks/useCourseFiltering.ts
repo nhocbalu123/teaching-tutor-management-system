@@ -73,7 +73,11 @@ export const useCourseFiltering = (existingApplications: string[]) => {
           course.code.toLowerCase().includes(query.toLowerCase()) ||
           course.name.toLowerCase().includes(query.toLowerCase()) ||
           course.role.toLowerCase().includes(query.toLowerCase()) ||
-          course.availability.toLowerCase().includes(query.toLowerCase());
+          course.availability.toLowerCase().includes(query.toLowerCase()) ||
+          (course.skills &&
+            course.skills.some((skill) =>
+              skill.toLowerCase().includes(query.toLowerCase())
+            ));
 
         // Apply application status filter
         const isApplied = applications.includes(course.code);
