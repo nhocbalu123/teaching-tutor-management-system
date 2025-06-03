@@ -88,3 +88,56 @@ export const validateSigninData = (data: any): ValidationResult => {
         errors,
     };
 };
+
+export const validateApplicationData = (data: any): ValidationResult => {
+    const errors: Record<string, string> = {};
+
+    // Course ID validation
+    if (!data.courseId) {
+        errors.courseId = "Course is required";
+    } else if (!Number.isInteger(data.courseId) || data.courseId <= 0) {
+        errors.courseId = "Invalid course selection";
+    }
+
+    // Role ID validation
+    if (!data.roleId) {
+        errors.roleId = "Role is required";
+    } else if (!Number.isInteger(data.roleId) || data.roleId <= 0) {
+        errors.roleId = "Invalid role selection";
+    }
+
+    // Availability validation
+    if (!data.availability) {
+        errors.availability = "Availability is required";
+    } else if (!["Part Time", "Full Time"].includes(data.availability)) {
+        errors.availability = "Invalid availability type";
+    }
+
+    // Skills validation
+    if (!data.skills) {
+        errors.skills = "Skills are required";
+    } else if (data.skills.length < 10) {
+        errors.skills = "Skills description must be at least 10 characters long";
+    } else if (data.skills.length > 1000) {
+        errors.skills = "Skills description must be less than 1000 characters";
+    }
+
+    // Experience validation (optional)
+    if (data.experience && data.experience.length > 2000) {
+        errors.experience = "Experience description must be less than 2000 characters";
+    }
+
+    // Motivation validation
+    if (!data.motivation) {
+        errors.motivation = "Motivation is required";
+    } else if (data.motivation.length < 20) {
+        errors.motivation = "Motivation must be at least 20 characters long";
+    } else if (data.motivation.length > 1000) {
+        errors.motivation = "Motivation must be less than 1000 characters";
+    }
+
+    return {
+        isValid: Object.keys(errors).length === 0,
+        errors,
+    };
+};

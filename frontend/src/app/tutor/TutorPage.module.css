@@ -4,11 +4,99 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+  min-height: calc(100vh - 200px);
+  background: linear-gradient(180deg, 
+    var(--color-bg-primary) 0%, 
+    var(--color-bg-secondary) 100%);
 }
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .tutorContainer {
     padding: 1rem;
+  }
+}
+
+/* Course Grid - Optimized for 3 cards per row */
+.courseGrid {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Responsive grid layout */
+@media (min-width: 1200px) {
+  .courseGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .courseGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .courseGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+
+/* Card hover effects for grid */
+.courseGrid > * {
+  transition: all 0.3s ease;
+}
+
+.courseGrid > *:hover {
+  transform: translateY(-4px);
+}
+
+/* Loading state */
+.tutorContainer .loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+/* Filter section spacing */
+.tutorContainer .searchFiltersContainer {
+  margin-bottom: 2rem;
+}
+
+/* Empty state styling */
+.tutorContainer .emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary);
+}
+
+.tutorContainer .emptyState h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+}
+
+.tutorContainer .emptyState p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .tutorContainer {
+    padding: 0 0.5rem;
+  }
+  
+  .courseGrid {
+    padding: 0;
   }
 }

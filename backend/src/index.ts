@@ -4,6 +4,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import { initializeDatabase } from "./config/database";
 import authRoutes from "./routes/auth";
+import applicationRoutes from "./routes/application";
 
 config();
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/applications", applicationRoutes);
 
 // Basic health check route
 app.get("/health", (req, res) => {
@@ -34,9 +36,9 @@ const startServer = async () => {
         await initializeDatabase();
 
         app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-            console.log(`📍 Health check: http://localhost:${PORT}/health`);
-            console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
+            console.log(`Server is running on port ${PORT}`);
+            console.log(`Health check: http://localhost:${PORT}/health`);
+            console.log(`Auth endpoints: http://localhost:${PORT}/api/auth`);
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);

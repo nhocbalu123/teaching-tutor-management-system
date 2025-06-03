@@ -7,6 +7,11 @@ interface JwtPayload {
     userType: string;
 }
 
+// Add interface for authenticated requests
+export interface AuthenticatedRequest extends Request {
+    user?: JwtPayload;
+}
+
 declare global {
     namespace Express {
         interface Request {

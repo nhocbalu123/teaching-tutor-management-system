@@ -1,6 +1,12 @@
 import { DataSource } from "typeorm";
 import { config } from "dotenv";
-import { User } from "../entities/User";
+import { User, UserType } from "../entities/User";
+import { Course } from "../entities/Course";
+import { Role } from "../entities/Role";
+import { CourseAssignment } from "../entities/CourseAssignment";
+import { Application } from "../entities/Application";
+import { SelectedCandidate } from "../entities/SelectedCandidate";
+import bcrypt from "bcryptjs";
 
 config();
 
@@ -15,12 +21,11 @@ export const AppDataSource = new DataSource({
     logging: process.env.NODE_ENV === "development",
     entities: [
         User,
-        // Other entities will be added for later parts of the assignment
-        // Course,
-        // Role,
-        // CourseAssignment,
-        // Application,
-        // SelectedCandidate,
+        Course,
+        Role,
+        CourseAssignment,
+        Application,
+        SelectedCandidate,
     ],
     migrations: ["src/migrations/*.ts"],
     subscribers: ["src/subscribers/*.ts"],
@@ -30,46 +35,254 @@ export const initializeDatabase = async () => {
     try {
         await AppDataSource.initialize();
         console.log("✅ Database connection initialized successfully");
-        console.log("📊 User table ready for authentication");
+        console.log("📊 All tables ready for TT application");
 
-        // Role seeding will be added for later assignment parts
-        // await seedDefaultRoles();
+        // Seed default data
+        await seedDefaultRoles();
+        await seedDefaultCourses();
+        await seedMockLecturers();
+        await seedCourseAssignments();
     } catch (error) {
         console.error("❌ Error during database initialization:", error);
         throw error;
     }
 };
 
-// Commented out for PA part b - will be used in later parts
-// const seedDefaultRoles = async () => {
-//     try {
-//         const roleRepository = AppDataSource.getRepository(Role);
+const seedDefaultRoles = async () => {
+    try {
+        const roleRepository = AppDataSource.getRepository(Role);
 
-//         const tutorRole = await roleRepository.findOne({
-//             where: { roleName: "tutor" },
-//         });
-//         if (!tutorRole) {
-//             const tutor = roleRepository.create({
-//                 roleName: "tutor",
-//                 description: "Tutor role for conducting tutorial sessions",
-//             });
-//             await roleRepository.save(tutor);
-//             console.log("✅ Tutor role created");
-//         }
+        const tutorRole = await roleRepository.findOne({
+            where: { roleName: "tutor" },
+        });
+        if (!tutorRole) {
+            const tutor = roleRepository.create({
+                roleName: "tutor",
+                description: "Tutor role for conducting tutorial sessions",
+            });
+            await roleRepository.save(tutor);
+            console.log("✅ Tutor role created");
+        }
 
-//         const labAssistantRole = await roleRepository.findOne({
-//             where: { roleName: "lab_assistant" },
-//         });
-//         if (!labAssistantRole) {
-//             const labAssistant = roleRepository.create({
-//                 roleName: "lab_assistant",
-//                 description:
-//                     "Lab Assistant role for assisting in laboratory sessions",
-//             });
-//             await roleRepository.save(labAssistant);
-//             console.log("✅ Lab Assistant role created");
-//         }
-//     } catch (error) {
-//         console.error("❌ Error seeding default roles:", error);
-//     }
-// };
+        const labAssistantRole = await roleRepository.findOne({
+            where: { roleName: "lab_assistant" },
+        });
+        if (!labAssistantRole) {
+            const labAssistant = roleRepository.create({
+                roleName: "lab_assistant",
+                description: "Lab Assistant role for assisting in laboratory sessions",
+            });
+            await roleRepository.save(labAssistant);
+            console.log("✅ Lab Assistant role created");
+        }
+    } catch (error) {
+        console.error("❌ Error seeding default roles:", error);
+    }
+};
+
+const seedDefaultCourses = async () => {
+    try {
+        const courseRepository = AppDataSource.getRepository(Course);
+
+        const defaultCourses = [
+            {
+                courseCode: "COSC2758",
+                courseName: "Full Stack Development",
+                semester: "Semester 1 2025",
+                description: "Learn to build modern web applications with React, Node.js, and databases",
+                maxTutors: 5,
+                maxLabAssistants: 3,
+            },
+            {
+                courseCode: "COSC2938",
+                courseName: "Further Web Programming",
+                semester: "Semester 1 2025",
+                description: "Advanced web development concepts and frameworks",
+                maxTutors: 4,
+                maxLabAssistants: 2,
+            },
+            {
+                courseCode: "COSC1295",
+                courseName: "Advanced Programming",
+                semester: "Semester 1 2025",
+                description: "Object-oriented programming with Java",
+                maxTutors: 6,
+                maxLabAssistants: 4,
+            },
+            {
+                courseCode: "COSC2123",
+                courseName: "Algorithms and Analysis",
+                semester: "Semester 1 2025",
+                description: "Study of algorithms, data structures, and computational complexity",
+                maxTutors: 4,
+                maxLabAssistants: 3,
+            },
+            {
+                courseCode: "COSC2767",
+                courseName: "Systems Deployment and Operations",
+                semester: "Semester 1 2025",
+                description: "Cloud deployment, DevOps practices, and system operations",
+                maxTutors: 3,
+                maxLabAssistants: 2,
+            },
+            {
+                courseCode: "COSC2671",
+                courseName: "Introduction to Web Programming",
+                semester: "Semester 1 2025",
+                description: "Fundamentals of web development with HTML, CSS, and JavaScript",
+                maxTutors: 5,
+                maxLabAssistants: 4,
+            },
+        ];
+
+        for (const courseData of defaultCourses) {
+            const existingCourse = await courseRepository.findOne({
+                where: { courseCode: courseData.courseCode },
+            });
+
+            if (!existingCourse) {
+                const course = courseRepository.create(courseData);
+                await courseRepository.save(course);
+                console.log(`✅ Course ${courseData.courseCode} created`);
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error seeding default courses:", error);
+    }
+};
+
+const seedMockLecturers = async () => {
+    try {
+        const userRepository = AppDataSource.getRepository(User);
+        const saltRounds = 10;
+
+        const mockLecturers = [
+            {
+                email: "dr.smith@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "John",
+                lastName: "Smith",
+                phone: "+61 3 9925 1234",
+            },
+            {
+                email: "prof.johnson@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "Sarah",
+                lastName: "Johnson",
+                phone: "+61 3 9925 2345",
+            },
+            {
+                email: "dr.williams@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "Michael",
+                lastName: "Williams",
+                phone: "+61 3 9925 3456",
+            },
+            {
+                email: "prof.brown@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "Emily",
+                lastName: "Brown",
+                phone: "+61 3 9925 4567",
+            },
+            {
+                email: "dr.davis@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "David",
+                lastName: "Davis",
+                phone: "+61 3 9925 5678",
+            },
+            {
+                email: "prof.wilson@rmit.edu.au",
+                password: "lecturer123",
+                firstName: "Lisa",
+                lastName: "Wilson",
+                phone: "+61 3 9925 6789",
+            },
+        ];
+
+        for (const lecturerData of mockLecturers) {
+            const existingLecturer = await userRepository.findOne({
+                where: { email: lecturerData.email },
+            });
+
+            if (!existingLecturer) {
+                const hashedPassword = await bcrypt.hash(lecturerData.password, saltRounds);
+
+                const lecturer = userRepository.create({
+                    email: lecturerData.email,
+                    password: hashedPassword,
+                    firstName: lecturerData.firstName,
+                    lastName: lecturerData.lastName,
+                    userType: UserType.LECTURER,
+                    phone: lecturerData.phone,
+                    isBlocked: false,
+                });
+
+                await userRepository.save(lecturer);
+                console.log(`✅ Lecturer ${lecturerData.firstName} ${lecturerData.lastName} created`);
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error seeding mock lecturers:", error);
+    }
+};
+
+const seedCourseAssignments = async () => {
+    try {
+        const userRepository = AppDataSource.getRepository(User);
+        const courseRepository = AppDataSource.getRepository(Course);
+        const assignmentRepository = AppDataSource.getRepository(CourseAssignment);
+
+        // Get all lecturers and courses
+        const lecturers = await userRepository.find({
+            where: { userType: UserType.LECTURER },
+        });
+        const courses = await courseRepository.find();
+
+        if (lecturers.length === 0 || courses.length === 0) {
+            console.log("⚠️ No lecturers or courses found for assignment seeding");
+            return;
+        }
+
+        // Define course assignments (lecturer email -> course codes)
+        const assignments = {
+            "dr.smith@rmit.edu.au": ["COSC2758", "COSC2671"],
+            "prof.johnson@rmit.edu.au": ["COSC2938", "COSC2123"],
+            "dr.williams@rmit.edu.au": ["COSC1295", "COSC2767"],
+            "prof.brown@rmit.edu.au": ["COSC2758", "COSC2938"],
+            "dr.davis@rmit.edu.au": ["COSC2123", "COSC2671"],
+            "prof.wilson@rmit.edu.au": ["COSC2767", "COSC1295"],
+        };
+
+        for (const [lecturerEmail, courseCodes] of Object.entries(assignments)) {
+            const lecturer = lecturers.find(l => l.email === lecturerEmail);
+            if (!lecturer) continue;
+
+            for (const courseCode of courseCodes) {
+                const course = courses.find(c => c.courseCode === courseCode);
+                if (!course) continue;
+
+                // Check if assignment already exists
+                const existingAssignment = await assignmentRepository.findOne({
+                    where: {
+                        lecturerId: lecturer.id,
+                        courseId: course.id,
+                    },
+                });
+
+                if (!existingAssignment) {
+                    const assignment = assignmentRepository.create({
+                        lecturerId: lecturer.id,
+                        courseId: course.id,
+                    });
+
+                    await assignmentRepository.save(assignment);
+                    console.log(`✅ Assigned ${lecturer.firstName} ${lecturer.lastName} to ${course.courseCode}`);
+                }
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error seeding course assignments:", error);
+    }
+};
