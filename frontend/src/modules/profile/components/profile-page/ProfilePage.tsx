@@ -169,6 +169,12 @@ export const ProfilePage: React.FC = () => {
                   {user.isBlocked ? "🔒 Blocked" : "✅ Active"}
                 </span>
               </div>
+              {user.userType === UserType.LECTURER && (
+                <div className={styles.statItem}>
+                  <span className={styles.statLabel}>Role</span>
+                  <span className={styles.statValue}>Teaching Staff</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -176,7 +182,7 @@ export const ProfilePage: React.FC = () => {
         {/* Profile Content */}
         <div className={styles.profileContent}>
           <div className={styles.contentGrid}>
-            {/* Contact Information Card */}
+            {/* Contact Information Card - Now positioned first */}
             <div className={styles.infoCard}>
               <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>
@@ -198,7 +204,7 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Account Information Card */}
+            {/* Account Information Card - Now positioned second */}
             <div className={styles.infoCard}>
               <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>
@@ -220,8 +226,8 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Role-Specific Information Card */}
-            <div className={styles.infoCard}>
+            {/* Role-Specific Information Card - Enhanced to span multiple columns */}
+            <div className={`${styles.infoCard} ${styles.wideCard}`}>
               <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>
                   <span className={styles.cardIcon}>{getUserTypeIcon(user.userType)}</span>
@@ -242,11 +248,20 @@ export const ProfilePage: React.FC = () => {
 
                 {user.userType === UserType.LECTURER && (
                   <div className={styles.roleDescription}>
-                    <p>As a lecturer, you can view and manage applications for your assigned courses. Review candidate profiles and make hiring decisions.</p>
+                    <p>As a lecturer, you can view and manage applications for your assigned courses. Review candidate profiles, evaluate their qualifications, and make hiring decisions for tutoring and lab assistant positions.</p>
                     <div className={styles.featureList}>
+                      <span className={styles.feature}>📚 View assigned courses</span>
                       <span className={styles.feature}>👥 Manage applications</span>
                       <span className={styles.feature}>📈 View analytics</span>
                       <span className={styles.feature}>🎯 Select candidates</span>
+                      <span className={styles.feature}>⭐ Rank applicants</span>
+                      <span className={styles.feature}>📊 Track hiring progress</span>
+                    </div>
+                    <div className={styles.lecturerInfo}>
+                      <p className={styles.lecturerNote}>
+                        <strong>Note:</strong> You can only view applications for courses you are assigned to teach. 
+                        Access your <a href="/lecturer" className={styles.lecturerLink}>Lecturer Dashboard</a> to manage applications and view detailed analytics.
+                      </p>
                     </div>
                   </div>
                 )}

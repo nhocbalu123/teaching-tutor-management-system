@@ -97,23 +97,18 @@ const TutorDashboardPage: React.FC = () => {
   const getComprehensiveStats = () => {
     const totalRoleCourseCombinations = courses.length * roles.length;
     const appliedCombinations = myApplications.length;
-    const availableCombinations = totalRoleCourseCombinations - appliedCombinations;
     
-    // Calculate total available positions (more accurate)
-    let totalAvailablePositions = 0;
-    let appliedPositions = 0;
+    // Calculate available opportunities (role-course combinations the user can apply for)
+    let availableOpportunities = 0;
     
     courses.forEach(course => {
       roles.forEach(role => {
-        const maxPositions = role.roleName === "tutor" ? course.maxTutors : course.maxLabAssistants;
         const hasApplied = myApplications.some(
           app => app.courseId === course.id && app.roleId === role.id
         );
         
-        if (hasApplied) {
-          appliedPositions += maxPositions;
-        } else {
-          totalAvailablePositions += maxPositions;
+        if (!hasApplied) {
+          availableOpportunities += 1; // Count each role-course combination as one opportunity
         }
       });
     });
@@ -121,9 +116,7 @@ const TutorDashboardPage: React.FC = () => {
     return {
       totalCourses: courses.length,
       totalApplications: myApplications.length,
-      availableOpportunities: totalAvailablePositions,
-      appliedPositions,
-      availableCourseCombinations: availableCombinations,
+      availableOpportunities, // Number of role-course combinations user can still apply for
       completionRate: totalRoleCourseCombinations > 0 
         ? Math.round((appliedCombinations / totalRoleCourseCombinations) * 100)
         : 0

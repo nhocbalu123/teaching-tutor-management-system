@@ -88,103 +88,105 @@ const Header: React.FC = () => {
     <header
       className={`${styles["main-header"]} ${isScrolled ? styles.scrolled : ""}`}
     >
-      <div className={styles["header-grid"]}>
-        <div className={styles["logo-wrapper"]}>
-          <Link href="/" className={styles["logo-link"]}>
-            <div className={styles["logo-container"]}>
-              <div className={styles["logo-image-container"]}>
-                <Image
-                  src="/letter-e.png"
-                  alt="duTeam Logo"
-                  width={45}
-                  height={45}
-                  className={styles["logo-image"]}
-                />
+      <div className={styles["header-container"]}>
+        <div className={styles["header-grid"]}>
+          <div className={styles["logo-wrapper"]}>
+            <Link href="/" className={styles["logo-link"]}>
+              <div className={styles["logo-container"]}>
+                <div className={styles["logo-image-container"]}>
+                  <Image
+                    src="/letter-e.png"
+                    alt="duTeam Logo"
+                    width={45}
+                    height={45}
+                    className={styles["logo-image"]}
+                  />
+                </div>
+                <span className={styles["logo-text"]}>
+                  <span className={styles["logo-prefix"]}>du</span>Team
+                </span>
               </div>
-              <span className={styles["logo-text"]}>
-                <span className={styles["logo-prefix"]}>du</span>Team
-              </span>
-            </div>
-          </Link>
-        </div>
-
-        <nav className={styles["main-nav"]}>
-          <div className={styles["nav-links"]}>
-            <Link
-              href="/"
-              className={`${styles["nav-link"]} ${pathname === "/" ? styles.active : ""}`}
-            >
-              Home
             </Link>
-            {showTutorLink && (
+          </div>
+
+          <nav className={styles["main-nav"]}>
+            <div className={styles["nav-links"]}>
               <Link
-                href="/tutor"
-                className={`${styles["nav-link"]} ${pathname === "/tutor" ? styles.active : ""}`}
+                href="/"
+                className={`${styles["nav-link"]} ${pathname === "/" ? styles.active : ""}`}
               >
-                Candidates
+                Home
               </Link>
+              {showTutorLink && (
+                <Link
+                  href="/tutor"
+                  className={`${styles["nav-link"]} ${pathname === "/tutor" ? styles.active : ""}`}
+                >
+                  Candidates
+                </Link>
+              )}
+              {showLecturerLink && (
+                <Link
+                  href="/lecturer"
+                  className={`${styles["nav-link"]} ${pathname === "/lecturer" ? styles.active : ""}`}
+                >
+                  Lecturers
+                </Link>
+              )}
+            </div>
+          </nav>
+
+          <div className={styles["header-actions"]}>
+            {!isAuthenticated && (
+              <button
+                onClick={toggleDarkMode}
+                className={`${styles["theme-toggle-btn"]} ${
+                  isThemeToggleRemoving
+                    ? styles.removing
+                    : isThemeToggleAdding
+                      ? styles.adding
+                      : ""
+                }`}
+                aria-label="Toggle dark mode"
+              >
+                <div className={styles["theme-icon-wrapper"]}>
+                  <span className={`${styles["theme-icon"]} ${styles.sun}`}>
+                    ☀️
+                  </span>
+                  <span className={`${styles["theme-icon"]} ${styles.moon}`}>
+                    🌙
+                  </span>
+                </div>
+              </button>
             )}
-            {showLecturerLink && (
-              <Link
-                href="/lecturer"
-                className={`${styles["nav-link"]} ${pathname === "/lecturer" ? styles.active : ""}`}
-              >
-                Lecturers
-              </Link>
+            {isAuthenticated && user ? (
+              <UserDropdown
+                user={{
+                  fullName: `${user.firstName} ${user.lastName}`,
+                  email: user.email,
+                  role: getUserRole(),
+                }}
+                onSignOut={handleSignOut}
+                onToggleDarkMode={toggleDarkMode}
+                isDarkMode={isDarkMode}
+              />
+            ) : (
+              <div className={styles.authButtons}>
+                <Link
+                  href="/signin"
+                  className={`${styles.authButton} ${styles.authButtonSecondary} ${pathname === "/signin" ? styles.active : ""}`}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className={`${styles.authButton} ${styles.authButtonPrimary} ${pathname === "/signup" ? styles.active : ""}`}
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
-        </nav>
-
-        <div className={styles["header-actions"]}>
-          {!isAuthenticated && (
-            <button
-              onClick={toggleDarkMode}
-              className={`${styles["theme-toggle-btn"]} ${
-                isThemeToggleRemoving
-                  ? styles.removing
-                  : isThemeToggleAdding
-                    ? styles.adding
-                    : ""
-              }`}
-              aria-label="Toggle dark mode"
-            >
-              <div className={styles["theme-icon-wrapper"]}>
-                <span className={`${styles["theme-icon"]} ${styles.sun}`}>
-                  ☀️
-                </span>
-                <span className={`${styles["theme-icon"]} ${styles.moon}`}>
-                  🌙
-                </span>
-              </div>
-            </button>
-          )}
-          {isAuthenticated && user ? (
-            <UserDropdown
-              user={{
-                fullName: `${user.firstName} ${user.lastName}`,
-                email: user.email,
-                role: getUserRole(),
-              }}
-              onSignOut={handleSignOut}
-              onToggleDarkMode={toggleDarkMode}
-              isDarkMode={isDarkMode}
-            />
-          ) : (
-            <div className={styles.authButtons}>
-              <Link
-                href="/signin"
-                className={`${styles.authButton} ${styles.authButtonSecondary} ${pathname === "/signin" ? styles.active : ""}`}
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className={`${styles.authButton} ${styles.authButtonPrimary} ${pathname === "/signup" ? styles.active : ""}`}
-              >
-                Sign Up
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </header>

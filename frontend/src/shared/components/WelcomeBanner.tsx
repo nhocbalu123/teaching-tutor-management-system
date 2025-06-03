@@ -92,6 +92,19 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     }
   };
 
+  const getRoleIcon = () => {
+    switch (user.userType) {
+      case "candidate":
+        return "🎓";
+      case "lecturer":
+        return "👨‍🏫";
+      case "admin":
+        return "⚙️";
+      default:
+        return "👤";
+    }
+  };
+
   if (!isVisible) {
     return null;
   }
@@ -114,33 +127,40 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
         style={bannerStyle}
         data-scrolled={isScrolled ? "true" : "false"} // For debugging
       >
-        <div className={styles.welcomeContent}>
-          <div className={styles.celebrationIcon}>
-            🎉
+        <div className={styles.welcomeContainer}>
+          <div className={styles.welcomeContent}>
+            <div className={styles.celebrationSection}>
+              <div className={styles.celebrationIcon}>
+                🎉
+              </div>
+              <div className={styles.roleIcon}>
+                {getRoleIcon()}
+              </div>
+            </div>
+            <div className={styles.messageSection}>
+              <h1 className={styles.welcomeMessage}>{getWelcomeMessage()}</h1>
+              <p className={styles.welcomeSubtitle}>
+                Successfully logged in as {getUserTypeLabel()}
+              </p>
+            </div>
+            <button
+              className={styles.closeButton}
+              onClick={hideWithAnimation}
+              aria-label="Close welcome banner"
+            >
+              ✕
+            </button>
           </div>
-          <div className={styles.messageSection}>
-            <h1 className={styles.welcomeMessage}>{getWelcomeMessage()}</h1>
-            <p className={styles.welcomeSubtitle}>
-              You are logged in as a {getUserTypeLabel()}
-            </p>
+          
+          {/* Progress bar showing auto-hide countdown */}
+          <div className={styles.progressBar}>
+            <div 
+              className={styles.progressFill}
+              style={{
+                animationDuration: `${autoHideDelay}ms`
+              }}
+            />
           </div>
-          <button
-            className={styles.closeButton}
-            onClick={hideWithAnimation}
-            aria-label="Close welcome banner"
-          >
-            ✕
-          </button>
-        </div>
-        
-        {/* Progress bar showing auto-hide countdown */}
-        <div className={styles.progressBar}>
-          <div 
-            className={styles.progressFill}
-            style={{
-              animationDuration: `${autoHideDelay}ms`
-            }}
-          />
         </div>
       </div>
       
