@@ -11,13 +11,9 @@ import bcrypt from "bcryptjs";
 config();
 
 export const AppDataSource = new DataSource({
-    type: "mysql",
-    host: process.env.DB_HOST || "209.38.26.237",
-    port: parseInt(process.env.DB_PORT || "3306"),
-    username: process.env.DB_USERNAME || "your_username",
-    password: process.env.DB_PASSWORD || "your_password",
-    database: process.env.DB_NAME || "your_database_name",
-    synchronize: process.env.NODE_ENV !== "production", // Auto-create tables in development
+    type: "sqlite",
+    database: "database.sqlite",
+    synchronize: true, // Auto-create tables in development
     logging: process.env.NODE_ENV === "development",
     entities: [
         User,

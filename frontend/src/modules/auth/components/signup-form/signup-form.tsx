@@ -152,8 +152,9 @@ export default function SignUpForm() {
       const response = await AuthService.signup(signupData);
 
       if (response.success && response.data) {
-        // Use the AuthContext login method to properly set authentication state
-        login(response.data.user, response.data.token);
+        // Use the AuthContext login method to properly set authentication state - ensure token exists
+        const token = response.data.token || "";
+        login(response.data.user, token);
 
         // Redirect to profile or dashboard - welcome banner will show automatically
         router.push("/profile");

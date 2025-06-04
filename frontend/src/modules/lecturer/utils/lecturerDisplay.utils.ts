@@ -88,6 +88,7 @@ export const courseAssignments = {
   "dr.smith@rmit.edu.au": [
     { code: "COSC2758", name: "Full Stack Development", semester: "Semester 1 2025", students: 120, tutorsNeeded: 5, labAssistantsNeeded: 3 },
     { code: "COSC2671", name: "Database Systems", semester: "Semester 1 2025", students: 95, tutorsNeeded: 4, labAssistantsNeeded: 2 },
+    { code: "COSC2410", name: "Software Engineering Fundamentals", semester: "Semester 1 2025", students: 88, tutorsNeeded: 3, labAssistantsNeeded: 2 },
   ],
   "prof.johnson@rmit.edu.au": [
     { code: "COSC2938", name: "Further Web Programming", semester: "Semester 1 2025", students: 85, tutorsNeeded: 4, labAssistantsNeeded: 2 },

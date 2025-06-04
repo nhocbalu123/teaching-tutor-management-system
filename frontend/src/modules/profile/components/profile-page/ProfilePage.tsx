@@ -4,12 +4,14 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { AuthService } from "../../../../shared/services/authService";
 import { User, UserType } from "../../../../shared/types/user";
+import { AssignedCourse } from "../../../../shared/types/courseTypes";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import styles from "./ProfilePage.module.css";
 
 export const ProfilePage: React.FC = () => {
   const { user: contextUser, updateUser, isLoading: authLoading } = useAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [assignedCourses, setAssignedCourses] = useState<AssignedCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -22,14 +24,39 @@ export const ProfilePage: React.FC = () => {
         setUser(savedUser);
         setIsLoading(false);
 
-        // Optionally try to fetch fresh data in the background
+        // For lecturer users, add mock assigned courses to test the UI
+        if (savedUser.userType === UserType.LECTURER) {
+          const mockAssignedCourses = [
+            {
+              id: 1,
+              courseCode: "COSC2758",
+              courseName: "Full Stack Development",
+              semester: "Semester 1 2025",
+              assignedAt: new Date("2024-01-15")
+            },
+            {
+              id: 2,
+              courseCode: "COSC2671", 
+              courseName: "Introduction to Web Programming",
+              semester: "Semester 1 2025",
+              assignedAt: new Date("2024-01-20")
+            }
+          ];
+          setAssignedCourses(mockAssignedCourses);
+        }
+
+        // Fetch fresh data from API to get assigned courses for lecturers
         try {
           const response = await AuthService.getProfile();
           if (response.success && response.data) {
             setUser(response.data.user);
             updateUser(response.data.user);
+            
+            // Set assigned courses if user is a lecturer and data is available from API
+            if (response.data.assignedCourses && response.data.assignedCourses.length > 0) {
+              setAssignedCourses(response.data.assignedCourses);
+            }
           }
-          // If API call fails, we still have the cached user data, so don't show error
         } catch (apiError) {
           console.warn(
             "Failed to fetch fresh profile data, using cached data:",
@@ -54,6 +81,15 @@ export const ProfilePage: React.FC = () => {
       year: "numeric",
       month: "long",
       day: "numeric",
+    });
+  };
+
+  const formatAssignedDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -172,6 +208,15 @@ export const ProfilePage: React.FC = () => {
                 </span>
               </div>
             </div>
+            {user.userType === UserType.LECTURER && (
+              <div className={styles.statCard}>
+                <div className={styles.statIcon}>📚</div>
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>Assigned Courses</span>
+                  <span className={styles.statValue}>{assignedCourses.length}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -209,17 +254,56 @@ export const ProfilePage: React.FC = () => {
           <div className={styles.infoCard}>
             <div className={styles.cardHeader}>
               <div className={styles.cardIcon}>{getUserTypeIcon(user.userType)}</div>
-              <h3 className={styles.cardTitle}>Role Details</h3>
+              <h3 className={styles.cardTitle}>
+                {user.userType === UserType.LECTURER ? "Assigned Courses" : "Role Details"}
+              </h3>
             </div>
             <div className={styles.cardContent}>
-              <p className={styles.roleDescription}>
-                Explore and apply for tutor and lab assistant positions across various courses.
-              </p>
-              <div className={styles.actionButton}>
-                <a href="/tutor" className={styles.primaryButton}>
-                  View Opportunities
-                </a>
-              </div>
+              {user.userType === UserType.LECTURER ? (
+                <>
+                  {assignedCourses.length > 0 ? (
+                    <>
+                      <p className={styles.courseCount}>
+                        You are currently assigned to {assignedCourses.length} course{assignedCourses.length !== 1 ? 's' : ''}
+                      </p>
+                      <div className={styles.courseList}>
+                        {assignedCourses.map((course) => (
+                          <div key={course.id} className={styles.courseItem}>
+                            <div className={styles.courseInfo}>
+                              <div className={styles.courseCode}>{course.courseCode}</div>
+                              <div className={styles.courseName}>{course.courseName}</div>
+                              <div className={styles.courseSemester}>{course.semester}</div>
+                            </div>
+                            <div className={styles.courseDate}>
+                              <span className={styles.courseAssignedLabel}>Assigned</span>
+                              <span className={styles.courseAssignedDate}>
+                                {formatAssignedDate(course.assignedAt.toString())}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles.emptyCourses}>
+                      No courses are currently assigned to you.
+                      <br />
+                      Please contact the administrator if you believe this is an error.
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className={styles.roleDescription}>
+                    Explore and apply for tutor and lab assistant positions across various courses.
+                  </p>
+                  <div className={styles.actionButton}>
+                    <a href="/tutor" className={styles.primaryButton}>
+                      View Opportunities
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

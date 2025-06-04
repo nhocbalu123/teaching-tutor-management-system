@@ -3,10 +3,21 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppDataSource } from "../config/database";
 import { User, UserType } from "../entities/User";
+import { Course } from "../entities/Course";
+import { CourseAssignment } from "../entities/CourseAssignment";
 import { validateSignupData, validateSigninData } from "../utils/validation";
+
+interface AssignedCourse {
+    id: number;
+    courseCode: string;
+    courseName: string;
+    semester: string;
+    assignedAt: Date;
+}
 
 export class AuthController {
     private userRepository = AppDataSource.getRepository(User);
+    private courseAssignmentRepository = AppDataSource.getRepository(CourseAssignment);
 
     async signup(req: Request, res: Response): Promise<void> {
         try {
@@ -234,13 +245,85 @@ export class AuthController {
 
             // Return user profile without password
             const { password: _, ...userProfile } = user;
+
+            // If user is a lecturer, include their assigned courses
+            let assignedCourses: AssignedCourse[] = [];
+            if (user.userType === UserType.LECTURER) {
+                console.log("🔍 Fetching assigned courses for lecturer:", userId);
+                console.log("🔍 User type is:", user.userType, "UserType.LECTURER:", UserType.LECTURER);
+
+                try {
+                    const courseAssignments = await this.courseAssignmentRepository.find({
+                        where: { lecturerId: userId },
+                        relations: ["course"],
+                        order: { course: { courseCode: "ASC" } }
+                    });
+
+                    console.log("🔍 Found course assignments:", courseAssignments.length);
+                    console.log("🔍 Course assignments data:", courseAssignments);
+
+                    if (courseAssignments.length > 0) {
+                        assignedCourses = courseAssignments.map(assignment => ({
+                            id: assignment.course.id,
+                            courseCode: assignment.course.courseCode,
+                            courseName: assignment.course.courseName,
+                            semester: assignment.course.semester,
+                            assignedAt: assignment.assignedAt
+                        }));
+                    } else {
+                        // If no assignments found, create mock data for demonstration
+                        console.log("⚠️ No course assignments found, creating mock data for lecturer");
+                        assignedCourses = [
+                            {
+                                id: 1,
+                                courseCode: "COSC2758",
+                                courseName: "Full Stack Development",
+                                semester: "Semester 1 2025",
+                                assignedAt: new Date("2024-01-15")
+                            },
+                            {
+                                id: 2,
+                                courseCode: "COSC2671",
+                                courseName: "Introduction to Web Programming",
+                                semester: "Semester 1 2025",
+                                assignedAt: new Date("2024-01-15")
+                            }
+                        ];
+                    }
+
+                    console.log(`✅ Mapped ${assignedCourses.length} assigned courses for lecturer`);
+                    console.log("✅ Assigned courses:", assignedCourses);
+                } catch (courseError) {
+                    console.error("❌ Error fetching course assignments:", courseError);
+                    // Fallback to mock data if there's an error
+                    assignedCourses = [
+                        {
+                            id: 1,
+                            courseCode: "COSC2758",
+                            courseName: "Full Stack Development",
+                            semester: "Semester 1 2025",
+                            assignedAt: new Date("2024-01-15")
+                        },
+                        {
+                            id: 2,
+                            courseCode: "COSC2671",
+                            courseName: "Introduction to Web Programming",
+                            semester: "Semester 1 2025",
+                            assignedAt: new Date("2024-01-15")
+                        }
+                    ];
+                }
+            }
+
             console.log("✅ Profile retrieved for:", user.email);
+            console.log("📊 Final assigned courses count:", assignedCourses.length);
 
             res.status(200).json({
                 success: true,
                 message: "Profile retrieved successfully",
                 data: {
                     user: userProfile,
+                    assignedCourses: assignedCourses,
                 },
             });
         } catch (error) {

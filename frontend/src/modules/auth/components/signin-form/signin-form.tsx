@@ -85,8 +85,9 @@ export default function SignInForm() {
           response.data.user.email
         );
         
-        // Use auth context to login
-        login(response.data.user, response.data.token);
+        // Use auth context to login - ensure token exists
+        const token = response.data.token || "";
+        login(response.data.user, token);
         
         // Store user data and show success modal
         setLoggedInUser(response.data.user);

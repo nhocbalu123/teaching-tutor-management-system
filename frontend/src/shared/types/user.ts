@@ -1,3 +1,5 @@
+import { AssignedCourse } from "./courseTypes";
+
 export enum UserType {
   CANDIDATE = "candidate",
   LECTURER = "lecturer",
@@ -21,7 +23,8 @@ export interface AuthResponse {
   message: string;
   data?: {
     user: User;
-    token: string;
+    token?: string;
+    assignedCourses?: AssignedCourse[];
   };
   errors?: Record<string, string>;
 }

@@ -11,3 +11,11 @@ export interface CourseDetails extends Course {
   skills?: string[]; // Recommended or required skills for the role
   // Add other details specific to a course offering or application context
 }
+
+export interface AssignedCourse {
+  id: number;
+  courseCode: string;
+  courseName: string;
+  semester: string;
+  assignedAt: Date;
+}
