@@ -100,12 +100,10 @@ export const ProfilePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className={styles.pageContainer}>
-        <div className="container">
-          <div className={styles.loadingWrapper}>
-            <div className={styles.loadingSpinner}></div>
-            <p className={styles.loadingText}>Loading your profile...</p>
-          </div>
+      <div className={styles.profileContainer}>
+        <div className={styles.loadingWrapper}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Loading your profile...</p>
         </div>
       </div>
     );
@@ -113,169 +111,114 @@ export const ProfilePage: React.FC = () => {
 
   if (error || !user) {
     return (
-      <div className={styles.pageContainer}>
-        <div className="container">
-          <div className={styles.errorWrapper}>
-            <div className={styles.errorIcon}>❌</div>
-            <h2 className={styles.errorTitle}>Error Loading Profile</h2>
-            <p className={styles.errorMessage}>{error || "Profile information could not be loaded."}</p>
-          </div>
+      <div className={styles.profileContainer}>
+        <div className={styles.errorWrapper}>
+          <div className={styles.errorIcon}>❌</div>
+          <h2 className={styles.errorTitle}>Error Loading Profile</h2>
+          <p className={styles.errorMessage}>{error || "Profile information could not be loaded."}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.pageContainer}>
-      <div className="container">
-        {/* Profile Header */}
-        <div className={styles.profileHeader}>
-          <div className={styles.headerContent}>
-            <div className={styles.avatarSection}>
-              <div className={styles.avatarWrapper}>
-                <Image
-                  src={getAvatarPath(user)}
-                  alt={`${user.firstName} ${user.lastName} avatar`}
-                  width={120}
-                  height={120}
-                  className={styles.avatarImage}
-                />
-                <div className={styles.avatarOverlay}>
-                  <span className={styles.roleIcon}>{getUserTypeIcon(user.userType)}</span>
-                </div>
+    <div className={styles.profileContainer}>
+      <div className={styles.profileGrid}>
+        {/* Left Panel - User Information */}
+        <div className={styles.userPanel}>
+          <div className={styles.avatarSection}>
+            <div className={styles.avatarWrapper}>
+              <Image
+                src={getAvatarPath(user)}
+                alt={`${user.firstName} ${user.lastName} avatar`}
+                width={120}
+                height={120}
+                className={styles.avatarImage}
+              />
+              <div className={styles.roleIndicator}>
+                <span className={styles.roleIcon}>{getUserTypeIcon(user.userType)}</span>
               </div>
             </div>
-            
-            <div className={styles.userInfo}>
-              <h1 className={styles.userName}>
-                {user.firstName} {user.lastName}
-              </h1>
-              <div className={styles.userRole}>
-                <span className={`${styles.roleBadge} ${styles[user.userType]}`}>
-                  {getUserTypeIcon(user.userType)} {getUserTypeLabel(user.userType)}
-                </span>
-              </div>
-              <p className={styles.userEmail}>{user.email}</p>
+          </div>
+          
+          <div className={styles.userInfo}>
+            <h1 className={styles.userName}>
+              {user.firstName} {user.lastName}
+            </h1>
+            <div className={styles.userRole}>
+              <span className={`${styles.roleBadge} ${styles[user.userType]}`}>
+                {getUserTypeIcon(user.userType)} {getUserTypeLabel(user.userType)}
+              </span>
             </div>
+            <p className={styles.userEmail}>{user.email}</p>
+          </div>
 
-            <div className={styles.quickStats}>
-              <div className={styles.statItem}>
+          <div className={styles.quickStats}>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>📅</div>
+              <div className={styles.statContent}>
                 <span className={styles.statLabel}>Member Since</span>
                 <span className={styles.statValue}>{formatDate(user.createdAt)}</span>
               </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Account Status</span>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statIcon}>
+                {user.isBlocked ? "🔒" : "✅"}
+              </div>
+              <div className={styles.statContent}>
+                <span className={styles.statLabel}>Status</span>
                 <span className={`${styles.statusBadge} ${user.isBlocked ? styles.blocked : styles.active}`}>
-                  {user.isBlocked ? "🔒 Blocked" : "✅ Active"}
+                  {user.isBlocked ? "Blocked" : "Active"}
                 </span>
               </div>
-              {user.userType === UserType.LECTURER && (
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Role</span>
-                  <span className={styles.statValue}>Teaching Staff</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Profile Content */}
-        <div className={styles.profileContent}>
-          <div className={styles.contentGrid}>
-            {/* Contact Information Card - Now positioned first */}
-            <div className={styles.infoCard}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>
-                  <span className={styles.cardIcon}>📧</span>
-                  Contact Information
-                </h3>
-              </div>
-              <div className={styles.cardContent}>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Email Address</span>
-                  <span className={styles.infoValue}>{user.email}</span>
-                </div>
-                {user.phone && (
-                  <div className={styles.infoRow}>
-                    <span className={styles.infoLabel}>Phone Number</span>
-                    <span className={styles.infoValue}>{user.phone}</span>
-                  </div>
-                )}
-              </div>
+        {/* Right Panel - Information Cards */}
+        <div className={styles.infoPanel}>
+          {/* Account Information */}
+          <div className={styles.infoCard}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardIcon}>🛠️</div>
+              <h3 className={styles.cardTitle}>Account Information</h3>
             </div>
-
-            {/* Account Information Card - Now positioned second */}
-            <div className={styles.infoCard}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>
-                  <span className={styles.cardIcon}>🛠️</span>
-                  Account Details
-                </h3>
-              </div>
-              <div className={styles.cardContent}>
-                <div className={styles.infoRow}>
+            <div className={styles.cardContent}>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Account Type</span>
-                  <span className={`${styles.roleBadge} ${styles[user.userType]} ${styles.small}`}>
-                    {getUserTypeIcon(user.userType)} {getUserTypeLabel(user.userType)}
-                  </span>
+                  <span className={styles.infoValue}>{getUserTypeLabel(user.userType)}</span>
                 </div>
-                <div className={styles.infoRow}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Username</span>
+                  <span className={styles.infoValue}>{user.firstName} {user.lastName}</span>
+                </div>
+                <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Join Date</span>
                   <span className={styles.infoValue}>{formatDate(user.createdAt)}</span>
                 </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Email</span>
+                  <span className={styles.infoValue}>{user.email}</span>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Role-Specific Information Card - Enhanced to span multiple columns */}
-            <div className={`${styles.infoCard} ${styles.wideCard}`}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>
-                  <span className={styles.cardIcon}>{getUserTypeIcon(user.userType)}</span>
-                  {getUserTypeLabel(user.userType)} Information
-                </h3>
-              </div>
-              <div className={styles.cardContent}>
-                {user.userType === UserType.CANDIDATE && (
-                  <div className={styles.roleDescription}>
-                    <p>As a candidate, you can apply for tutor and lab assistant positions for various courses. Browse available opportunities and submit your applications to get started.</p>
-                    <div className={styles.featureList}>
-                      <span className={styles.feature}>📚 Apply for teaching roles</span>
-                      <span className={styles.feature}>⭐ Track application status</span>
-                      <span className={styles.feature}>📊 View course opportunities</span>
-                    </div>
-                  </div>
-                )}
-
-                {user.userType === UserType.LECTURER && (
-                  <div className={styles.roleDescription}>
-                    <p>As a lecturer, you can view and manage applications for your assigned courses. Review candidate profiles, evaluate their qualifications, and make hiring decisions for tutoring and lab assistant positions.</p>
-                    <div className={styles.featureList}>
-                      <span className={styles.feature}>📚 View assigned courses</span>
-                      <span className={styles.feature}>👥 Manage applications</span>
-                      <span className={styles.feature}>📈 View analytics</span>
-                      <span className={styles.feature}>🎯 Select candidates</span>
-                      <span className={styles.feature}>⭐ Rank applicants</span>
-                      <span className={styles.feature}>📊 Track hiring progress</span>
-                    </div>
-                    <div className={styles.lecturerInfo}>
-                      <p className={styles.lecturerNote}>
-                        <strong>Note:</strong> You can only view applications for courses you are assigned to teach. 
-                        Access your <a href="/lecturer" className={styles.lecturerLink}>Lecturer Dashboard</a> to manage applications and view detailed analytics.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {user.userType === UserType.ADMIN && (
-                  <div className={styles.roleDescription}>
-                    <p>As an administrator, you have full access to manage the system, courses, and users. Oversee the entire teaching application process.</p>
-                    <div className={styles.featureList}>
-                      <span className={styles.feature}>⚙️ System management</span>
-                      <span className={styles.feature}>📋 Course administration</span>
-                      <span className={styles.feature}>👥 User management</span>
-                    </div>
-                  </div>
-                )}
+          {/* Role-Specific Information */}
+          <div className={styles.infoCard}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardIcon}>{getUserTypeIcon(user.userType)}</div>
+              <h3 className={styles.cardTitle}>Role Details</h3>
+            </div>
+            <div className={styles.cardContent}>
+              <p className={styles.roleDescription}>
+                Explore and apply for tutor and lab assistant positions across various courses.
+              </p>
+              <div className={styles.actionButton}>
+                <a href="/tutor" className={styles.primaryButton}>
+                  View Opportunities
+                </a>
               </div>
             </div>
           </div>

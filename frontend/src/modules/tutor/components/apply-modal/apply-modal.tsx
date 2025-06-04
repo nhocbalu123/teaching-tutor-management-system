@@ -223,7 +223,10 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
         {/* Header */}
         <div className={styles.applyModalHeader}>
           <div className={styles.applyModalHeaderContent}>
-            <h3 className={styles.applyModalTitle}>Apply for Course</h3>
+            <div className={styles.headerTitleSection}>
+              <h3 className={styles.applyModalTitle}>Apply for Course</h3>
+              <p className={styles.headerSubtitle}>Complete your application below</p>
+            </div>
             <button
               type="button"
               onClick={onClose}
@@ -250,29 +253,60 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
         {/* Form */}
         <div className={styles.applyModalForm}>
           <form onSubmit={handleSubmit}>
-            {/* Course Info (Read-only) */}
+            {/* Course Info - Row 1 (Full Width) */}
             <div className={styles.applyModalFieldGroup}>
-              <label className={styles.applyModalLabel}>Course</label>
-              <div className={styles.applyModalReadonlyField}>
-                <p className="font-semibold">
-                  {course.code} - {course.name}
-                </p>
+              <label className={styles.applyModalLabel}>Course Information</label>
+              <div className={styles.courseInfoCard}>
+                <div className={styles.courseMainInfo}>
+                  <h4 className={styles.courseCodeTitle}>{course.code}</h4>
+                  <p className={styles.courseNameTitle}>{course.name}</p>
+                </div>
               </div>
             </div>
 
-            {/* Role & Availability (Read-only) */}
-            <div className={styles.applyModalGrid}>
+            {/* Role & Availability - Row 2 (Split) */}
+            <div className={styles.applyModalCompactGrid}>
               <div className={styles.applyModalFieldGroup}>
                 <label className={styles.applyModalLabel}>Role</label>
-                <div className={styles.applyModalReadonlyField}>
-                  <p className="font-medium">{course.role}</p>
+                <div className={styles.roleInfoCard}>
+                  <div className={styles.roleIconContainer}>
+                    <svg
+                      className={styles.roleIcon}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  </div>
+                  <span className={styles.roleText}>{course.role}</span>
                 </div>
               </div>
 
               <div className={styles.applyModalFieldGroup}>
                 <label className={styles.applyModalLabel}>Availability</label>
-                <div className={styles.applyModalReadonlyField}>
-                  <p className="font-medium">{course.availability}</p>
+                <div className={styles.availabilityCard}>
+                  <div className={styles.availabilityIconContainer}>
+                    <svg
+                      className={styles.availabilityIcon}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <span className={styles.availabilityText}>{course.availability}</span>
                 </div>
               </div>
             </div>
@@ -334,9 +368,29 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
 
             {/* Skills */}
             <div className={styles.applyModalFieldGroup}>
-              <label className={styles.applyModalLabel}>Skills</label>
+              <div className={styles.skillsSectionHeader}>
+                <label className={styles.applyModalLabel}>
+                  <svg
+                    className={styles.skillsIcon}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                  Skills & Expertise
+                </label>
+                <p className={styles.skillsDescription}>
+                  Showcase your technical and teaching abilities
+                </p>
+              </div>
 
-              <div className={styles.applyModalSkillsContainer}>
+              <div className={styles.enhancedSkillsContainer}>
                 {selectedSkills.map((skill, index) => (
                   <SkillTag
                     key={index}
@@ -348,14 +402,14 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
 
               {/* Skill input field */}
               {showSkillInput ? (
-                <div className={styles.applyModalSkillInput}>
+                <div className={styles.enhancedSkillInput}>
                   <input
                     type="text"
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
                     onKeyDown={handleSkillInputKeyDown}
-                    placeholder="Type skill and press Enter"
-                    className={`${styles.applyModalSkillInputField} ${
+                    placeholder="Enter a skill (e.g., Python, Data Analysis)"
+                    className={`${styles.enhancedSkillInputField} ${
                       errors.skills ? styles.applyModalInputError : ""
                     }`}
                     autoFocus
@@ -401,42 +455,55 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                         setShowSkillInput(false);
                       }
                     }}
-                    className={styles.applyModalAddButton}
+                    className={styles.enhancedAddButton}
                   >
-                    Add
+                    <svg
+                      className={styles.addButtonIcon}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    Add Skill
                   </button>
                 </div>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowSkillInput(true)}
-                  className={styles.applyModalAddSkillsButton}
+                  className={styles.enhancedAddSkillsButton}
                 >
-                  <svg viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className={styles.addSkillsIcon}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                       clipRule="evenodd"
                     />
                   </svg>
-                  Add Skills
+                  Add Custom Skill
                 </button>
               )}
 
               {errors.skills && (
                 <p className={styles.applyModalErrorText}>{errors.skills}</p>
               )}
-              <p className={styles.applyModalSecondaryText}>
-                At least 2 skills required, maximum 5 skills allowed. Skills
-                should be relevant to the course.
-              </p>
 
               {/* Popular skills section */}
-              <div className={styles.applyModalPopularSkills}>
-                <p className={styles.applyModalPopularSkillsLabel}>
-                  Popular skills:
+              <div className={styles.enhancedPopularSkills}>
+                <p className={styles.popularSkillsLabel}>
+                  💡 Suggested Skills:
                 </p>
-                <div className={styles.applyModalPopularSkillsContainer}>
+                <div className={styles.popularSkillsGrid}>
                   {availableSkills.slice(0, 6).map((skill, index) => (
                     <button
                       key={index}
@@ -457,16 +524,50 @@ const ApplyModal: React.FC<ApplyModalProps> = ({
                           }));
                         }
                       }}
-                      className={`${styles.popularSkillButton} ${
-                        selectedSkills.includes(skill) ? "opacity-50" : ""
+                      className={`${styles.enhancedPopularSkillButton} ${
+                        selectedSkills.includes(skill) ? styles.skillSelected : ""
                       }`}
                       disabled={selectedSkills.includes(skill)}
                     >
-                      {skill}
+                      <span className={styles.skillButtonText}>{skill}</span>
+                      {!selectedSkills.includes(skill) && (
+                        <svg
+                          className={styles.skillButtonIcon}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      )}
+                      {selectedSkills.includes(skill) && (
+                        <svg
+                          className={styles.skillButtonIconAdded}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
                     </button>
                   ))}
                 </div>
               </div>
+              
+              <p className={styles.skillsRequirement}>
+                <strong>Requirements:</strong> Select 2-5 relevant skills that demonstrate your expertise.
+              </p>
             </div>
 
             {/* Form actions */}

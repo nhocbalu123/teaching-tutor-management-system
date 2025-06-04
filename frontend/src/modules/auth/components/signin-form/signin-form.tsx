@@ -139,7 +139,7 @@ export default function SignInForm() {
               required
             />
             {errors.email && (
-              <div className={`${styles.alert} ${styles.alertError}`}>
+              <div className={styles.errorMessage}>
                 {errors.email}
               </div>
             )}
@@ -192,7 +192,7 @@ export default function SignInForm() {
               )}
             </button>
             {errors.password && (
-              <div className={`${styles.alert} ${styles.alertError}`}>
+              <div className={styles.errorMessage}>
                 {errors.password}
               </div>
             )}

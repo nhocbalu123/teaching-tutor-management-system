@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { User } from "../types/user";
-import Fireworks from "./fireworks/Fireworks";
 import styles from "./LoginSuccessModal.module.css";
 
 interface LoginSuccessModalProps {
@@ -31,11 +30,18 @@ export const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
     }, 300);
   }, [onHide]);
 
+  const handleContinueClick = () => {
+    setShowFireworks(true);
+    // Hide fireworks after a short duration, then close modal
+    setTimeout(() => {
+      handleHide();
+    }, 1500);
+  };
+
   // Start animation when modal becomes visible
   useEffect(() => {
     if (isVisible) {
       setIsAnimating(true);
-      setShowFireworks(true);
       
       // Auto-hide after duration
       const timer = setTimeout(() => {
@@ -46,26 +52,9 @@ export const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
     }
   }, [isVisible, duration, handleHide]);
 
-  const handleFireworksComplete = useCallback(() => {
-    setShowFireworks(false);
-  }, []);
-
   const getWelcomeMessage = () => {
     const firstName = user.firstName || "User";
     return `Welcome back, ${firstName}!`;
-  };
-
-  const getUserTypeLabel = () => {
-    switch (user.userType) {
-      case "candidate":
-        return "Candidate";
-      case "lecturer":
-        return "Lecturer"; 
-      case "admin":
-        return "Administrator";
-      default:
-        return "User";
-    }
   };
 
   if (!isVisible) {
@@ -84,7 +73,7 @@ export const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
           className={`${styles.modalContent} ${isAnimating ? styles.animated : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Success Icon */}
+          {/* Success Icon with Enhanced Checkmark */}
           <div className={styles.successIcon}>
             <div className={styles.checkmark}>
               <svg viewBox="0 0 52 52" className={styles.checkmarkSvg}>
@@ -102,34 +91,43 @@ export const LoginSuccessModal: React.FC<LoginSuccessModalProps> = ({
                 />
               </svg>
             </div>
+            {/* Pulse rings for enhanced effect */}
+            <div className={styles.pulseRing}></div>
+            <div className={styles.pulseRing} style={{ animationDelay: '0.3s' }}></div>
           </div>
 
-          {/* Welcome Message */}
+          {/* Simplified Message Section */}
           <div className={styles.messageSection}>
-            <h2 className={styles.welcomeTitle}>Login Successful!</h2>
+            <h2 className={styles.welcomeTitle}>Success!</h2>
             <h3 className={styles.welcomeMessage}>{getWelcomeMessage()}</h3>
-            <p className={styles.welcomeSubtitle}>
-              You are logged in as a {getUserTypeLabel()}
-            </p>
           </div>
 
-          {/* Close Button */}
-          <button
-            className={styles.closeButton}
-            onClick={handleHide}
-            aria-label="Close celebration modal"
-          >
-            Continue
-          </button>
+          {/* Continue Button with Fireworks Effect */}
+          <div className={styles.buttonContainer}>
+            <button
+              className={`${styles.continueButton} ${showFireworks ? styles.fireworksActive : ''}`}
+              onClick={handleContinueClick}
+              aria-label="Continue to dashboard"
+            >
+              <span className={styles.buttonText}>Continue</span>
+              {showFireworks && (
+                <div className={styles.fireworksContainer}>
+                  {[...Array(8)].map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={styles.firework} 
+                      style={{ 
+                        '--angle': `${i * 45}deg`,
+                        '--delay': `${i * 0.1}s` 
+                      } as React.CSSProperties}
+                    />
+                  ))}
+                </div>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-      
-      {/* Fireworks Animation */}
-      <Fireworks 
-        isVisible={showFireworks} 
-        onComplete={handleFireworksComplete}
-        duration={2500}
-      />
     </>
   );
 }; 

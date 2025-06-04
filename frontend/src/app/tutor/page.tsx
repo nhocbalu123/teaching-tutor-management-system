@@ -91,7 +91,7 @@ const TutorDashboardPage: React.FC = () => {
     };
 
     loadData();
-  }, [user]);
+  }, [user, showError]);
 
   // Calculate comprehensive statistics
   const getComprehensiveStats = () => {
@@ -204,13 +204,13 @@ const TutorDashboardPage: React.FC = () => {
         // Close modal and show success message
         setIsModalOpen(false);
         showSuccess(
-          `Your application for ${selectedRole.roleName} position in ${selectedCourse.courseCode} has been submitted successfully!`
+          `Application submitted for ${selectedCourse.courseCode}!`
         );
 
-        // Clear the success message after 5 seconds
+        // Clear the success message after 3 seconds
         setTimeout(() => {
           hideSuccess();
-        }, 5000);
+        }, 3000);
       } else {
         showError(response.message || "Failed to submit your application. Please try again.");
       }

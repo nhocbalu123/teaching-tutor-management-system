@@ -23,7 +23,6 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
 }) => {
   // Form state
   const [availability, setAvailability] = useState<"Part Time" | "Full Time">("Part Time");
-  const [skills, setSkills] = useState("");
   const [experience, setExperience] = useState("");
   const [motivation, setMotivation] = useState("");
   const [selectedSkillTags, setSelectedSkillTags] = useState<string[]>([]);
@@ -50,7 +49,6 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setAvailability("Part Time");
-      setSkills("");
       setExperience("");
       setMotivation("");
       setSelectedSkillTags([]);
@@ -60,26 +58,15 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
   }, [isOpen]);
 
   const handleAddSkillTag = (skill: string) => {
-    if (skill.trim() && !selectedSkillTags.includes(skill.trim()) && selectedSkillTags.length < 5) {
+    if (skill.trim() && !selectedSkillTags.includes(skill.trim()) && selectedSkillTags.length < 10) {
       setSelectedSkillTags([...selectedSkillTags, skill.trim()]);
       setCustomSkillInput("");
-      // Update the skills text area
-      const updatedSkills = [...selectedSkillTags, skill.trim()].join(", ");
-      setSkills(updatedSkills);
     }
   };
 
   const handleRemoveSkillTag = (skillToRemove: string) => {
     const updatedTags = selectedSkillTags.filter(skill => skill !== skillToRemove);
     setSelectedSkillTags(updatedTags);
-    setSkills(updatedTags.join(", "));
-  };
-
-  const handleSkillsTextChange = (value: string) => {
-    setSkills(value);
-    // Parse skills from text and update tags
-    const skillArray = value.split(",").map(s => s.trim()).filter(s => s.length > 0);
-    setSelectedSkillTags(skillArray.slice(0, 5)); // Limit to 5 skills
   };
 
   const validateForm = (): boolean => {
@@ -90,10 +77,8 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
     } = {};
 
     // Skills validation
-    if (!skills.trim()) {
-      newErrors.skills = "Skills are required";
-    } else if (skills.trim().length < 10) {
-      newErrors.skills = "Skills description must be at least 10 characters";
+    if (selectedSkillTags.length === 0) {
+      newErrors.skills = "Please select at least one skill";
     }
 
     // Motivation validation
@@ -123,7 +108,7 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
       courseId: course.id,
       roleId: role.id,
       availability,
-      skills: skills.trim(),
+      skills: selectedSkillTags.join(", "),
       experience: experience.trim() || undefined,
       motivation: motivation.trim(),
     };
@@ -205,11 +190,11 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
               </div>
             </div>
 
-            {/* Availability Selection */}
+            {/* Simplified Availability Selection */}
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Availability *</label>
-              <div className={styles.radioGroup}>
-                <label className={styles.radioLabel}>
+              <div className={styles.availabilityOptions}>
+                <label className={`${styles.availabilityOption} ${availability === "Part Time" ? styles.selected : ""}`}>
                   <input
                     type="radio"
                     name="availability"
@@ -218,10 +203,12 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                     onChange={(e) => setAvailability(e.target.value as "Part Time" | "Full Time")}
                     disabled={isSubmitting}
                   />
-                  <span className={styles.radioText}>Part Time</span>
-                  <span className={styles.radioDescription}>Up to 20 hours per week</span>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionTitle}>Part Time</span>
+                    <span className={styles.optionDescription}>Up to 20 hours per week</span>
+                  </div>
                 </label>
-                <label className={styles.radioLabel}>
+                <label className={`${styles.availabilityOption} ${availability === "Full Time" ? styles.selected : ""}`}>
                   <input
                     type="radio"
                     name="availability"
@@ -230,34 +217,39 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                     onChange={(e) => setAvailability(e.target.value as "Part Time" | "Full Time")}
                     disabled={isSubmitting}
                   />
-                  <span className={styles.radioText}>Full Time</span>
-                  <span className={styles.radioDescription}>More than 20 hours per week</span>
+                  <div className={styles.optionContent}>
+                    <span className={styles.optionTitle}>Full Time</span>
+                    <span className={styles.optionDescription}>More than 20 hours per week</span>
+                  </div>
                 </label>
               </div>
             </div>
 
-            {/* Skills */}
+            {/* Enhanced Skills Section */}
             <div className={styles.fieldGroup}>
-              <label htmlFor="skills" className={styles.label}>
-                Skills * <span className={styles.hint}>(minimum 10 characters)</span>
+              <label className={styles.label}>
+                Your Skills * <span className={styles.hint}>Select skills that match this role</span>
               </label>
               
-              {/* Skill Tags */}
+              {/* Selected Skills Display */}
               {selectedSkillTags.length > 0 && (
-                <div className={styles.skillTags}>
-                  {selectedSkillTags.map((skill, index) => (
-                    <SkillTag
-                      key={index}
-                      skill={skill}
-                      onRemove={handleRemoveSkillTag}
-                    />
-                  ))}
+                <div className={styles.selectedSkills}>
+                  <h4 className={styles.selectedSkillsTitle}>Selected Skills ({selectedSkillTags.length}/10)</h4>
+                  <div className={styles.skillTags}>
+                    {selectedSkillTags.map((skill, index) => (
+                      <SkillTag
+                        key={index}
+                        skill={skill}
+                        onRemove={handleRemoveSkillTag}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Popular Skills */}
               <div className={styles.popularSkills}>
-                <span className={styles.popularSkillsLabel}>Quick add:</span>
+                <span className={styles.popularSkillsLabel}>Popular skills for this role:</span>
                 <div className={styles.popularSkillButtons}>
                   {getPopularSkills(role?.roleName).map((skill, index) => (
                     <button
@@ -267,7 +259,7 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                         selectedSkillTags.includes(skill) ? styles.skillButtonSelected : ""
                       }`}
                       onClick={() => handleAddSkillTag(skill)}
-                      disabled={selectedSkillTags.includes(skill) || selectedSkillTags.length >= 5 || isSubmitting}
+                      disabled={selectedSkillTags.includes(skill) || selectedSkillTags.length >= 10 || isSubmitting}
                     >
                       {skill}
                     </button>
@@ -287,31 +279,20 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                       handleAddSkillTag(customSkillInput);
                     }
                   }}
-                  placeholder="Add custom skill (press Enter)"
+                  placeholder="Add a custom skill (press Enter or click Add)"
                   className={styles.skillInput}
-                  disabled={selectedSkillTags.length >= 5 || isSubmitting}
+                  disabled={selectedSkillTags.length >= 10 || isSubmitting}
                 />
                 <button
                   type="button"
                   onClick={() => handleAddSkillTag(customSkillInput)}
                   className={styles.addSkillButton}
-                  disabled={!customSkillInput.trim() || selectedSkillTags.length >= 5 || isSubmitting}
+                  disabled={!customSkillInput.trim() || selectedSkillTags.length >= 10 || isSubmitting}
                 >
                   Add
                 </button>
               </div>
 
-              {/* Skills Textarea */}
-              <textarea
-                id="skills"
-                value={skills}
-                onChange={(e) => handleSkillsTextChange(e.target.value)}
-                placeholder="Describe your relevant skills and expertise..."
-                className={`${styles.textarea} ${errors.skills ? styles.textareaError : ""}`}
-                rows={3}
-                disabled={isSubmitting}
-                required
-              />
               {errors.skills && (
                 <span className={styles.errorText}>{errors.skills}</span>
               )}
@@ -327,7 +308,7 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                 value={experience}
                 onChange={(e) => setExperience(e.target.value)}
                 placeholder="Describe any relevant teaching, tutoring, or related experience..."
-                className={`${styles.textarea} ${errors.experience ? styles.textareaError : ""}`}
+                className={`${styles.textarea} ${styles.noResize} ${errors.experience ? styles.textareaError : ""}`}
                 rows={3}
                 disabled={isSubmitting}
               />
@@ -346,7 +327,7 @@ const EnhancedApplyModal: React.FC<EnhancedApplyModalProps> = ({
                 value={motivation}
                 onChange={(e) => setMotivation(e.target.value)}
                 placeholder="Explain your motivation for applying to this role and what you hope to contribute..."
-                className={`${styles.textarea} ${errors.motivation ? styles.textareaError : ""}`}
+                className={`${styles.textarea} ${styles.noResize} ${errors.motivation ? styles.textareaError : ""}`}
                 rows={4}
                 disabled={isSubmitting}
                 required

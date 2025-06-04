@@ -16,7 +16,7 @@
   background-color: var(--color-bg-primary);
   border-radius: 1rem;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  max-width: 32rem;
+  max-width: 42rem;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
@@ -184,51 +184,92 @@
   font-size: 0.75rem;
 }
 
-.radioGroup {
+/* New Simplified Availability Options */
+.availabilityOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.availabilityOption {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  background-color: var(--color-bg-secondary);
+}
+
+.availabilityOption:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-primary);
+}
+
+.availabilityOption.selected {
+  border-color: var(--color-primary);
+  background-color: rgba(249, 115, 22, 0.05);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.availabilityOption input[type="radio"] {
+  display: none;
+}
+
+.optionContent {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.25rem;
 }
 
-.radioLabel {
-  display: flex;
-  align-items: flex-start;
-  cursor: pointer;
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.radioLabel:hover {
-  border-color: var(--color-primary);
-  background-color: var(--color-bg-hover);
-}
-
-.radioLabel input[type="radio"] {
-  margin-right: 0.75rem;
-  margin-top: 0.125rem;
-  accent-color: var(--color-primary);
-}
-
-.radioText {
+.optionTitle {
   font-weight: 600;
   color: var(--color-text-primary);
-  display: block;
-  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
 }
 
-.radioDescription {
+.optionDescription {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
-  display: block;
+}
+
+/* Enhanced Skills Section */
+.selectedSkills {
+  background-color: var(--color-bg-secondary);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.selectedSkillsTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selectedSkillsTitle::before {
+  content: "✓";
+  background-color: var(--color-primary);
+  color: white;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
 .skillTags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .popularSkills {
@@ -240,7 +281,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .popularSkillButtons {
@@ -252,19 +295,19 @@
 .skillButton {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 500;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .skillButton:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: white;
   border-color: var(--color-primary);
-  background-color: rgba(249, 115, 22, 0.1);
-  color: var(--color-primary);
 }
 
 .skillButton:disabled {
@@ -273,9 +316,9 @@
 }
 
 .skillButtonSelected {
-  background-color: rgba(249, 115, 22, 0.1);
+  background-color: var(--color-primary);
+  color: white;
   border-color: var(--color-primary);
-  color: var(--color-primary);
 }
 
 .customSkillInput {
@@ -286,13 +329,12 @@
 
 .skillInput {
   flex: 1;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .skillInput:focus {
@@ -307,19 +349,19 @@
 }
 
 .addSkillButton {
+  padding: 0.75rem 1rem;
   background-color: var(--color-primary);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
   font-weight: 600;
+  font-size: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .addSkillButton:hover:not(:disabled) {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-secondary);
 }
 
 .addSkillButton:disabled {
@@ -332,12 +374,11 @@
   padding: 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
-  transition: border-color 0.2s ease;
-  resize: vertical;
-  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: all 0.2s ease;
 }
 
 .textarea:focus {
@@ -352,12 +393,16 @@
 }
 
 .textareaError {
-  border-color: var(--color-danger);
+  border-color: #ef4444;
+}
+
+.noResize {
+  resize: none;
 }
 
 .errorText {
   display: block;
-  color: var(--color-danger);
+  color: #ef4444;
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }

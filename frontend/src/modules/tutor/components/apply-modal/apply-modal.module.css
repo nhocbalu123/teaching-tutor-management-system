@@ -22,7 +22,7 @@
   background-color: #ffffff !important;
   color: #111827 !important;
   border: 1px solid #e5e7eb !important;
-  border-radius: 0.5rem !important;
+  border-radius: 0.75rem !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   width: 100% !important;
   max-width: 42rem !important; /* 672px */
@@ -36,61 +36,175 @@
   border: 1px solid #374151 !important;
 }
 
+/* Enhanced Header */
 .applyModalHeader {
   border-bottom: 1px solid #e5e7eb !important;
-  padding: 1.5rem !important;
+  padding: 2rem 2rem 1.5rem !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
 }
 
 :global(.dark) .applyModalHeader {
   border-bottom: 1px solid #374151 !important;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
 }
 
 .applyModalHeaderContent {
   display: flex !important;
   justify-content: space-between !important;
-  align-items: center !important;
+  align-items: flex-start !important;
+  gap: 1.5rem !important;
+}
+
+.headerTitleSection {
+  flex: 1 !important;
 }
 
 .applyModalTitle {
   color: #111827 !important;
-  font-size: 1.25rem !important;
+  font-size: 1.5rem !important;
   font-weight: 700 !important;
-  margin: 0 !important;
+  margin: 0 0 0.5rem 0 !important;
+  line-height: 1.3 !important;
 }
 
 :global(.dark) .applyModalTitle {
   color: #f3f4f6 !important;
 }
 
+.headerSubtitle {
+  color: #6b7280 !important;
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+:global(.dark) .headerSubtitle {
+  color: #9ca3af !important;
+}
+
 .applyModalClose {
-  color: #4b5563 !important;
-  transition: color 0.2s ease !important;
-  background: none !important;
-  border: none !important;
-  padding: 0.5rem !important;
-  border-radius: 0.375rem !important;
+  color: #6b7280 !important;
+  transition: all 0.3s ease !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 0.75rem !important;
+  border-radius: 0.5rem !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 :global(.dark) .applyModalClose {
   color: #9ca3af !important;
+  background: #374151 !important;
+  border-color: #4b5563 !important;
 }
 
 .applyModalClose:hover {
-  color: #111827 !important;
-  background-color: #f3f4f6 !important;
+  color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  border-color: #f87171 !important;
+  transform: scale(1.05) !important;
 }
 
 :global(.dark) .applyModalClose:hover {
-  color: #f3f4f6 !important;
-  background-color: #374151 !important;
+  color: #f87171 !important;
+  background-color: #450a0a !important;
+  border-color: #7f1d1d !important;
 }
 
+/* Enhanced Form Layout */
 .applyModalForm {
+  padding: 2rem !important;
+}
+
+.applyModalCompactGrid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+@media (max-width: 768px) {
+  .applyModalCompactGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Course Information Card */
+.courseInfoCard {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  color: white !important;
   padding: 1.5rem !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
+  transition: transform 0.3s ease !important;
+}
+
+.courseInfoCard:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4) !important;
+}
+
+.courseMainInfo {
+  text-align: center !important;
+}
+
+.courseCodeTitle {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.5rem 0 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.courseNameTitle {
+  font-size: 0.95rem !important;
+  margin: 0 !important;
+  opacity: 0.9 !important;
+  line-height: 1.4 !important;
+}
+
+/* Role and Availability Cards */
+.roleInfoCard, .availabilityCard {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  padding: 1rem !important;
+  border-radius: 0.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.roleInfoCard:hover, .availabilityCard:hover {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.roleIconContainer, .availabilityIconContainer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 0.5rem !important;
+  background: rgba(249, 115, 22, 0.1) !important;
+  flex-shrink: 0 !important;
+}
+
+.roleIcon, .availabilityIcon {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  color: var(--color-primary) !important;
+}
+
+.roleText, .availabilityText {
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.9rem !important;
 }
 
 .applyModalFieldGroup {

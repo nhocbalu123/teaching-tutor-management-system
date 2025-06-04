@@ -197,7 +197,7 @@ export default function SignUpForm() {
             className={`${styles.inputField} ${errors.fullName ? styles.inputError : ""}`}
           />
           {errors.fullName && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
+            <div className={styles.errorMessage}>
               {errors.fullName}
             </div>
           )}
@@ -213,7 +213,7 @@ export default function SignUpForm() {
             className={`${styles.inputField} ${errors.email ? styles.inputError : ""}`}
           />
           {errors.email && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
+            <div className={styles.errorMessage}>
               {errors.email}
             </div>
           )}
@@ -265,7 +265,7 @@ export default function SignUpForm() {
             )}
           </button>
           {errors.password && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
+            <div className={styles.errorMessage}>
               {errors.password}
             </div>
           )}
@@ -338,7 +338,7 @@ export default function SignUpForm() {
             )}
           </button>
           {errors.confirmPassword && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
+            <div className={styles.errorMessage}>
               {errors.confirmPassword}
             </div>
           )}

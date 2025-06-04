@@ -35,6 +35,38 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
     return ["Teaching", "Communication", "Organization"];
   };
 
+  // Limit skills display to maximum 2 skills
+  const renderSkills = () => {
+    const skills = getSuggestedSkills();
+    const displaySkills = skills.slice(0, 2);
+    const hasMoreSkills = skills.length > 2;
+
+    return (
+      <div className={styles.skillsWrapper}>
+        {displaySkills.map((skill, index) => (
+          <SkillTag key={index} skill={skill} />
+        ))}
+        {hasMoreSkills && (
+          <span 
+            className={styles.moreSkillsIndicator}
+            tabIndex={0}
+            role="button"
+            aria-label={`${skills.length - 2} more skills available`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                // You can add a function to show all skills or expand the list
+                console.log('Expand skills list');
+              }
+            }}
+          >
+            ...
+          </span>
+        )}
+      </div>
+    );
+  };
+
   return (
     <motion.div 
       className={styles.enhancedCourseCard}
@@ -51,22 +83,14 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
       <div className={styles.cardBody}>
         <h3 className={styles.courseTitle}>{course.courseName}</h3>
         
-        {course.description && (
-          <p className={styles.courseDescription}>{course.description}</p>
-        )}
-
-        {/* Suggested Skills */}
+        {/* Simplified Skills Section */}
         <div className={styles.skillsContainer}>
           <span className={styles.skillsLabel}>Relevant Skills:</span>
-          <div className={styles.skillsWrapper}>
-            {getSuggestedSkills().map((skill, index) => (
-              <SkillTag key={index} skill={skill} />
-            ))}
-          </div>
+          {renderSkills()}
         </div>
       </div>
 
-      {/* Role Options */}
+      {/* Simplified Available Positions Section */}
       <div className={styles.roleSection}>
         <h4 className={styles.roleSectionTitle}>Available Positions</h4>
         
@@ -98,7 +122,7 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
                       {role.roleName === "tutor" ? "Tutor" : "Lab Assistant"}
                     </span>
                     <span className={styles.rolePositions}>
-                      {maxPositions} positions available
+                      {maxPositions} positions
                     </span>
                   </div>
                 </div>
@@ -140,10 +164,6 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
                   )}
                 </div>
               </div>
-              
-              {role.description && (
-                <p className={styles.roleDescription}>{role.description}</p>
-              )}
             </div>
           );
         })}

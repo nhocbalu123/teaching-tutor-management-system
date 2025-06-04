@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Fireworks.module.css';
 
@@ -60,7 +60,7 @@ const Fireworks: React.FC<FireworksProps> = ({
     return newParticles;
   };
 
-  const createFireworkBurst = () => {
+  const createFireworkBurst = useCallback(() => {
     // Create multiple bursts at different positions
     const bursts = [
       { x: 20 + Math.random() * 60, y: 20 + Math.random() * 40 },
@@ -75,7 +75,7 @@ const Fireworks: React.FC<FireworksProps> = ({
     });
 
     setParticles(allParticles);
-  };
+  }, []);
 
   useEffect(() => {
     if (!isVisible) {
@@ -103,7 +103,7 @@ const Fireworks: React.FC<FireworksProps> = ({
     return () => {
       clearTimeout(completeTimer);
     };
-  }, [isVisible, duration, onComplete]);
+  }, [isVisible, duration, onComplete, createFireworkBurst]);
 
   if (!isVisible) return null;
 
