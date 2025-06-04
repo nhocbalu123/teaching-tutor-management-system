@@ -306,6 +306,17 @@
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
+.noCoursesMessage {
+  padding: 0.75rem;
+  background: rgba(156, 163, 175, 0.1);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
 /* Advanced Filters */
 .advancedFilters {
   background: var(--color-bg-primary);

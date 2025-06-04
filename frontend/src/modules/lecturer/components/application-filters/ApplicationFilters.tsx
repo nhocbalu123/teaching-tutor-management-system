@@ -183,19 +183,25 @@ const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
           <label htmlFor="courseSelect" className={styles.selectLabel}>
             Course
           </label>
-          <select
-            id="courseSelect"
-            value={selectedCourse}
-            onChange={(e) => onCourseChange(e.target.value)}
-            className={styles.selectInput}
-          >
-            <option value="">All Courses</option>
-            {courses.map((course) => (
-              <option key={course.code} value={course.code}>
-                {course.code} - {course.name}
-              </option>
-            ))}
-          </select>
+          {courses.length > 0 ? (
+            <select
+              id="courseSelect"
+              value={selectedCourse}
+              onChange={(e) => onCourseChange(e.target.value)}
+              className={styles.selectInput}
+            >
+              <option value="all">All Assigned Courses</option>
+              {courses.map((course) => (
+                <option key={course.code} value={course.code}>
+                  {course.code} - {course.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className={styles.noCoursesMessage}>
+              Loading courses...
+            </div>
+          )}
         </div>
       </div>
 

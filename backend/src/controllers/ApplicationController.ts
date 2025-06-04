@@ -246,6 +246,8 @@ export class ApplicationController {
 
             const applications = await queryBuilder.getMany();
 
+            console.log(`✅ Found ${applications.length} applications for lecturer`);
+
             res.status(200).json({
                 success: true,
                 data: applications,
@@ -455,5 +457,49 @@ export class ApplicationController {
         });
 
         return { partTime, fullTime };
+    }
+
+    // PA Part D: Get assigned courses for lecturer
+    async getAssignedCoursesForLecturer(req: AuthenticatedRequest, res: Response): Promise<void> {
+        try {
+            const lecturerId = req.user?.userId;
+
+            console.log("🔄 Fetching assigned courses for lecturer:", lecturerId);
+
+            // Verify user is a lecturer
+            const lecturer = await this.userRepository.findOne({
+                where: { id: lecturerId, userType: UserType.LECTURER },
+            });
+
+            if (!lecturer) {
+                res.status(403).json({
+                    success: false,
+                    message: "Only lecturers can access assigned courses",
+                });
+                return;
+            }
+
+            // Get lecturer's assigned courses with course details
+            const courseAssignments = await this.courseAssignmentRepository.find({
+                where: { lecturerId },
+                relations: ["course"],
+                order: { course: { courseCode: "ASC" } },
+            });
+
+            const assignedCourses = courseAssignments.map(ca => ca.course);
+
+            console.log(`✅ Found ${assignedCourses.length} assigned courses for lecturer`);
+
+            res.status(200).json({
+                success: true,
+                data: assignedCourses,
+            });
+        } catch (error) {
+            console.error("💥 Error fetching assigned courses:", error);
+            res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
     }
 } 

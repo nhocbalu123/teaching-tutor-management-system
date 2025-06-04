@@ -51,8 +51,8 @@ export class User {
     lastName: string;
 
     @Column({
-        type: "enum",
-        enum: UserType,
+        type: "varchar",
+        length: 20,
         nullable: false,
     })
     userType: UserType;

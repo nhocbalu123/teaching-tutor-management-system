@@ -49,4 +49,11 @@ router.put(
     applicationController.updateApplicationStatus.bind(applicationController)
 );
 
+router.get(
+    "/lecturer-assigned-courses",
+    authenticateToken,
+    requireUserType(["lecturer"]),
+    applicationController.getAssignedCoursesForLecturer.bind(applicationController)
+);
+
 export default router; 

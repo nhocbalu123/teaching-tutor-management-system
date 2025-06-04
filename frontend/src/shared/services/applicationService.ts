@@ -144,6 +144,23 @@ export class ApplicationService {
         }
     }
 
+    // PA Part D: Get assigned courses for lecturer
+    static async getAssignedCoursesForLecturer(): Promise<ApiResponse<Course[]>> {
+        try {
+            const response = await applicationAPI.get("/lecturer-assigned-courses");
+            return response.data;
+        } catch (error: unknown) {
+            const axiosError = error as AxiosError<ApiResponse<Course[]>>;
+            if (axiosError.response?.data) {
+                return axiosError.response.data;
+            }
+            return {
+                success: false,
+                message: "Network error occurred while fetching assigned courses.",
+            };
+        }
+    }
+
     // CR Part: Get applications for lecturer with filtering
     static async getApplicationsForLecturer(filters?: ApplicationFilters): Promise<ApiResponse<ApplicationResponse[]>> {
         try {
@@ -156,10 +173,13 @@ export class ApplicationService {
             if (filters?.status) queryParams.set("status", filters.status);
 
             const url = queryParams.toString() ? `/lecturer?${queryParams}` : "/lecturer";
+
             const response = await applicationAPI.get(url);
+
             return response.data;
         } catch (error: unknown) {
             const axiosError = error as AxiosError<ApiResponse<ApplicationResponse[]>>;
+
             if (axiosError.response?.data) {
                 return axiosError.response.data;
             }

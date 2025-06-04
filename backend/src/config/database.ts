@@ -4,7 +4,7 @@ import { User, UserType } from "../entities/User";
 import { Course } from "../entities/Course";
 import { Role } from "../entities/Role";
 import { CourseAssignment } from "../entities/CourseAssignment";
-import { Application } from "../entities/Application";
+import { Application, ApplicationStatus } from "../entities/Application";
 import { SelectedCandidate } from "../entities/SelectedCandidate";
 import bcrypt from "bcryptjs";
 
@@ -38,6 +38,7 @@ export const initializeDatabase = async () => {
         await seedDefaultCourses();
         await seedMockLecturers();
         await seedCourseAssignments();
+        await seedMockCandidatesAndApplications();
     } catch (error) {
         console.error("❌ Error during database initialization:", error);
         throw error;
@@ -280,5 +281,199 @@ const seedCourseAssignments = async () => {
         }
     } catch (error) {
         console.error("❌ Error seeding course assignments:", error);
+    }
+};
+
+const seedMockCandidatesAndApplications = async () => {
+    try {
+        const userRepository = AppDataSource.getRepository(User);
+        const courseRepository = AppDataSource.getRepository(Course);
+        const roleRepository = AppDataSource.getRepository(Role);
+        const applicationRepository = AppDataSource.getRepository(Application);
+        const saltRounds = 10;
+
+        // Create mock candidates
+        const mockCandidates = [
+            {
+                email: "john.doe@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "John",
+                lastName: "Doe",
+                phone: "+61 400 123 456",
+            },
+            {
+                email: "jane.smith@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "Jane",
+                lastName: "Smith",
+                phone: "+61 400 234 567",
+            },
+            {
+                email: "alex.brown@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "Alex",
+                lastName: "Brown",
+                phone: "+61 400 345 678",
+            },
+            {
+                email: "sarah.wilson@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "Sarah",
+                lastName: "Wilson",
+                phone: "+61 400 456 789",
+            },
+            {
+                email: "mike.johnson@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "Mike",
+                lastName: "Johnson",
+                phone: "+61 400 567 890",
+            },
+            {
+                email: "emma.davis@student.rmit.edu.au",
+                password: "candidate123",
+                firstName: "Emma",
+                lastName: "Davis",
+                phone: "+61 400 678 901",
+            },
+        ];
+
+        // Seed candidates
+        for (const candidateData of mockCandidates) {
+            const existingCandidate = await userRepository.findOne({
+                where: { email: candidateData.email },
+            });
+
+            if (!existingCandidate) {
+                const hashedPassword = await bcrypt.hash(candidateData.password, saltRounds);
+
+                const candidate = userRepository.create({
+                    email: candidateData.email,
+                    password: hashedPassword,
+                    firstName: candidateData.firstName,
+                    lastName: candidateData.lastName,
+                    userType: UserType.CANDIDATE,
+                    phone: candidateData.phone,
+                    isBlocked: false,
+                });
+
+                await userRepository.save(candidate);
+                console.log(`✅ Candidate ${candidateData.firstName} ${candidateData.lastName} created`);
+            }
+        }
+
+        // Get all necessary data for applications
+        const candidates = await userRepository.find({
+            where: { userType: UserType.CANDIDATE },
+        });
+        const courses = await courseRepository.find();
+        const roles = await roleRepository.find();
+
+        if (candidates.length === 0 || courses.length === 0 || roles.length === 0) {
+            console.log("⚠️ Missing data for application seeding");
+            return;
+        }
+
+        // Create sample applications for different courses
+        const sampleApplications = [
+            // Applications for COSC2758 (Full Stack Development)
+            {
+                candidateEmail: "john.doe@student.rmit.edu.au",
+                courseCode: "COSC2758",
+                roleName: "tutor",
+                availability: { type: "Full Time" },
+                skills: "JavaScript, React, Node.js, MongoDB, TypeScript",
+                experience: "2 years of web development experience with React and Node.js. Built 3 full-stack applications during internship.",
+                motivation: "I am passionate about web development and want to help other students learn modern frameworks and best practices.",
+            },
+            {
+                candidateEmail: "jane.smith@student.rmit.edu.au",
+                courseCode: "COSC2758",
+                roleName: "lab_assistant",
+                availability: { type: "Part Time" },
+                skills: "React, HTML, CSS, Git, Agile methodologies",
+                experience: "Completed advanced web development courses and contributed to open-source projects.",
+                motivation: "I enjoy problem-solving and helping peers understand complex programming concepts.",
+            },
+            {
+                candidateEmail: "alex.brown@student.rmit.edu.au",
+                courseCode: "COSC2758",
+                roleName: "tutor",
+                availability: { type: "Part Time" },
+                skills: "JavaScript, Vue.js, Express.js, PostgreSQL, Docker",
+                experience: "3 years of freelance web development. Mentored junior developers in previous roles.",
+                motivation: "Teaching others has always been my passion, and I want to share my industry experience with students.",
+            },
+            // Applications for COSC2671 (Introduction to Web Programming)
+            {
+                candidateEmail: "sarah.wilson@student.rmit.edu.au",
+                courseCode: "COSC2671",
+                roleName: "tutor",
+                availability: { type: "Full Time" },
+                skills: "HTML, CSS, JavaScript, Bootstrap, jQuery",
+                experience: "Strong foundation in web technologies. Tutored high school students in programming.",
+                motivation: "I want to help beginning students build confidence in their programming abilities.",
+            },
+            {
+                candidateEmail: "mike.johnson@student.rmit.edu.au",
+                courseCode: "COSC2671",
+                roleName: "lab_assistant",
+                availability: { type: "Part Time" },
+                skills: "HTML, CSS, JavaScript, Responsive Design, Accessibility",
+                experience: "Completed web development bootcamp and built several portfolio projects.",
+                motivation: "I understand the challenges beginners face and want to provide supportive guidance.",
+            },
+            // Applications for COSC2938 (Further Web Programming)
+            {
+                candidateEmail: "emma.davis@student.rmit.edu.au",
+                courseCode: "COSC2938",
+                roleName: "tutor",
+                availability: { type: "Part Time" },
+                skills: "Angular, TypeScript, RxJS, Testing, CI/CD",
+                experience: "Industry experience with enterprise Angular applications. Led development teams.",
+                motivation: "I want to bridge the gap between academic learning and industry practices.",
+            },
+        ];
+
+        // Create applications
+        for (const appData of sampleApplications) {
+            const candidate = candidates.find(c => c.email === appData.candidateEmail);
+            const course = courses.find(c => c.courseCode === appData.courseCode);
+            const role = roles.find(r => r.roleName === appData.roleName);
+
+            if (!candidate || !course || !role) {
+                console.log(`⚠️ Skipping application - missing data for ${appData.candidateEmail} -> ${appData.courseCode}`);
+                continue;
+            }
+
+            // Check if application already exists
+            const existingApplication = await applicationRepository.findOne({
+                where: {
+                    candidateId: candidate.id,
+                    courseId: course.id,
+                    roleId: role.id,
+                },
+            });
+
+            if (!existingApplication) {
+                const application = applicationRepository.create({
+                    candidateId: candidate.id,
+                    courseId: course.id,
+                    roleId: role.id,
+                    availability: appData.availability,
+                    skills: appData.skills,
+                    experience: appData.experience,
+                    motivation: appData.motivation,
+                    status: ApplicationStatus.PENDING,
+                });
+
+                await applicationRepository.save(application);
+                console.log(`✅ Application created: ${candidate.firstName} ${candidate.lastName} -> ${course.courseCode} (${role.roleName})`);
+            }
+        }
+
+        console.log("✅ Mock candidates and applications seeded successfully");
+    } catch (error) {
+        console.error("❌ Error seeding mock candidates and applications:", error);
     }
 };
