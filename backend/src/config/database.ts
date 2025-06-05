@@ -29,6 +29,12 @@ export const AppDataSource = new DataSource({
     ],
     migrations: ["src/migrations/*.ts"],
     subscribers: ["src/subscribers/*.ts"],
+    // Connection options for Cloud MySQL
+    extra: {
+        charset: "utf8mb4_unicode_ci",
+    },
+    connectTimeout: 60000,
+    acquireTimeout: 60000,
 });
 
 export const initializeDatabase = async () => {

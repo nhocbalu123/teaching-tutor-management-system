@@ -171,9 +171,6 @@ export const ProfilePage: React.FC = () => {
                 height={120}
                 className={styles.avatarImage}
               />
-              <div className={styles.roleIndicator}>
-                <span className={styles.roleIcon}>{getUserTypeIcon(user.userType)}</span>
-              </div>
             </div>
           </div>
           

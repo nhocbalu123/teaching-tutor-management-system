@@ -66,21 +66,6 @@
   object-fit: cover;
 }
 
-.roleIndicator {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 36px;
-  height: 36px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid var(--color-bg-surface);
-  font-size: 14px;
-}
-
 /* User Info */
 .userInfo {
   text-align: center;
@@ -93,6 +78,9 @@
   margin: 0 0 0.5rem 0;
   color: var(--color-text-primary);
   line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .userRole {
@@ -580,12 +568,6 @@
   .avatarWrapper {
     width: 100px;
     height: 100px;
-  }
-  
-  .roleIndicator {
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
   }
   
   .userName {

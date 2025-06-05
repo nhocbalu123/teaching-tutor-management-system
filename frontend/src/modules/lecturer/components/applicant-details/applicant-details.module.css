@@ -1,9 +1,8 @@
 /* ApplicantDetails Styles */
 .detailsContainer {
   padding: 1.5rem;
-  height: 100%;
-  overflow-y: auto;
-  max-height: 600px;
+  overflow-y: scroll;
+  max-height: 690px;
   background-color: var(--color-bg-primary);
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -12,7 +11,7 @@
 
 /* Applicant email with proper dark/light mode colors */
 .applicantEmail {
-  color: #4b5563; /* gray-600 equivalent */
+  color: #ccc;
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
 }
@@ -602,7 +601,7 @@
 /* Experience & Skills Grid */
 .experienceSkillsGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 1.5rem;
 }
 
