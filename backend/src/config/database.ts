@@ -11,8 +11,12 @@ import bcrypt from "bcryptjs";
 config();
 
 export const AppDataSource = new DataSource({
-    type: "sqlite",
-    database: "database.sqlite",
+    type: "mysql",
+    host: process.env.DB_HOST || "209.38.26.237",
+    port: parseInt(process.env.DB_PORT || "3306"),
+    username: process.env.DB_USERNAME || "S3959931",
+    password: process.env.DB_PASSWORD || "Eel404101@@",
+    database: process.env.DB_NAME || "S3959931",
     synchronize: true, // Auto-create tables in development
     logging: process.env.NODE_ENV === "development",
     entities: [
@@ -155,42 +159,42 @@ const seedMockLecturers = async () => {
 
         const mockLecturers = [
             {
-                email: "dr.smith@rmit.edu.au",
+                email: "john.smith@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "John",
                 lastName: "Smith",
                 phone: "+61 3 9925 1234",
             },
             {
-                email: "prof.johnson@rmit.edu.au",
+                email: "sarah.johnson@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Sarah",
                 lastName: "Johnson",
                 phone: "+61 3 9925 2345",
             },
             {
-                email: "dr.williams@rmit.edu.au",
+                email: "michael.williams@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Michael",
                 lastName: "Williams",
                 phone: "+61 3 9925 3456",
             },
             {
-                email: "prof.brown@rmit.edu.au",
+                email: "emily.brown@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Emily",
                 lastName: "Brown",
                 phone: "+61 3 9925 4567",
             },
             {
-                email: "dr.davis@rmit.edu.au",
+                email: "david.davis@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "David",
                 lastName: "Davis",
                 phone: "+61 3 9925 5678",
             },
             {
-                email: "prof.wilson@rmit.edu.au",
+                email: "lisa.wilson@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Lisa",
                 lastName: "Wilson",
@@ -244,12 +248,12 @@ const seedCourseAssignments = async () => {
 
         // Define course assignments (lecturer email -> course codes)
         const assignments = {
-            "dr.smith@rmit.edu.au": ["COSC2758", "COSC2671"],
-            "prof.johnson@rmit.edu.au": ["COSC2938", "COSC2123"],
-            "dr.williams@rmit.edu.au": ["COSC1295", "COSC2767"],
-            "prof.brown@rmit.edu.au": ["COSC2758", "COSC2938"],
-            "dr.davis@rmit.edu.au": ["COSC2123", "COSC2671"],
-            "prof.wilson@rmit.edu.au": ["COSC2767", "COSC1295"],
+            "john.smith@lecturer.edu.au": ["COSC2758", "COSC2671"],
+            "sarah.johnson@lecturer.edu.au": ["COSC2938", "COSC2123"],
+            "michael.williams@lecturer.edu.au": ["COSC1295", "COSC2767"],
+            "emily.brown@lecturer.edu.au": ["COSC2758", "COSC2938"],
+            "david.davis@lecturer.edu.au": ["COSC2123", "COSC2671"],
+            "lisa.wilson@lecturer.edu.au": ["COSC2767", "COSC1295"],
         };
 
         for (const [lecturerEmail, courseCodes] of Object.entries(assignments)) {
@@ -292,49 +296,21 @@ const seedMockCandidatesAndApplications = async () => {
         const applicationRepository = AppDataSource.getRepository(Application);
         const saltRounds = 10;
 
-        // Create mock candidates
+        // Create exactly 2 mock candidates as required
         const mockCandidates = [
             {
-                email: "john.doe@student.rmit.edu.au",
+                email: "john.doe@candidate.edu.au",
                 password: "candidate123",
                 firstName: "John",
                 lastName: "Doe",
                 phone: "+61 400 123 456",
             },
             {
-                email: "jane.smith@student.rmit.edu.au",
+                email: "jane.smith@candidate.edu.au",
                 password: "candidate123",
                 firstName: "Jane",
                 lastName: "Smith",
                 phone: "+61 400 234 567",
-            },
-            {
-                email: "alex.brown@student.rmit.edu.au",
-                password: "candidate123",
-                firstName: "Alex",
-                lastName: "Brown",
-                phone: "+61 400 345 678",
-            },
-            {
-                email: "sarah.wilson@student.rmit.edu.au",
-                password: "candidate123",
-                firstName: "Sarah",
-                lastName: "Wilson",
-                phone: "+61 400 456 789",
-            },
-            {
-                email: "mike.johnson@student.rmit.edu.au",
-                password: "candidate123",
-                firstName: "Mike",
-                lastName: "Johnson",
-                phone: "+61 400 567 890",
-            },
-            {
-                email: "emma.davis@student.rmit.edu.au",
-                password: "candidate123",
-                firstName: "Emma",
-                lastName: "Davis",
-                phone: "+61 400 678 901",
             },
         ];
 
@@ -374,11 +350,11 @@ const seedMockCandidatesAndApplications = async () => {
             return;
         }
 
-        // Create sample applications for different courses
+        // Create sample applications for different courses with updated email addresses
         const sampleApplications = [
             // Applications for COSC2758 (Full Stack Development)
             {
-                candidateEmail: "john.doe@student.rmit.edu.au",
+                candidateEmail: "john.doe@candidate.edu.au",
                 courseCode: "COSC2758",
                 roleName: "tutor",
                 availability: { type: "Full Time" },
@@ -387,7 +363,7 @@ const seedMockCandidatesAndApplications = async () => {
                 motivation: "I am passionate about web development and want to help other students learn modern frameworks and best practices.",
             },
             {
-                candidateEmail: "jane.smith@student.rmit.edu.au",
+                candidateEmail: "jane.smith@candidate.edu.au",
                 courseCode: "COSC2758",
                 roleName: "lab_assistant",
                 availability: { type: "Part Time" },
@@ -395,43 +371,24 @@ const seedMockCandidatesAndApplications = async () => {
                 experience: "Completed advanced web development courses and contributed to open-source projects.",
                 motivation: "I enjoy problem-solving and helping peers understand complex programming concepts.",
             },
-            {
-                candidateEmail: "alex.brown@student.rmit.edu.au",
-                courseCode: "COSC2758",
-                roleName: "tutor",
-                availability: { type: "Part Time" },
-                skills: "JavaScript, Vue.js, Express.js, PostgreSQL, Docker",
-                experience: "3 years of freelance web development. Mentored junior developers in previous roles.",
-                motivation: "Teaching others has always been my passion, and I want to share my industry experience with students.",
-            },
             // Applications for COSC2671 (Introduction to Web Programming)
             {
-                candidateEmail: "sarah.wilson@student.rmit.edu.au",
+                candidateEmail: "john.doe@candidate.edu.au",
                 courseCode: "COSC2671",
                 roleName: "tutor",
-                availability: { type: "Full Time" },
+                availability: { type: "Part Time" },
                 skills: "HTML, CSS, JavaScript, Bootstrap, jQuery",
                 experience: "Strong foundation in web technologies. Tutored high school students in programming.",
                 motivation: "I want to help beginning students build confidence in their programming abilities.",
             },
             {
-                candidateEmail: "mike.johnson@student.rmit.edu.au",
+                candidateEmail: "jane.smith@candidate.edu.au",
                 courseCode: "COSC2671",
                 roleName: "lab_assistant",
                 availability: { type: "Part Time" },
                 skills: "HTML, CSS, JavaScript, Responsive Design, Accessibility",
                 experience: "Completed web development bootcamp and built several portfolio projects.",
                 motivation: "I understand the challenges beginners face and want to provide supportive guidance.",
-            },
-            // Applications for COSC2938 (Further Web Programming)
-            {
-                candidateEmail: "emma.davis@student.rmit.edu.au",
-                courseCode: "COSC2938",
-                roleName: "tutor",
-                availability: { type: "Part Time" },
-                skills: "Angular, TypeScript, RxJS, Testing, CI/CD",
-                experience: "Industry experience with enterprise Angular applications. Led development teams.",
-                motivation: "I want to bridge the gap between academic learning and industry practices.",
             },
         ];
 

@@ -5,6 +5,53 @@ interface ValidationResult {
     errors: Record<string, string>;
 }
 
+// Helper function to determine userType based on email domain
+export const getUserTypeFromEmail = (email: string): UserType | null => {
+    const emailLowercase = email.toLowerCase();
+
+    if (emailLowercase.endsWith("@candidate.edu.au")) {
+        return UserType.CANDIDATE;
+    } else if (emailLowercase.endsWith("@lecturer.edu.au")) {
+        return UserType.LECTURER;
+    } else if (emailLowercase === "admin@admin.com") {
+        return UserType.ADMIN;
+    }
+
+    return null;
+};
+
+// Helper function to validate email domain requirements
+export const validateEmailDomain = (email: string, expectedUserType?: UserType): { isValid: boolean; expectedDomain?: string } => {
+    const emailLowercase = email.toLowerCase();
+
+    // If no expected user type, just check if it matches any valid domain
+    if (!expectedUserType) {
+        const userType = getUserTypeFromEmail(email);
+        return { isValid: userType !== null };
+    }
+
+    // Check if email matches the expected user type domain
+    switch (expectedUserType) {
+        case UserType.CANDIDATE:
+            return {
+                isValid: emailLowercase.endsWith("@candidate.edu.au"),
+                expectedDomain: "@candidate.edu.au"
+            };
+        case UserType.LECTURER:
+            return {
+                isValid: emailLowercase.endsWith("@lecturer.edu.au"),
+                expectedDomain: "@lecturer.edu.au"
+            };
+        case UserType.ADMIN:
+            return {
+                isValid: emailLowercase === "admin@admin.com",
+                expectedDomain: "admin@admin.com"
+            };
+        default:
+            return { isValid: false };
+    }
+};
+
 export const validateSignupData = (data: any): ValidationResult => {
     const errors: Record<string, string> = {};
 
@@ -13,6 +60,21 @@ export const validateSignupData = (data: any): ValidationResult => {
         errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         errors.email = "Please enter a valid email address";
+    } else {
+        // Always check if email domain is valid for any user type
+        const domainValidation = validateEmailDomain(data.email);
+        if (!domainValidation.isValid) {
+            errors.email = "Email must end with @candidate.edu.au (for candidates) or @lecturer.edu.au (for lecturers)";
+        } else {
+            // If userType is provided, validate it matches the email domain
+            if (data.userType) {
+                const userTypeFromEmail = getUserTypeFromEmail(data.email);
+                if (userTypeFromEmail && userTypeFromEmail !== data.userType) {
+                    const expectedDomain = userTypeFromEmail === UserType.CANDIDATE ? "@candidate.edu.au" : "@lecturer.edu.au";
+                    errors.email = `Email domain does not match selected user type. Use ${expectedDomain} for ${userTypeFromEmail}s`;
+                }
+            }
+        }
     }
 
     // Password validation
@@ -50,10 +112,8 @@ export const validateSignupData = (data: any): ValidationResult => {
         errors.lastName = "Last name can only contain letters and spaces";
     }
 
-    // User type validation
-    if (!data.userType) {
-        errors.userType = "User type is required";
-    } else if (!Object.values(UserType).includes(data.userType)) {
+    // User type validation - now optional since we can derive it from email
+    if (data.userType && !Object.values(UserType).includes(data.userType)) {
         errors.userType = "Invalid user type";
     }
 

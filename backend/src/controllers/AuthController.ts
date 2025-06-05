@@ -5,7 +5,7 @@ import { AppDataSource } from "../config/database";
 import { User, UserType } from "../entities/User";
 import { Course } from "../entities/Course";
 import { CourseAssignment } from "../entities/CourseAssignment";
-import { validateSignupData, validateSigninData } from "../utils/validation";
+import { validateSignupData, validateSigninData, getUserTypeFromEmail } from "../utils/validation";
 
 interface AssignedCourse {
     id: number;
@@ -25,9 +25,52 @@ export class AuthController {
                 req.body;
 
             console.log("🔄 Signup attempt for email:", email);
+            console.log("🔍 Request body received:", JSON.stringify(req.body, null, 2));
+            console.log("🔍 UserType provided:", userType);
 
-            // Validate input data
+            // Automatically determine userType from email domain if not provided
+            let finalUserType = userType;
+            if (!finalUserType) {
+                console.log("🔍 No userType provided, determining from email...");
+                finalUserType = getUserTypeFromEmail(email);
+                if (!finalUserType) {
+                    console.log("❌ Invalid email domain for:", email);
+                    res.status(400).json({
+                        success: false,
+                        message: "Invalid email domain",
+                        errors: {
+                            email: "Email must end with @candidate.edu.au (for candidates) or @lecturer.edu.au (for lecturers)"
+                        }
+                    });
+                    return;
+                }
+                console.log("📧 Auto-determined userType from email:", finalUserType);
+                // Set the userType in the request body for validation
+                req.body.userType = finalUserType;
+            } else {
+                console.log("🔍 UserType provided, validating against email...");
+                // If userType is provided, verify it matches the email domain
+                const userTypeFromEmail = getUserTypeFromEmail(email);
+                if (userTypeFromEmail && userTypeFromEmail !== finalUserType) {
+                    const expectedDomain = userTypeFromEmail === UserType.CANDIDATE ? "@candidate.edu.au" : "@lecturer.edu.au";
+                    console.log("❌ UserType mismatch for:", email);
+                    res.status(400).json({
+                        success: false,
+                        message: "User type does not match email domain",
+                        errors: {
+                            email: `Email domain does not match selected user type. Use ${expectedDomain} for ${userTypeFromEmail}s`
+                        }
+                    });
+                    return;
+                }
+            }
+
+            console.log("🔍 Data to validate:", JSON.stringify(req.body, null, 2));
+
+            // Validate input data with userType now set
             const validation = validateSignupData(req.body);
+            console.log("🔍 Validation result:", JSON.stringify(validation, null, 2));
+
             if (!validation.isValid) {
                 console.log("❌ Signup validation failed:", validation.errors);
                 res.status(400).json({
@@ -57,19 +100,19 @@ export class AuthController {
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             console.log("🔐 Password hashed successfully");
 
-            // Create new user
+            // Create new user with the final userType
             const newUser = this.userRepository.create({
                 email,
                 password: hashedPassword,
                 firstName,
                 lastName,
-                userType: userType as UserType,
+                userType: finalUserType as UserType,
                 phone: phone || null,
             });
 
             // Save user to database
             const savedUser = await this.userRepository.save(newUser);
-            console.log("✅ User created successfully:", savedUser.id);
+            console.log("✅ User created successfully:", savedUser.id, "Type:", savedUser.userType);
 
             // Generate JWT token
             const token = jwt.sign(
