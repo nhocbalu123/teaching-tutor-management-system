@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import "@/shared/styles/globals.css"; // Adjusted path as per proposed structure
 import Header from "@/shared/components/layout/header/header";
 import Footer from "@/shared/components/layout/footer/footer";
-import { AuthProvider } from "@/modules/auth/hooks/useAuth";
+import { AuthProvider } from "@/modules/auth/contexts/AuthContext";
 import GlobalWelcomeBanner from "@/shared/components/GlobalWelcomeBanner";
 
 const inter = Inter({ subsets: ["latin"] });

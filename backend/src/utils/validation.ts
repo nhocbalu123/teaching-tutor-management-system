@@ -117,10 +117,7 @@ export const validateSignupData = (data: any): ValidationResult => {
         errors.userType = "Invalid user type";
     }
 
-    // Phone validation (optional)
-    if (data.phone && !/^[\d\s\-\+\(\)]+$/.test(data.phone)) {
-        errors.phone = "Please enter a valid phone number";
-    }
+
 
     return {
         isValid: Object.keys(errors).length === 0,

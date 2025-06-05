@@ -526,3 +526,310 @@
   margin-top: 0.25rem !important;
   font-weight: 500 !important;
 }
+
+/* Enhanced Styles for Merged Functionality */
+.applyModalRequiredAsterisk {
+  color: #ef4444 !important;
+  margin-left: 0.25rem !important;
+}
+
+.applyModalHint {
+  font-weight: 400 !important;
+  color: var(--color-text-secondary) !important;
+  font-size: 0.75rem !important;
+  margin-left: 0.5rem !important;
+}
+
+.applyModalOptional {
+  font-weight: 400 !important;
+  color: var(--color-text-secondary) !important;
+  font-size: 0.75rem !important;
+}
+
+/* Enhanced Availability Options */
+.availabilityOptions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1rem !important;
+}
+
+.availabilityOption {
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  padding: 1rem !important;
+  border: 2px solid var(--color-border) !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.3s ease !important;
+  background-color: var(--color-bg-secondary) !important;
+}
+
+.availabilityOption:hover {
+  border-color: var(--color-primary) !important;
+  background-color: var(--color-bg-primary) !important;
+}
+
+.availabilityOption.selected {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(249, 115, 22, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1) !important;
+}
+
+.availabilityOption input[type="radio"] {
+  display: none !important;
+}
+
+.optionContent {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+}
+
+.optionTitle {
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.875rem !important;
+}
+
+.optionDescription {
+  font-size: 0.75rem !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* Enhanced Skills Section */
+.selectedSkills {
+  background-color: var(--color-bg-secondary) !important;
+  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.selectedSkillsTitle {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+  margin-bottom: 0.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.selectedSkillsTitle::before {
+  content: "✓" !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  border-radius: 50% !important;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+.skillTags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+}
+
+.popularSkills {
+  margin-bottom: 1rem !important;
+}
+
+.popularSkillsLabel {
+  display: block !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-primary) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.popularSkillButtons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+}
+
+.skillButton {
+  padding: 0.5rem 0.75rem !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.5rem !important;
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.skillButton:hover:not(:disabled) {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(249, 115, 22, 0.05) !important;
+}
+
+.skillButton:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.skillButtonSelected {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(249, 115, 22, 0.1) !important;
+  color: var(--color-primary) !important;
+}
+
+.customSkillInput {
+  display: flex !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+}
+
+.skillInput {
+  flex: 1 !important;
+  padding: 0.75rem !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  background-color: var(--color-bg-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.skillInput:focus {
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1) !important;
+}
+
+.skillInput:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.addSkillButton {
+  padding: 0.75rem 1rem !important;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.addSkillButton:hover:not(:disabled) {
+  background-color: var(--color-secondary) !important;
+}
+
+.addSkillButton:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.applyModalCancelButton {
+  flex: 1 !important;
+  padding: 0.75rem 1rem !important;
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.applyModalCancelButton:hover:not(:disabled) {
+  background-color: var(--color-bg-hover) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.applyModalCancelButton:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.applyModalSubmitButton {
+  flex: 2 !important;
+  padding: 0.75rem 1rem !important;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+
+.applyModalSubmitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #ea580c 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
+}
+
+.applyModalSubmitButton:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.applyModalSpinner {
+  width: 1rem !important;
+  height: 1rem !important;
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode support for enhanced styles */
+:global(.dark) .availabilityOption {
+  border-color: #374151 !important;
+}
+
+:global(.dark) .skillButton {
+  border-color: #374151 !important;
+  background-color: #111827 !important;
+}
+
+:global(.dark) .skillInput {
+  border-color: #374151 !important;
+  background-color: #1f2937 !important;
+}
+
+:global(.dark) .applyModalCancelButton {
+  border-color: #374151 !important;
+  background-color: #111827 !important;
+}
+
+:global(.dark) .applyModalCancelButton:hover:not(:disabled) {
+  background-color: #374151 !important;
+}
+
+@media (max-width: 640px) {
+  .availabilityOptions {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .customSkillInput {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .applyModalActions {
+    flex-direction: column !important;
+  }
+}

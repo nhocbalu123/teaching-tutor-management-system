@@ -12,7 +12,6 @@ export interface User {
   firstName: string;
   lastName: string;
   userType: UserType;
-  phone?: string;
   isBlocked: boolean;
   createdAt: string;
   updatedAt: string;
@@ -36,7 +35,6 @@ export interface SignupData {
   firstName: string;
   lastName: string;
   userType: UserType;
-  phone?: string;
 }
 
 export interface SigninData {

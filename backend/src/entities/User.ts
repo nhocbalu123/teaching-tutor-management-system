@@ -57,12 +57,7 @@ export class User {
     })
     userType: UserType;
 
-    @Column({
-        type: "varchar",
-        length: 20,
-        nullable: true,
-    })
-    phone?: string;
+
 
     @Column({
         type: "boolean",

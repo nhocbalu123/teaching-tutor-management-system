@@ -49,6 +49,19 @@ export const initializeDatabase = async () => {
     }
 };
 
+export const initializeDatabaseConnection = async () => {
+    try {
+        if (!AppDataSource.isInitialized) {
+            await AppDataSource.initialize();
+            console.log("✅ Database connection initialized successfully");
+            console.log("📊 All tables ready for TT application");
+        }
+    } catch (error) {
+        console.error("❌ Error during database connection initialization:", error);
+        throw error;
+    }
+};
+
 const seedDefaultRoles = async () => {
     try {
         const roleRepository = AppDataSource.getRepository(Role);
@@ -163,42 +176,36 @@ const seedMockLecturers = async () => {
                 password: "lecturer123",
                 firstName: "John",
                 lastName: "Smith",
-                phone: "+61 3 9925 1234",
             },
             {
                 email: "sarah.johnson@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Sarah",
                 lastName: "Johnson",
-                phone: "+61 3 9925 2345",
             },
             {
                 email: "michael.williams@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Michael",
                 lastName: "Williams",
-                phone: "+61 3 9925 3456",
             },
             {
                 email: "emily.brown@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Emily",
                 lastName: "Brown",
-                phone: "+61 3 9925 4567",
             },
             {
                 email: "david.davis@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "David",
                 lastName: "Davis",
-                phone: "+61 3 9925 5678",
             },
             {
                 email: "lisa.wilson@lecturer.edu.au",
                 password: "lecturer123",
                 firstName: "Lisa",
                 lastName: "Wilson",
-                phone: "+61 3 9925 6789",
             },
         ];
 
@@ -216,7 +223,6 @@ const seedMockLecturers = async () => {
                     firstName: lecturerData.firstName,
                     lastName: lecturerData.lastName,
                     userType: UserType.LECTURER,
-                    phone: lecturerData.phone,
                     isBlocked: false,
                 });
 
@@ -303,14 +309,12 @@ const seedMockCandidatesAndApplications = async () => {
                 password: "candidate123",
                 firstName: "John",
                 lastName: "Doe",
-                phone: "+61 400 123 456",
             },
             {
                 email: "jane.smith@candidate.edu.au",
                 password: "candidate123",
                 firstName: "Jane",
                 lastName: "Smith",
-                phone: "+61 400 234 567",
             },
         ];
 
@@ -329,7 +333,6 @@ const seedMockCandidatesAndApplications = async () => {
                     firstName: candidateData.firstName,
                     lastName: candidateData.lastName,
                     userType: UserType.CANDIDATE,
-                    phone: candidateData.phone,
                     isBlocked: false,
                 });
 

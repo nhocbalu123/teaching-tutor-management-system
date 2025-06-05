@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { ApplicationService, Course, Role, ApplicationData, ApplicationResponse } from "@/shared/services/applicationService";
-import EnhancedCourseCard from "@/modules/tutor/components/enhanced-course-card/EnhancedCourseCard";
-import EnhancedApplyModal from "@/modules/tutor/components/enhanced-apply-modal/EnhancedApplyModal";
+import CourseCard from "@/modules/tutor/components/course-card/course-card";
+import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
 import Toast from "@/shared/components/common/toast/toast";
 import LoadingWrapper from "@/shared/components/common/loading-wrapper/LoadingWrapper";
 import { useToast } from "@/shared/hooks/useNotification";
@@ -298,7 +298,7 @@ const TutorDashboardPage: React.FC = () => {
           ) : (
             <div className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
               {filteredCourses.map((course) => (
-                <EnhancedCourseCard
+                <CourseCard
                   key={course.id}
                   course={course}
                   roles={roles}
@@ -311,8 +311,8 @@ const TutorDashboardPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Enhanced Apply Modal */}
-      <EnhancedApplyModal
+      {/* Apply Modal */}
+      <ApplyModal
         isOpen={isModalOpen}
         course={selectedCourse}
         role={selectedRole}

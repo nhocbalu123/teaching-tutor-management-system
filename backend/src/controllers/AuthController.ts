@@ -21,7 +21,7 @@ export class AuthController {
 
     async signup(req: Request, res: Response): Promise<void> {
         try {
-            const { email, password, firstName, lastName, userType, phone } =
+            const { email, password, firstName, lastName, userType } =
                 req.body;
 
             console.log("🔄 Signup attempt for email:", email);
@@ -107,7 +107,6 @@ export class AuthController {
                 firstName,
                 lastName,
                 userType: finalUserType as UserType,
-                phone: phone || null,
             });
 
             // Save user to database
