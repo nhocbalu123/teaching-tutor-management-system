@@ -13,7 +13,7 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   // Add more setup options before each test is run
   setupFilesAfterEnv: ["<rootDir>/__tests__/setup.ts"],
-  testEnvironment: "jsdom",
+  testEnvironment: "jest-fixed-jsdom",
   coverageProvider: "v8",
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
   moduleNameMapper: {
