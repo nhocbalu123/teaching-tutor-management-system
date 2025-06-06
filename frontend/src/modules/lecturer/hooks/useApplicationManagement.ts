@@ -1,16 +1,24 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ApplicationService, ApplicationResponse, ApplicationFilters, ApplicationStatistics } from "@/shared/services/applicationService";
+import {
+  ApplicationService,
+  ApplicationResponse,
+  ApplicationFilters,
+  ApplicationStatistics,
+} from "@/shared/services/applicationService";
 
 export const useApplicationManagement = () => {
   // Data state
   const [applications, setApplications] = useState<ApplicationResponse[]>([]);
-  const [statistics, setStatistics] = useState<ApplicationStatistics | null>(null);
+  const [statistics, setStatistics] = useState<ApplicationStatistics | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Filter state for CR Part
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
-  const [selectedRankingCourse, setSelectedRankingCourse] = useState<string>("");
+  const [selectedRankingCourse, setSelectedRankingCourse] =
+    useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [roleTypeFilter, setRoleTypeFilter] = useState<string>("all");
   const [availabilityFilter, setAvailabilityFilter] = useState<string>("all");
@@ -19,11 +27,14 @@ export const useApplicationManagement = () => {
   const [sortBy, setSortBy] = useState<string>("none");
 
   // Selected application state
-  const [selectedApplication, setSelectedApplication] = useState<ApplicationResponse | null>(null);
+  const [selectedApplication, setSelectedApplication] =
+    useState<ApplicationResponse | null>(null);
   const [comment, setComment] = useState<string>("");
 
   // Ranking state (for existing functionality)
-  const [rankedApplications, setRankedApplications] = useState<ApplicationResponse[]>([]);
+  const [rankedApplications, setRankedApplications] = useState<
+    ApplicationResponse[]
+  >([]);
 
   // Load applications with filters (CR Part)
   const loadApplications = useCallback(async () => {
@@ -35,22 +46,25 @@ export const useApplicationManagement = () => {
 
       if (searchQuery.trim()) filters.candidateName = searchQuery.trim();
       if (roleTypeFilter !== "all") filters.roleType = roleTypeFilter;
-      if (availabilityFilter !== "all") filters.availability = availabilityFilter;
+      if (availabilityFilter !== "all")
+        filters.availability = availabilityFilter;
       if (skillsFilter.trim()) filters.skills = skillsFilter.trim();
       if (selectedCourse !== "all") filters.courseCode = selectedCourse;
       if (statusFilter !== "all") filters.status = statusFilter;
 
-      const response = await ApplicationService.getApplicationsForLecturer(filters);
+      const response =
+        await ApplicationService.getApplicationsForLecturer(filters);
 
       if (response.success && response.data) {
         setApplications(response.data);
 
         // Update ranked applications - filter for applications with ranking data
-        const ranked = response.data.filter(app =>
-          app.status === "selected" &&
-          app.rank !== undefined &&
-          app.rank !== null &&
-          app.rankedForCourse
+        const ranked = response.data.filter(
+          (app) =>
+            app.status === "selected" &&
+            app.rank !== undefined &&
+            app.rank !== null &&
+            app.rankedForCourse
         );
 
         // Sort ranked applications by rank for proper display
@@ -69,7 +83,14 @@ export const useApplicationManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, roleTypeFilter, availabilityFilter, skillsFilter, selectedCourse, statusFilter]);
+  }, [
+    searchQuery,
+    roleTypeFilter,
+    availabilityFilter,
+    skillsFilter,
+    selectedCourse,
+    statusFilter,
+  ]);
 
   // Load statistics (DI Part)
   const loadStatistics = useCallback(async () => {
@@ -108,35 +129,84 @@ export const useApplicationManagement = () => {
     if (isInitialized) {
       loadApplications();
     }
-  }, [isInitialized, loadApplications, searchQuery, roleTypeFilter, availabilityFilter, skillsFilter, selectedCourse, statusFilter]);
+  }, [
+    isInitialized,
+    loadApplications,
+    searchQuery,
+    roleTypeFilter,
+    availabilityFilter,
+    skillsFilter,
+    selectedCourse,
+    statusFilter,
+  ]);
+
+  // Sync selectedApplication with updated applications data
+  useEffect(() => {
+    if (selectedApplication && applications.length > 0) {
+      // Find the updated version of the currently selected application
+      const updatedSelectedApplication = applications.find(
+        (app) => app.id === selectedApplication.id
+      );
+      if (updatedSelectedApplication) {
+        const hasCommentChanged =
+          selectedApplication.comment !== updatedSelectedApplication.comment;
+
+        console.log("🔄 Syncing selectedApplication with updated data:", {
+          oldComment: selectedApplication.comment,
+          newComment: updatedSelectedApplication.comment,
+          applicationId: selectedApplication.id,
+          hasCommentChanged,
+          willUpdate:
+            updatedSelectedApplication !== selectedApplication ||
+            hasCommentChanged,
+        });
+
+        // Update the selectedApplication if it's different OR if the comment has changed
+        if (
+          updatedSelectedApplication !== selectedApplication ||
+          hasCommentChanged
+        ) {
+          setSelectedApplication(updatedSelectedApplication);
+          // Always update the comment to match the latest comment from the updated application
+          setComment(updatedSelectedApplication.comment || "");
+        }
+      }
+    }
+  }, [applications, selectedApplication?.id]); // Only depend on applications and the ID to avoid infinite loops
 
   // Save application (update status)
-  const saveApplication = useCallback(async (application: ApplicationResponse) => {
-    try {
-      const response = await ApplicationService.updateApplicationStatus(
-        application.id,
-        application.status
-      );
+  const saveApplication = useCallback(
+    async (application: ApplicationResponse) => {
+      try {
+        const response = await ApplicationService.updateApplicationStatus(
+          application.id,
+          application.status
+        );
 
-      if (response.success) {
-        // Reload applications to get updated data
-        await loadApplications();
-        return true;
-      } else {
-        console.error("Failed to save application:", response.message);
+        if (response.success) {
+          // Reload applications to get updated data
+          await loadApplications();
+          return true;
+        } else {
+          console.error("Failed to save application:", response.message);
+          return false;
+        }
+      } catch (error) {
+        console.error("Error saving application:", error);
         return false;
       }
-    } catch (error) {
-      console.error("Error saving application:", error);
-      return false;
-    }
-  }, [loadApplications]);
+    },
+    [loadApplications]
+  );
 
   // Handle application selection
-  const handleSelectApplication = useCallback((application: ApplicationResponse) => {
-    setSelectedApplication(application);
-    setComment(""); // Clear comment when selecting new application
-  }, []);
+  const handleSelectApplication = useCallback(
+    (application: ApplicationResponse) => {
+      setSelectedApplication(application);
+      setComment(application.comment || ""); // Load existing comment when selecting application
+    },
+    []
+  );
 
   // Sort applications based on sortBy criteria
   const sortedApplications = useMemo(() => {
@@ -147,21 +217,27 @@ export const useApplicationManagement = () => {
     switch (sortBy) {
       case "name":
         return sorted.sort((a, b) => {
-          const nameA = `${a.candidate?.firstName || ''} ${a.candidate?.lastName || ''}`.toLowerCase();
-          const nameB = `${b.candidate?.firstName || ''} ${b.candidate?.lastName || ''}`.toLowerCase();
+          const nameA =
+            `${a.candidate?.firstName || ""} ${a.candidate?.lastName || ""}`.toLowerCase();
+          const nameB =
+            `${b.candidate?.firstName || ""} ${b.candidate?.lastName || ""}`.toLowerCase();
           return nameA.localeCompare(nameB);
         });
 
       case "availability":
         return sorted.sort((a, b) => {
-          const availabilityA = (a.availability as { type: string })?.type || '';
-          const availabilityB = (b.availability as { type: string })?.type || '';
+          const availabilityA =
+            (a.availability as { type: string })?.type || "";
+          const availabilityB =
+            (b.availability as { type: string })?.type || "";
           return availabilityA.localeCompare(availabilityB);
         });
 
       case "date":
         return sorted.sort((a, b) => {
-          return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
+          return (
+            new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
+          );
         });
 
       case "status":

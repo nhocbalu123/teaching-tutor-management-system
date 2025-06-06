@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ApplicationService, ApplicationResponse } from "@/shared/services/applicationService";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  ApplicationService,
+  ApplicationResponse,
+} from "@/shared/services/applicationService";
 import { Application } from "@/shared/types/application";
 import ApplicantList from "@/modules/lecturer/components/applicant-list/applicant-list";
 import ApplicantDetails from "@/modules/lecturer/components/applicant-details/applicant-details";
@@ -21,30 +24,41 @@ import styles from "./LecturerPage.module.css";
 type TabType = "applications" | "rankings" | "stats";
 
 // Adapter function to convert ApplicationResponse to Application
-const convertToLegacyApplication = (appResponse: ApplicationResponse): Application => {
-  const availabilityValue = (appResponse.availability as { type: string })?.type || "Part Time";
-  const availability: "Full Time" | "Part Time" = availabilityValue === "Full Time" ? "Full Time" : "Part Time";
-  
+const convertToLegacyApplication = (
+  appResponse: ApplicationResponse
+): Application => {
+  const availabilityValue =
+    (appResponse.availability as { type: string })?.type || "Part Time";
+  const availability: "Full Time" | "Part Time" =
+    availabilityValue === "Full Time" ? "Full Time" : "Part Time";
+
   return {
     id: appResponse.id.toString(),
     userId: appResponse.candidateId.toString(),
     email: appResponse.candidate?.email || "",
-    fullName: `${appResponse.candidate?.firstName || ""} ${appResponse.candidate?.lastName || ""}`.trim(),
+    fullName:
+      `${appResponse.candidate?.firstName || ""} ${appResponse.candidate?.lastName || ""}`.trim(),
     courses: [appResponse.course.courseCode],
     availability,
-    skills: appResponse.skills ? appResponse.skills.split(",").map(s => s.trim()) : [],
+    skills: appResponse.skills
+      ? appResponse.skills.split(",").map((s) => s.trim())
+      : [],
     academicCredentials: appResponse.experience || "",
     dateApplied: appResponse.appliedAt,
-    status: appResponse.status as "pending" | "shortlisted" | "rejected" | "hired",
+    status: appResponse.status as
+      | "pending"
+      | "shortlisted"
+      | "rejected"
+      | "hired",
     selected: appResponse.status === "selected",
-    comment: "", // Comments would need to be implemented in backend
+    comment: appResponse.comment || "",
     rank: undefined,
   };
 };
 
 // Convert statistics to legacy format
 const convertToLegacyStatistics = (stats: unknown) => {
-  if (!stats || typeof stats !== 'object') {
+  if (!stats || typeof stats !== "object") {
     return {
       totalApplications: 0,
       selectedTutorApplications: 0,
@@ -62,18 +76,21 @@ const convertToLegacyStatistics = (stats: unknown) => {
     totalApplications: typedStats.totalApplications || 0,
     selectedTutorApplications: typedStats.applicationsByStatus?.selected || 0,
     pendingTutorApplications: typedStats.applicationsByStatus?.pending || 0,
-    selectionRate: typedStats.totalApplications && typedStats.totalApplications > 0 
-      ? Math.round(((typedStats.applicationsByStatus?.selected || 0) / typedStats.totalApplications) * 100)
-      : 0,
+    selectionRate:
+      typedStats.totalApplications && typedStats.totalApplications > 0
+        ? Math.round(
+            ((typedStats.applicationsByStatus?.selected || 0) /
+              typedStats.totalApplications) *
+              100
+          )
+        : 0,
   };
 };
 
 const LecturerDashboardPage: React.FC = () => {
   // Authentication
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const {
-    lecturerName,
-  } = useLecturerAuth();
+  const { lecturerName } = useLecturerAuth();
 
   // Application management with enhanced filtering
   const {
@@ -108,12 +125,33 @@ const LecturerDashboardPage: React.FC = () => {
   // Convert to legacy format for existing components
   const applications = rawApplications.map(convertToLegacyApplication);
   const statistics = convertToLegacyStatistics(rawStatistics);
-  const selectedApplication = rawSelectedApplication ? convertToLegacyApplication(rawSelectedApplication) : null;
-  const rankedApplications = rawRankedApplications.map(convertToLegacyApplication);
+  const selectedApplication = useMemo(
+    () =>
+      rawSelectedApplication
+        ? convertToLegacyApplication(rawSelectedApplication)
+        : null,
+    [rawSelectedApplication]
+  );
+  const rankedApplications = rawRankedApplications.map(
+    convertToLegacyApplication
+  );
+
+  // Debug log to track selectedApplication conversion
+  useEffect(() => {
+    if (selectedApplication) {
+      console.log("🔄 selectedApplication converted:", {
+        id: selectedApplication.id,
+        comment: selectedApplication.comment,
+        rawComment: rawSelectedApplication?.comment,
+      });
+    }
+  }, [selectedApplication, rawSelectedApplication]);
 
   // UI state
   const [activeTab, setActiveTab] = useState<TabType>("applications");
-  const [courses, setCourses] = useState<Array<{code: string, name: string}>>([]);
+  const [courses, setCourses] = useState<Array<{ code: string; name: string }>>(
+    []
+  );
   const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const [skillsFilterArray, setSkillsFilterArray] = useState<string[]>([]);
   const [toast, setToast] = useState({
@@ -144,31 +182,45 @@ const LecturerDashboardPage: React.FC = () => {
         // First set mock courses to ensure UI works immediately
         const mockCourseList = [
           { code: "COSC2758", name: "Full Stack Development" },
-          { code: "COSC2671", name: "Introduction to Web Programming" }
+          { code: "COSC2671", name: "Introduction to Web Programming" },
         ];
         setCourses(mockCourseList);
-        console.log(`✅ Set ${mockCourseList.length} mock assigned courses for lecturer`);
+        console.log(
+          `✅ Set ${mockCourseList.length} mock assigned courses for lecturer`
+        );
 
         // Try to get real data from API
-        const response = await ApplicationService.getAssignedCoursesForLecturer();
+        const response =
+          await ApplicationService.getAssignedCoursesForLecturer();
         if (response.success && response.data && response.data.length > 0) {
-          const courseList = response.data.map(course => ({
+          const courseList = response.data.map((course) => ({
             code: course.courseCode,
-            name: course.courseName
+            name: course.courseName,
           }));
           setCourses(courseList);
-          console.log(`✅ Updated with ${courseList.length} real assigned courses for lecturer`);
+          console.log(
+            `✅ Updated with ${courseList.length} real assigned courses for lecturer`
+          );
         } else {
           console.log("📝 Using mock data - API returned no courses or failed");
           // Keep mock data if API fails or returns empty
           if (response.message && !response.success) {
-            showToast("Using demonstration data. Contact administrator for course assignments.", "info");
+            showToast(
+              "Using demonstration data. Contact administrator for course assignments.",
+              "info"
+            );
           }
         }
       } catch (error) {
-        console.error("Error loading assigned courses, using mock data:", error);
+        console.error(
+          "Error loading assigned courses, using mock data:",
+          error
+        );
         // Mock data is already set above, so no need to do anything
-        showToast("Using demonstration courses. Please check your connection.", "info");
+        showToast(
+          "Using demonstration courses. Please check your connection.",
+          "info"
+        );
       }
     };
 
@@ -180,9 +232,9 @@ const LecturerDashboardPage: React.FC = () => {
   // Extract all unique skills from applications
   useEffect(() => {
     const allSkills = new Set<string>();
-    rawApplications.forEach(app => {
+    rawApplications.forEach((app) => {
       if (app.skills) {
-        app.skills.split(',').forEach(skill => {
+        app.skills.split(",").forEach((skill) => {
           const trimmedSkill = skill.trim();
           if (trimmedSkill) {
             allSkills.add(trimmedSkill);
@@ -196,7 +248,12 @@ const LecturerDashboardPage: React.FC = () => {
   // Sync skillsFilterArray with the string skillsFilter from the hook
   useEffect(() => {
     if (skillsFilter) {
-      setSkillsFilterArray(skillsFilter.split(',').map(s => s.trim()).filter(s => s));
+      setSkillsFilterArray(
+        skillsFilter
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s)
+      );
     } else {
       setSkillsFilterArray([]);
     }
@@ -205,31 +262,31 @@ const LecturerDashboardPage: React.FC = () => {
   // Handle skills filter change - convert array to comma-separated string
   const handleSkillsFilterChange = (skills: string[]) => {
     setSkillsFilterArray(skills);
-    setSkillsFilter(skills.join(', '));
+    setSkillsFilter(skills.join(", "));
   };
 
   // Calculate active filter count
   const getActiveFilterCount = () => {
     let count = 0;
     if (searchQuery) count++;
-    if (selectedCourse && selectedCourse !== 'all') count++;
-    if (roleTypeFilter && roleTypeFilter !== 'all') count++;
-    if (availabilityFilter && availabilityFilter !== 'all') count++;
-    if (statusFilter && statusFilter !== 'all') count++;
+    if (selectedCourse && selectedCourse !== "all") count++;
+    if (roleTypeFilter && roleTypeFilter !== "all") count++;
+    if (availabilityFilter && availabilityFilter !== "all") count++;
+    if (statusFilter && statusFilter !== "all") count++;
     if (skillsFilterArray.length > 0) count += skillsFilterArray.length;
     return count;
   };
 
   // Clear all filters function
   const handleClearAllFilters = () => {
-    setSearchQuery('');
-    setSelectedCourse('all');
-    setRoleTypeFilter('all');
-    setAvailabilityFilter('all');
-    setStatusFilter('all');
-    setSkillsFilter('');
+    setSearchQuery("");
+    setSelectedCourse("all");
+    setRoleTypeFilter("all");
+    setAvailabilityFilter("all");
+    setStatusFilter("all");
+    setSkillsFilter("");
     setSkillsFilterArray([]);
-    setSortBy('none');
+    setSortBy("none");
   };
 
   // Toast function
@@ -245,7 +302,9 @@ const LecturerDashboardPage: React.FC = () => {
 
   // Wrap the selection handler to convert back to ApplicationResponse
   const handleSelectApplication = (app: Application) => {
-    const originalApp = rawApplications.find(rawApp => rawApp.id.toString() === app.id);
+    const originalApp = rawApplications.find(
+      (rawApp) => rawApp.id.toString() === app.id
+    );
     if (originalApp) {
       rawHandleSelectApplication(originalApp);
     }
@@ -254,20 +313,31 @@ const LecturerDashboardPage: React.FC = () => {
   // Application actions (simplified - using new backend)
   const handleSaveComment = async () => {
     if (!rawSelectedApplication) return;
-    
+
+    console.log(
+      "💾 Saving comment:",
+      comment,
+      "for application:",
+      rawSelectedApplication.id
+    );
+
     try {
       const response = await ApplicationService.updateApplicationComment(
         rawSelectedApplication.id,
         comment
       );
 
+      console.log("💾 Save comment response:", response);
+
       if (response.success) {
         showToast("Comment saved successfully", "success");
         await loadApplications(); // Reload to get updated data
+        console.log("💾 Applications reloaded after comment save");
       } else {
         showToast(response.message || "Failed to save comment", "error");
       }
-    } catch {
+    } catch (error) {
+      console.error("💾 Error saving comment:", error);
       showToast("Error saving comment", "error");
     }
   };
@@ -340,7 +410,10 @@ const LecturerDashboardPage: React.FC = () => {
 
     // Validation checks
     if (!selectedApplication.selected) {
-      showToast("Please select the applicant before adding to ranking", "error");
+      showToast(
+        "Please select the applicant before adding to ranking",
+        "error"
+      );
       return;
     }
 
@@ -350,7 +423,10 @@ const LecturerDashboardPage: React.FC = () => {
     }
 
     if (!selectedApplication.comment || !comment.trim()) {
-      showToast("Please add and save a comment before adding to ranking", "error");
+      showToast(
+        "Please add and save a comment before adding to ranking",
+        "error"
+      );
       return;
     }
 
@@ -367,9 +443,10 @@ const LecturerDashboardPage: React.FC = () => {
 
     try {
       // Calculate next rank (add to end of list)
-      const currentRankedForCourse = rankedApplications.filter(app => 
-        app.selectedForCourses?.includes(selectedRankingCourse) || 
-        app.courses.includes(selectedRankingCourse)
+      const currentRankedForCourse = rankedApplications.filter(
+        (app) =>
+          app.selectedForCourses?.includes(selectedRankingCourse) ||
+          app.courses.includes(selectedRankingCourse)
       );
       const nextRank = currentRankedForCourse.length + 1;
 
@@ -393,12 +470,15 @@ const LecturerDashboardPage: React.FC = () => {
   const handleMoveUp = async (app: Application) => {
     if (!selectedRankingCourse) return;
 
-    const filteredRanked = rankedApplications.filter(ranked => 
-      ranked.selectedForCourses?.includes(selectedRankingCourse) || 
-      ranked.courses.includes(selectedRankingCourse)
+    const filteredRanked = rankedApplications.filter(
+      (ranked) =>
+        ranked.selectedForCourses?.includes(selectedRankingCourse) ||
+        ranked.courses.includes(selectedRankingCourse)
     );
 
-    const currentIndex = filteredRanked.findIndex(ranked => ranked.id === app.id);
+    const currentIndex = filteredRanked.findIndex(
+      (ranked) => ranked.id === app.id
+    );
     if (currentIndex <= 0) return; // Already at top or not found
 
     const currentRank = currentIndex + 1;
@@ -434,12 +514,15 @@ const LecturerDashboardPage: React.FC = () => {
   const handleMoveDown = async (app: Application) => {
     if (!selectedRankingCourse) return;
 
-    const filteredRanked = rankedApplications.filter(ranked => 
-      ranked.selectedForCourses?.includes(selectedRankingCourse) || 
-      ranked.courses.includes(selectedRankingCourse)
+    const filteredRanked = rankedApplications.filter(
+      (ranked) =>
+        ranked.selectedForCourses?.includes(selectedRankingCourse) ||
+        ranked.courses.includes(selectedRankingCourse)
     );
 
-    const currentIndex = filteredRanked.findIndex(ranked => ranked.id === app.id);
+    const currentIndex = filteredRanked.findIndex(
+      (ranked) => ranked.id === app.id
+    );
     if (currentIndex >= filteredRanked.length - 1 || currentIndex < 0) return; // Already at bottom or not found
 
     const currentRank = currentIndex + 1;
@@ -651,9 +734,7 @@ const LecturerDashboardPage: React.FC = () => {
 
             {activeTab === "stats" && (
               <div className={styles.statsSection}>
-                <ApplicantStatsVisualization 
-                  applications={applications}
-                />
+                <ApplicantStatsVisualization applications={applications} />
               </div>
             )}
           </div>

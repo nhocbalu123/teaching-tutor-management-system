@@ -3,12 +3,12 @@ import type { Application as TutorApplication } from "@/shared/types/application
 import { availableCourses } from "@/shared/data/courses";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./applicant-details.module.css";
-import { 
-  validateLecturerComment, 
+import {
+  validateLecturerComment,
   validateStatusUpdate,
   sanitizeComment,
   formatValidationErrors,
-  DEFAULT_COMMENT_CONFIG 
+  DEFAULT_COMMENT_CONFIG,
 } from "../../utils/lecturerValidation.utils";
 
 interface ApplicantDetailsProps {
@@ -16,7 +16,7 @@ interface ApplicantDetailsProps {
   comment: string;
   setComment: (comment: string) => void;
   onSelectApplicant: (selectedCourses: string[]) => void;
-  onSaveComment: (selectedCourses: string[]) => void;
+  onSaveComment: () => void;
   onDeleteComment: () => void;
   onUnselectApplicant: () => void;
   onAddToRanking: () => void;
@@ -59,15 +59,22 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   // Track unsaved changes
   useEffect(() => {
     const originalComment = application?.comment || "";
-    setHasUnsavedChanges(comment !== originalComment);
+    const hasChanges = comment !== originalComment;
+    console.log("📝 Unsaved changes check:", {
+      originalComment,
+      comment,
+      hasChanges,
+      applicationId: application?.id,
+    });
+    setHasUnsavedChanges(hasChanges);
   }, [comment, application?.comment]);
 
   // Course selection handlers
   const handleCourseToggle = (courseCode: string) => {
     setCourseSelectionError("");
-    setSelectedCourses(prev => {
+    setSelectedCourses((prev) => {
       if (prev.includes(courseCode)) {
-        return prev.filter(code => code !== courseCode);
+        return prev.filter((code) => code !== courseCode);
       } else {
         return [...prev, courseCode];
       }
@@ -131,12 +138,12 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     try {
       // Sanitize comment
       const sanitizedComment = sanitizeComment(comment);
-      
+
       // Validate comment
       const validation = validateLecturerComment(sanitizedComment, {
         ...DEFAULT_COMMENT_CONFIG,
         allowEmpty: true,
-        minLength: 3
+        minLength: 3,
       });
 
       if (!validation.isValid) {
@@ -152,11 +159,10 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       }
 
       // Call the parent's save function (this should handle the API call)
-      await onSaveComment(application.courses);
-      
+      await onSaveComment();
+
       showToast("Comment saved successfully!", "success");
       setHasUnsavedChanges(false);
-      
     } catch {
       setCommentError("Failed to save comment. Please try again.");
       showToast("Failed to save comment", "error");
@@ -171,7 +177,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
     // Validate course selection
     if (selectedCourses.length === 0) {
-      setCourseSelectionError("Please select at least one course before selecting the applicant.");
+      setCourseSelectionError(
+        "Please select at least one course before selecting the applicant."
+      );
       showToast("Please select at least one course", "error");
       return;
     }
@@ -185,7 +193,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       {
         allowedStatuses: ["pending", "shortlisted", "selected", "rejected"],
         requireComment: false,
-        requireCourseSelection: true
+        requireCourseSelection: true,
       }
     );
 
@@ -301,6 +309,18 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         !application.comment ||
                         comment !== (application.comment || "")
                       }
+                      onMouseEnter={() => {
+                        console.log("🎯 Add to Ranking button debug:", {
+                          "application.comment": application.comment,
+                          "comment (local state)": comment,
+                          hasApplicationComment: !!application.comment,
+                          commentMatch: comment === (application.comment || ""),
+                          isDisabled:
+                            !application.comment ||
+                            comment !== (application.comment || ""),
+                          comparison: `"${comment}" === "${application.comment || ""}"`,
+                        });
+                      }}
                     >
                       Add to Ranking
                     </button>
@@ -311,7 +331,11 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   onClick={handleSelectButtonClick}
                   className={`${styles.actionButton} ${styles.selectButton}`}
                   disabled={selectedCourses.length === 0}
-                  title={selectedCourses.length === 0 ? "Please select at least one course" : "Select applicant for chosen courses"}
+                  title={
+                    selectedCourses.length === 0
+                      ? "Please select at least one course"
+                      : "Select applicant for chosen courses"
+                  }
                 >
                   Select Applicant
                 </button>
@@ -342,7 +366,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               <p className={styles.sectionDescription}>
                 Select the courses you want to consider this applicant for:
               </p>
-              
+
               {courseSelectionError && (
                 <div className={styles.errorMessage}>
                   <svg
@@ -367,7 +391,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 <button
                   onClick={handleSelectAllCourses}
                   className={`${styles.courseControlButton} ${styles.selectAllButton}`}
-                  disabled={selectedCourses.length === application.courses.length}
+                  disabled={
+                    selectedCourses.length === application.courses.length
+                  }
                 >
                   Select All
                 </button>
@@ -386,11 +412,11 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     (course) => course.code === courseCode
                   );
                   const isSelected = selectedCourses.includes(courseCode);
-                  
+
                   return (
-                    <div 
-                      key={courseCode} 
-                      className={`${styles.courseSelectionCard} ${isSelected ? styles.courseSelected : ''}`}
+                    <div
+                      key={courseCode}
+                      className={`${styles.courseSelectionCard} ${isSelected ? styles.courseSelected : ""}`}
                       onClick={() => handleCourseToggle(courseCode)}
                     >
                       <div className={styles.courseCheckbox}>
@@ -401,7 +427,10 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                           onChange={() => handleCourseToggle(courseCode)}
                           className={styles.courseCheckboxInput}
                         />
-                        <label htmlFor={`course-${courseCode}`} className={styles.courseCheckboxLabel}>
+                        <label
+                          htmlFor={`course-${courseCode}`}
+                          className={styles.courseCheckboxLabel}
+                        >
                           <svg
                             className={styles.courseCheckboxIcon}
                             xmlns="http://www.w3.org/2000/svg"
@@ -429,7 +458,8 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
               <div className={styles.selectionSummary}>
                 <span className={styles.selectionCount}>
-                  {selectedCourses.length} of {application.courses.length} courses selected
+                  {selectedCourses.length} of {application.courses.length}{" "}
+                  courses selected
                 </span>
               </div>
             </div>
@@ -587,7 +617,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 value={comment}
                 onChange={(e) => handleCommentChange(e.target.value)}
                 placeholder="Add your comments about this applicant..."
-                className={`${styles.commentTextarea} ${commentError ? styles.commentTextareaError : ''}`}
+                className={`${styles.commentTextarea} ${commentError ? styles.commentTextareaError : ""}`}
                 maxLength={1000}
                 disabled={isSubmitting}
               />
@@ -624,7 +654,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             <div className={styles.commentActions}>
               <button
                 onClick={handleSaveComment}
-                disabled={isSubmitting || (!comment.trim() && !application.comment)}
+                disabled={
+                  isSubmitting || (!comment.trim() && !application.comment)
+                }
                 className={`${styles.actionButton} ${styles.addToRankingButton}`}
                 style={{ fontSize: "0.875rem" }}
               >
