@@ -5,8 +5,9 @@ import "@/shared/styles/globals.css"; // Adjusted path as per proposed structure
 import Header from "@/shared/components/layout/header/Header";
 import Footer from "@/shared/components/layout/footer/footer";
 import { AuthProvider } from "@/modules/auth/contexts/AuthContext";
+import { ThemeProvider } from "@/shared/contexts/ThemeContext";
 import GlobalWelcomeBanner from "@/shared/components/welcome/GlobalWelcomeBanner";
-import AppInitializer from "@/shared/components/app-initializer/AppInitializer";
+import AppInitializer from "@/shared/components/app-initialization/AppInitializer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,17 +26,19 @@ export default function RootLayout({
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         {" "}
         {/* Added flex classes for sticky footer */}
-        <AuthProvider>
-          <AppInitializer />
-          <Header />
-          <GlobalWelcomeBanner />
-          <main className="flex-grow">
-            {" "}
-            {/* Added flex-grow to push footer down */}
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <AppInitializer />
+            <Header />
+            <GlobalWelcomeBanner />
+            <main className="flex-grow">
+              {" "}
+              {/* Added flex-grow to push footer down */}
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

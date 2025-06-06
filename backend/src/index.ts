@@ -3,9 +3,9 @@ import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
 import { initializeDatabase } from "./config/database";
-import authRoutes from "./routes/auth";
-import applicationRoutes from "./routes/application";
-import databaseRoutes from "./routes/database";
+import authRoutes from "./routes/user-auth-routes";
+import applicationRoutes from "./routes/application-routes";
+import databaseRoutes from "./routes/database-routes";
 import { getMelbourneTimestamp } from "./utils/dateUtils";
 
 config();

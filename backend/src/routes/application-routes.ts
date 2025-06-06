@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ApplicationController } from "../controllers/ApplicationController";
-import { authenticateToken, requireUserType } from "../middleware/auth";
+import { authenticateToken, requireUserType } from "../middleware/authMiddleware";
 import {
     validateStatusUpdate,
     validateCommentSubmission,
@@ -8,7 +8,7 @@ import {
     validateLecturerFilters,
     validateLecturerApplicationAccess,
     sanitizeCommentData
-} from "../middleware/lecturerValidation";
+} from "../middleware/lecturerValidationMiddleware";
 
 const router = Router();
 const applicationController = new ApplicationController();

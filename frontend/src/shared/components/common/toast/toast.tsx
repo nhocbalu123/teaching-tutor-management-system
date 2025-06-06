@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./toast.module.css";
+import styles from "./Toast.module.css";
 
 interface ToastProps {
   message: string;
@@ -13,6 +13,8 @@ interface ToastProps {
   autoCloseDelay?: number;
   showCloseButton?: boolean;
   className?: string;
+  title?: string;
+  darkMode?: boolean;
 }
 
 const Toast: React.FC<ToastProps> = ({
@@ -26,6 +28,8 @@ const Toast: React.FC<ToastProps> = ({
   autoCloseDelay = 3000,
   showCloseButton = true,
   className = "",
+  title,
+  darkMode = false,
 }) => {
   React.useEffect(() => {
     if (visible && autoClose) {
@@ -36,6 +40,17 @@ const Toast: React.FC<ToastProps> = ({
     }
   }, [visible, autoClose, autoCloseDelay, onClose]);
 
+  // Get default title based on type
+  const getDefaultTitle = () => {
+    switch (type) {
+      case "success": return "Success";
+      case "error": return "Error";
+      case "info": return "Informative";
+      case "warning": return "Warning";
+      default: return "Notification";
+    }
+  };
+
   const icons = {
     success: (
       <svg
@@ -43,11 +58,11 @@ const Toast: React.FC<ToastProps> = ({
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={3.5}
       >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={2}
           d="M5 13l4 4L19 7"
         />
       </svg>
@@ -58,11 +73,11 @@ const Toast: React.FC<ToastProps> = ({
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={3.5}
       >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={2}
           d="M6 18L18 6M6 6l12 12"
         />
       </svg>
@@ -73,11 +88,11 @@ const Toast: React.FC<ToastProps> = ({
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={3.5}
       >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={2}
           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
@@ -88,12 +103,12 @@ const Toast: React.FC<ToastProps> = ({
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={3.5}
       >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
         />
       </svg>
     ),
@@ -115,6 +130,7 @@ const Toast: React.FC<ToastProps> = ({
     ${getTypeClassName()} 
     ${styles[variant]} 
     ${variant === "toast" ? styles[position] : ""} 
+    ${darkMode ? styles.darkMode : ""}
     ${className}
   `.trim();
 
@@ -161,27 +177,49 @@ const Toast: React.FC<ToastProps> = ({
           exit={animationVariants.exit}
           transition={{ duration: 0.3 }}
         >
-          <div className={styles.toastIcon}>{icons[type]}</div>
-          <div className={styles.toastContent}>{message}</div>
-          {showCloseButton && (
-            <button
-              className={styles.toastClose}
-              onClick={onClose}
-              aria-label="Close toast"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+          {/* Floating icon ở trên như Vue template */}
+          <div className={styles.toastFloatingIcon}>
+            {icons[type]}
+          </div>
+          
+          {/* Main content wrapper */}
+          <div className={styles.toastInner}>
+            {/* Left side with decorative circles */}
+            <div className={styles.toastDecorative}>
+              <div className={styles.circle1}></div>
+              <div className={styles.circle2}></div>
+              <div className={styles.circle3}></div>
+            </div>
+            
+            {/* Content */}
+            <div className={styles.toastContentArea}>
+              <div className={styles.toastHeader}>
+                <h2 className={styles.toastTitle}>{title || getDefaultTitle()}</h2>
+              </div>
+              <p className={styles.toastMessage}>{message}</p>
+            </div>
+            
+            {/* Close button ở góc phải trên */}
+            {showCloseButton && (
+              <button
+                className={styles.toastClose}
+                onClick={onClose}
+                aria-label="Close toast"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

@@ -4,36 +4,21 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useTheme } from "@/shared/contexts/ThemeContext";
 import UserDropdown from "../user-dropdown";
-import StorageManager from "@/shared/utils/storageManager";
 import styles from "./header.module.css";
 
 const Header: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isThemeToggleRemoving, setIsThemeToggleRemoving] = useState(false);
   const [isThemeToggleAdding, setIsThemeToggleAdding] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const darkModePreference = StorageManager.getItem("darkMode") === "true";
-        setIsDarkMode(darkModePreference);
-        if (darkModePreference) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      } catch (e) {
-        console.error("Error loading dark mode preference:", e);
-        setIsDarkMode(false);
-      }
-    }
-
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -48,22 +33,6 @@ const Header: React.FC = () => {
   const handleSignOut = () => {
     logout();
     router.push("/");
-  };
-
-  const toggleDarkMode = () => {
-    try {
-      const newDarkMode = !isDarkMode;
-      setIsDarkMode(newDarkMode);
-      if (newDarkMode) {
-        document.documentElement.classList.add("dark");
-        StorageManager.setItem("darkMode", "true");
-      } else {
-        document.documentElement.classList.remove("dark");
-        StorageManager.setItem("darkMode", "false");
-      }
-    } catch (e) {
-      console.error("Error toggling dark mode:", e);
-    }
   };
 
   useEffect(() => {

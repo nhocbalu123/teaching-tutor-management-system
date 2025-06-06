@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import Toast from "@/shared/components/common/toast/toast";
+import Toast from "@/shared/components/common/toast/Toast";
 
 // Mock framer-motion
 jest.mock("framer-motion", () => ({

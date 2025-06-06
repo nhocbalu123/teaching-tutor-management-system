@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from './auth';
+import { AuthenticatedRequest } from './authMiddleware';
 
 interface ValidationError {
     field: string;

@@ -6,7 +6,7 @@ import { Role } from "../entities/Role";
 import { User, UserType } from "../entities/User";
 import { CourseAssignment } from "../entities/CourseAssignment";
 import { SelectedCandidate } from "../entities/SelectedCandidate";
-import { AuthenticatedRequest } from "../middleware/auth";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { validateApplicationData } from "../utils/validation";
 
 export class ApplicationController {

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ApplicationService, Course, Role, ApplicationData, ApplicationResponse } from "@/shared/services/applicationService";
 import CourseCard from "@/modules/tutor/components/course-card/course-card";
 import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
-import Toast from "@/shared/components/common/toast/toast";
+import Toast from "@/shared/components/common/toast/Toast";
 import LoadingWrapper from "@/shared/components/common/loading-wrapper/LoadingWrapper";
 import { useToast } from "@/shared/hooks/useNotification";
 import { useAuth } from "@/modules/auth/hooks/useAuth";

@@ -104,28 +104,33 @@
   color: #111827 !important;
 }
 
-/* Dark mode */
+/* Dark mode - Enhanced darker tones for better dark theme harmony */
 .dark .message,
 .dark .toast-notification {
-  background-color: #1f2937 !important;
-  box-shadow: 0 4px 10px #00000040 !important;
+  background-color: #111827 !important;
+  box-shadow: 0 4px 10px #00000050 !important;
 }
 
 .dark .success-message,
 .dark .toast-success {
-  background-color: #064e3b !important;
+  background-color: rgb(8, 32, 18) !important; /* EXTREMELY dark green, true dark mode */
   border: 1px solid #10b981 !important;
 }
 
 .dark .error-message,
 .dark .toast-error {
-  background-color: #7f1d1d !important;
+  background-color: rgb(32, 10, 10) !important; /* EXTREMELY dark red, true dark mode */
   border: 1px solid #ef4444 !important;
 }
 
 .dark .toast-info {
-  background-color: #1e3a8a !important;
+  background-color: rgb(10, 20, 50) !important; /* EXTREMELY dark blue, true dark mode */
   border: 1px solid #3b82f6 !important;
+}
+
+.dark .toast-warning {
+  background-color: rgb(40, 20, 6) !important; /* EXTREMELY dark amber, true dark mode */
+  border: 1px solid #f59e0b !important;
 }
 
 .dark .message-icon.success,
@@ -147,7 +152,8 @@
 
 .dark .message-content,
 .dark .toast-content {
-  color: #f9fafb !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important; /* Enhanced readability on darker backgrounds */
 }
 
 .dark .message-close,
