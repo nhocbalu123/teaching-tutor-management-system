@@ -57,7 +57,40 @@ const CourseGrid: React.FC<CourseGridProps> = ({
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
+        <div className={styles.loadingSpinner}>
+          <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%', color: 'var(--color-primary)' }}>
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeDasharray="32"
+              strokeDashoffset="32"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="0 12 12;360 12 12"
+                dur="1.5s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="strokeDasharray"
+                dur="2s"
+                values="0 32;16 16;0 32;0 32"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="strokeDashoffset"
+                dur="2s"
+                values="0;-16;-32;-32"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
+        </div>
         <p>Loading courses...</p>
       </div>
     );

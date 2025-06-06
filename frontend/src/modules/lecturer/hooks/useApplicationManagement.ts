@@ -172,7 +172,7 @@ export const useApplicationManagement = () => {
         }
       }
     }
-  }, [applications, selectedApplication?.id]); // Only depend on applications and the ID to avoid infinite loops
+  }, [applications, selectedApplication]); // Include full selectedApplication as dependency
 
   // Save application (update status)
   const saveApplication = useCallback(

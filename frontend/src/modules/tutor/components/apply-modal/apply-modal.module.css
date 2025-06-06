@@ -1,7 +1,8 @@
-/* Apply Modal CSS Modules - Using direct color values to match old design */
+/* Apply Modal CSS Modules - Redesigned for better UX and compact layout */
 
 .applyModalBackdrop {
   background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
   z-index: 50 !important;
   position: fixed !important;
   top: 0 !important;
@@ -12,10 +13,20 @@
   align-items: center !important;
   justify-content: center !important;
   padding: 1rem !important;
+  animation: fadeIn 0.3s ease-out !important;
 }
 
 :global(.dark) .applyModalBackdrop {
   background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .applyModal {
@@ -25,9 +36,10 @@
   border-radius: 0.75rem !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   width: 100% !important;
-  max-width: 42rem !important; /* 672px */
+  max-width: 36rem !important; /* Smaller max-width for more compact layout */
   max-height: 90vh !important;
   overflow-y: auto !important;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 :global(.dark) .applyModal {
@@ -36,11 +48,23 @@
   border: 1px solid #374151 !important;
 }
 
-/* Enhanced Header */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Compact Header */
 .applyModalHeader {
   border-bottom: 1px solid #e5e7eb !important;
-  padding: 2rem 2rem 1.5rem !important;
+  padding: 1.5rem 1.5rem 1rem !important;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  position: relative !important;
 }
 
 :global(.dark) .applyModalHeader {
@@ -52,7 +76,7 @@
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-start !important;
-  gap: 1.5rem !important;
+  gap: 1rem !important;
 }
 
 .headerTitleSection {
@@ -61,9 +85,9 @@
 
 .applyModalTitle {
   color: #111827 !important;
-  font-size: 1.5rem !important;
+  font-size: 1.375rem !important;
   font-weight: 700 !important;
-  margin: 0 0 0.5rem 0 !important;
+  margin: 0 0 0.375rem 0 !important;
   line-height: 1.3 !important;
 }
 
@@ -73,7 +97,7 @@
 
 .headerSubtitle {
   color: #6b7280 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8rem !important;
   margin: 0 !important;
   font-weight: 500 !important;
 }
@@ -82,18 +106,24 @@
   color: #9ca3af !important;
 }
 
+/* Enhanced Close Button with X icon and hover effects */
 .applyModalClose {
   color: #6b7280 !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   background: white !important;
   border: 1px solid #e5e7eb !important;
-  padding: 0.75rem !important;
+  padding: 0.5rem !important;
   border-radius: 0.5rem !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex-shrink: 0 !important;
 }
 
 :global(.dark) .applyModalClose {
@@ -102,11 +132,29 @@
   border-color: #4b5563 !important;
 }
 
+.applyModalClose::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  transform: scale(0) !important;
+  border-radius: 0.5rem !important;
+  transition: transform 0.2s ease !important;
+}
+
+.applyModalClose:hover::before {
+  transform: scale(1) !important;
+}
+
 .applyModalClose:hover {
   color: #ef4444 !important;
   background-color: #fef2f2 !important;
   border-color: #f87171 !important;
-  transform: scale(1.05) !important;
+  transform: scale(1.1) rotate(90deg) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
 }
 
 :global(.dark) .applyModalClose:hover {
@@ -115,16 +163,24 @@
   border-color: #7f1d1d !important;
 }
 
-/* Enhanced Form Layout */
+.applyModalClose svg {
+  width: 18px !important;
+  height: 18px !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Compact Form Layout */
 .applyModalForm {
-  padding: 2rem !important;
+  padding: 1.5rem !important;
 }
 
 .applyModalCompactGrid {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  gap: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
+  gap: 1rem !important;
+  margin-bottom: 1rem !important;
 }
 
 @media (max-width: 768px) {
@@ -133,14 +189,15 @@
   }
 }
 
-/* Course Information Card */
+/* Compact Course Information Card */
 .courseInfoCard {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
   color: white !important;
-  padding: 1.5rem !important;
-  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  border-radius: 0.5rem !important;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
   transition: transform 0.3s ease !important;
+  text-align: center !important;
 }
 
 .courseInfoCard:hover {
@@ -153,28 +210,28 @@
 }
 
 .courseCodeTitle {
-  font-size: 1.25rem !important;
+  font-size: 1.1rem !important;
   font-weight: 700 !important;
-  margin: 0 0 0.5rem 0 !important;
+  margin: 0 0 0.375rem 0 !important;
   letter-spacing: 0.05em !important;
 }
 
 .courseNameTitle {
-  font-size: 0.95rem !important;
+  font-size: 0.85rem !important;
   margin: 0 !important;
   opacity: 0.9 !important;
   line-height: 1.4 !important;
 }
 
-/* Role and Availability Cards */
+/* Compact Role and Availability Cards */
 .roleInfoCard, .availabilityCard {
   background: var(--color-bg-secondary) !important;
   border: 1px solid var(--color-border) !important;
-  padding: 1rem !important;
+  padding: 0.75rem !important;
   border-radius: 0.5rem !important;
   display: flex !important;
   align-items: center !important;
-  gap: 0.75rem !important;
+  gap: 0.5rem !important;
   transition: all 0.3s ease !important;
 }
 
@@ -188,34 +245,34 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-  border-radius: 0.5rem !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 0.375rem !important;
   background: rgba(249, 115, 22, 0.1) !important;
   flex-shrink: 0 !important;
 }
 
 .roleIcon, .availabilityIcon {
-  width: 1.25rem !important;
-  height: 1.25rem !important;
+  width: 1rem !important;
+  height: 1rem !important;
   color: var(--color-primary) !important;
 }
 
 .roleText, .availabilityText {
   font-weight: 600 !important;
   color: var(--color-text-primary) !important;
-  font-size: 0.9rem !important;
+  font-size: 0.85rem !important;
 }
 
 .applyModalFieldGroup {
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
 .applyModalGrid {
   display: grid !important;
   grid-template-columns: 1fr !important;
-  gap: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
+  gap: 1rem !important;
+  margin-bottom: 1rem !important;
 }
 
 @media (min-width: 768px) {
@@ -231,9 +288,9 @@
   transition: all 0.3s ease !important;
   resize: none !important;
   width: 100% !important;
-  padding: 0.75rem !important;
+  padding: 0.625rem !important;
   border-radius: 0.5rem !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8rem !important;
   line-height: 1.25rem !important;
 }
 
@@ -458,29 +515,34 @@
   cursor: not-allowed !important;
 }
 
+/* Compact Actions Section */
 .applyModalActions {
   display: flex !important;
   justify-content: flex-end !important;
-  padding-top: 1rem !important;
+  padding: 1rem 1.5rem !important;
   border-top: 1px solid #e5e7eb !important;
-  gap: 0.5rem !important;
+  gap: 0.75rem !important;
+  background-color: #f9fafb !important;
 }
 
 :global(.dark) .applyModalActions {
   border-top: 1px solid #374151 !important;
+  background-color: #1f2937 !important;
 }
 
+/* Compact Cancel Button */
 .applyModalButtonCancel {
   color: #111827 !important;
   border: 1px solid #d1d5db !important;
   background-color: #ffffff !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8rem !important;
   cursor: pointer !important;
   padding: 0.5rem 1rem !important;
   border-radius: 0.5rem !important;
-  margin-right: 0.5rem !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 :global(.dark) .applyModalButtonCancel {
@@ -489,30 +551,69 @@
   background-color: #1f2937 !important;
 }
 
+.applyModalButtonCancel::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: #f3f4f6 !important;
+  transform: scaleX(0) !important;
+  transform-origin: left !important;
+  transition: transform 0.2s ease !important;
+  z-index: 0 !important;
+}
+
+.applyModalButtonCancel:hover::before {
+  transform: scaleX(1) !important;
+}
+
 .applyModalButtonCancel:hover {
-  background-color: #f3f4f6 !important;
   border-color: #9ca3af !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 :global(.dark) .applyModalButtonCancel:hover {
-  background-color: #374151 !important;
   border-color: #6b7280 !important;
 }
 
+/* Compact Submit Button */
 .applyModalButtonSubmit {
-  background-color: #f97316 !important;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
   color: white !important;
-  transition: background-color 0.3s ease !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8rem !important;
   border: none !important;
   cursor: pointer !important;
   padding: 0.5rem 1rem !important;
   border-radius: 0.5rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2) !important;
+}
+
+.applyModalButtonSubmit::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  transition: left 0.4s ease !important;
+}
+
+.applyModalButtonSubmit:hover::before {
+  left: 100% !important;
 }
 
 .applyModalButtonSubmit:hover {
-  background-color: #ea580c !important;
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3) !important;
 }
 
 .applyModalButtonSubmit:focus {

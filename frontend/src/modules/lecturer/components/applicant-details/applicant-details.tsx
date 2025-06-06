@@ -67,7 +67,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       applicationId: application?.id,
     });
     setHasUnsavedChanges(hasChanges);
-  }, [comment, application?.comment]);
+  }, [comment, application?.comment, application?.id]);
 
   // Course selection handlers
   const handleCourseToggle = (courseCode: string) => {

@@ -4,9 +4,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthService } from "../../../../shared/services/authService";
 import {
-  validateEmail,
-  validateMinPasswordLength,
-  validateFullName,
   containsEmojis,
 } from "../../utils/authValidation.utils";
 import { SigninData, User } from "../../../../shared/types/user";

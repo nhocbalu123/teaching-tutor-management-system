@@ -17,25 +17,32 @@
   justify-content: center;
   padding: 3rem 0;
   text-align: center;
+  min-height: 300px;
 }
 
 .loadingSpinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(249, 115, 22, 0.2);
-  border-top: 4px solid var(--color-primary);
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   margin-bottom: 1.5rem;
-  animation: spin 1s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.3));
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.loadingContainer p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Dark mode enhancement */
+:global(.dark) .loadingSpinner {
+  filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.5));
+}
+
+:global(.dark) .loadingContainer p {
+  opacity: 0.9;
 }
 
 .noCourses {

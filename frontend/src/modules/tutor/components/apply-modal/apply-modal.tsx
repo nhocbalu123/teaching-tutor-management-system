@@ -381,7 +381,6 @@ const ApplyModal: React.FC<CombinedApplyModalProps> = (props) => {
                         />
                         <div className={styles.optionContent}>
                           <span className={styles.optionTitle}>Part Time</span>
-                          <span className={styles.optionDescription}>Up to 20 hours per week</span>
                         </div>
                       </label>
                       <label className={`${styles.availabilityOption} ${availability === "Full Time" ? styles.selected : ""}`}>
@@ -395,7 +394,6 @@ const ApplyModal: React.FC<CombinedApplyModalProps> = (props) => {
                         />
                         <div className={styles.optionContent}>
                           <span className={styles.optionTitle}>Full Time</span>
-                          <span className={styles.optionDescription}>More than 20 hours per week</span>
                         </div>
                       </label>
                     </div>
