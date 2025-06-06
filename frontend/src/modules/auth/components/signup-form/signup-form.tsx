@@ -7,6 +7,8 @@ import {
   validateRoleSpecificEmail,
   calculatePasswordStrength,
   getPasswordStrengthFeedback,
+  validateFullName,
+  containsEmojis,
 } from "../../utils/authValidation.utils";
 import { AuthService } from "../../../../shared/services/authService";
 import { UserType } from "../../../../shared/types/user";
@@ -73,8 +75,16 @@ export default function SignUpForm() {
     // Validate full name
     if (!fullName.trim()) {
       newErrors.fullName = "Full name is required";
-    } else if (fullName.trim().length < 2) {
-      newErrors.fullName = "Full name must be at least 2 characters long";
+    } else if (containsEmojis(fullName)) {
+      newErrors.fullName = "Full name cannot contain emojis";
+    } else if (!validateFullName(fullName)) {
+      // Check if it's a word count issue or invalid characters
+      const words = fullName.trim().split(/\s+/).filter(word => word.length > 0);
+      if (words.length < 2) {
+        newErrors.fullName = "Please enter both first name and last name";
+      } else {
+        newErrors.fullName = "Full name can only contain letters, apostrophes and hyphens";
+      }
     }
 
     // Validate email
@@ -92,6 +102,8 @@ export default function SignUpForm() {
       newErrors.password = "Password is required";
     } else if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long";
+    } else if (containsEmojis(password)) {
+      newErrors.password = "Password cannot contain emojis";
     } else if (
       passwordFeedback.level === "veryWeak" ||
       passwordFeedback.level === "weak"

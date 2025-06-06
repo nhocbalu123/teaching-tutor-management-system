@@ -19,7 +19,7 @@ const validateRequestBody = (requiredFields: string[]) => {
         if (Object.keys(errors).length > 0) {
             return res.status(400).json({
                 success: false,
-                message: "Validation failed",
+                message: "",
                 errors,
             });
         }
@@ -84,7 +84,7 @@ const validateSignupFields = (req: any, res: any, next: any) => {
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({
             success: false,
-            message: "Validation failed",
+            message: "",
             errors,
         });
     }

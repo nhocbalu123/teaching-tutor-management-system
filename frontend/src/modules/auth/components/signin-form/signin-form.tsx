@@ -6,6 +6,8 @@ import { AuthService } from "../../../../shared/services/authService";
 import {
   validateEmail,
   validateMinPasswordLength,
+  validateFullName,
+  containsEmojis,
 } from "../../utils/authValidation.utils";
 import { SigninData, User } from "../../../../shared/types/user";
 import { useAuth } from "../../hooks/useAuth";
@@ -21,7 +23,7 @@ export default function SignInForm() {
     password: "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<SigninData>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -62,24 +64,33 @@ export default function SignInForm() {
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Partial<SigninData> = {};
+
+    // Validate email
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate password
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (containsEmojis(formData.password)) {
+      newErrors.password = "Password cannot contain emojis";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setApiError("");
 
-    // Frontend validation
-    const newErrors: Record<string, string> = {};
-
-    if (!validateEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!validateMinPasswordLength(formData.password)) {
-      newErrors.password = "Password must be at least 8 characters long";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
@@ -112,7 +123,7 @@ export default function SignInForm() {
         // Handle validation errors from backend
         if (response.errors) {
           setErrors(response.errors);
-        } else {
+        } else if (response.message) {
           setApiError(response.message);
         }
       }

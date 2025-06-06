@@ -85,6 +85,12 @@ export const validateSignupData = (data: any): ValidationResult => {
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(data.password)) {
         errors.password =
             "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+    } else {
+        // Check for emojis in password
+        const emojiRegex = /[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/u;
+        if (emojiRegex.test(data.password)) {
+            errors.password = "Password cannot contain emojis";
+        }
     }
 
     // Confirm password validation
@@ -97,27 +103,37 @@ export const validateSignupData = (data: any): ValidationResult => {
     // First name validation
     if (!data.firstName) {
         errors.firstName = "First name is required";
-    } else if (data.firstName.length < 2) {
-        errors.firstName = "First name must be at least 2 characters long";
-    } else if (!/^[a-zA-Z\s]+$/.test(data.firstName)) {
-        errors.firstName = "First name can only contain letters and spaces";
+    } else if (data.firstName.length < 1) {
+        errors.firstName = "First name must be at least 1 character long";
+    } else {
+        // Check for emojis in first name
+        const emojiRegex = /[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/u;
+        if (emojiRegex.test(data.firstName)) {
+            errors.firstName = "First name cannot contain emojis";
+        } else if (!/^[a-zA-Z'-]+$/.test(data.firstName)) {
+            errors.firstName = "First name can only contain letters, apostrophes and hyphens";
+        }
     }
 
     // Last name validation
     if (!data.lastName) {
         errors.lastName = "Last name is required";
-    } else if (data.lastName.length < 2) {
-        errors.lastName = "Last name must be at least 2 characters long";
-    } else if (!/^[a-zA-Z\s]+$/.test(data.lastName)) {
-        errors.lastName = "Last name can only contain letters and spaces";
+    } else if (data.lastName.length < 1) {
+        errors.lastName = "Last name must be at least 1 character long";
+    } else {
+        // Check for emojis in last name
+        const emojiRegex = /[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/u;
+        if (emojiRegex.test(data.lastName)) {
+            errors.lastName = "Last name cannot contain emojis";
+        } else if (!/^[a-zA-Z'-]+$/.test(data.lastName)) {
+            errors.lastName = "Last name can only contain letters, apostrophes and hyphens";
+        }
     }
 
     // User type validation - now optional since we can derive it from email
     if (data.userType && !Object.values(UserType).includes(data.userType)) {
         errors.userType = "Invalid user type";
     }
-
-
 
     return {
         isValid: Object.keys(errors).length === 0,
@@ -127,6 +143,8 @@ export const validateSignupData = (data: any): ValidationResult => {
 
 export const validateSigninData = (data: any): ValidationResult => {
     const errors: Record<string, string> = {};
+
+    console.log("🔍 Validating signin data:", JSON.stringify(data, null, 2));
 
     // Email validation
     if (!data.email) {
@@ -138,10 +156,22 @@ export const validateSigninData = (data: any): ValidationResult => {
     // Password validation
     if (!data.password) {
         errors.password = "Password is required";
+    } else {
+        // Check for emojis in password
+        const emojiRegex = /[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/u;
+        console.log("🔍 Checking password for emojis:", data.password);
+        if (emojiRegex.test(data.password)) {
+            console.log("❌ Found emoji in password!");
+            errors.password = "Password cannot contain emojis";
+        }
     }
 
+    console.log("🔍 Validation errors found:", errors);
+    const isValid = Object.keys(errors).length === 0;
+    console.log("🔍 Validation result isValid:", isValid);
+
     return {
-        isValid: Object.keys(errors).length === 0,
+        isValid,
         errors,
     };
 };

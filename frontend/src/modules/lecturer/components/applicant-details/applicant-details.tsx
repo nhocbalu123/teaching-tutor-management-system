@@ -199,7 +199,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
 
     if (!validation.isValid) {
       const errorMessages = formatValidationErrors(validation.errors);
-      showToast(errorMessages[0] || "Validation failed", "error");
+      showToast(errorMessages[0] || "Please select at least one course", "error");
       return;
     }
 

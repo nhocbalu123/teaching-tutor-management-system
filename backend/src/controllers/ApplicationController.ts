@@ -30,7 +30,7 @@ export class ApplicationController {
             if (!validation.isValid) {
                 res.status(400).json({
                     success: false,
-                    message: "Validation failed",
+                    message: "",
                     errors: validation.errors,
                 });
                 return;

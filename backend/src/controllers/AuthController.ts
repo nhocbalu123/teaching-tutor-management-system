@@ -75,7 +75,7 @@ export class AuthController {
                 console.log("❌ Signup validation failed:", validation.errors);
                 res.status(400).json({
                     success: false,
-                    message: "Validation failed",
+                    message: "",
                     errors: validation.errors,
                 });
                 return;
@@ -155,7 +155,7 @@ export class AuthController {
                 console.log("❌ Validation failed:", validation.errors);
                 res.status(400).json({
                     success: false,
-                    message: "Validation failed",
+                    message: "",
                     errors: validation.errors,
                 });
                 return;

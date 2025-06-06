@@ -166,7 +166,7 @@ export const validateStatusUpdate = (req: AuthenticatedRequest, res: Response, n
     if (errors.length > 0) {
         res.status(400).json({
             success: false,
-            message: 'Validation failed',
+            message: '',
             errors: errors.reduce((acc, error) => {
                 acc[error.field] = error.message;
                 return acc;
@@ -205,7 +205,7 @@ export const validateCommentSubmission = (req: AuthenticatedRequest, res: Respon
     if (errors.length > 0) {
         res.status(400).json({
             success: false,
-            message: 'Validation failed',
+            message: '',
             errors: errors.reduce((acc, error) => {
                 acc[error.field] = error.message;
                 return acc;
@@ -274,7 +274,7 @@ export const validateRankingOperation = (req: AuthenticatedRequest, res: Respons
     if (errors.length > 0) {
         res.status(400).json({
             success: false,
-            message: 'Validation failed',
+            message: '',
             errors: errors.reduce((acc, error) => {
                 acc[error.field] = error.message;
                 return acc;
