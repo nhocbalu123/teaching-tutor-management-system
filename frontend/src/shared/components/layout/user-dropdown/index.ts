@@ -1,2 +1,2 @@
-export { default } from "./user-dropdown";
-export type { UserDropdownProps } from "./user-dropdown";
+export { default } from "./UserDropdown";
+export type { UserDropdownProps } from "./UserDropdown";

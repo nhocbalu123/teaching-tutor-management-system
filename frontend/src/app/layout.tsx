@@ -2,11 +2,11 @@ import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/shared/styles/globals.css"; // Adjusted path as per proposed structure
-import Header from "@/shared/components/layout/header/header";
+import Header from "@/shared/components/layout/header/Header";
 import Footer from "@/shared/components/layout/footer/footer";
 import { AuthProvider } from "@/modules/auth/contexts/AuthContext";
-import GlobalWelcomeBanner from "@/shared/components/GlobalWelcomeBanner";
-import AppInitializer from "@/shared/components/AppInitializer";
+import GlobalWelcomeBanner from "@/shared/components/welcome/GlobalWelcomeBanner";
+import AppInitializer from "@/shared/components/app-initializer/AppInitializer";
 
 const inter = Inter({ subsets: ["latin"] });
 

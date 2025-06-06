@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { User } from "../types/user";
+import { User } from "../../../types/user";
 import styles from "./LoginSuccessModal.module.css";
 
 interface LoginSuccessModalProps {

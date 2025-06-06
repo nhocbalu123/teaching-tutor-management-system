@@ -9,7 +9,7 @@ import {
 } from "../../utils/authValidation.utils";
 import { SigninData, User } from "../../../../shared/types/user";
 import { useAuth } from "../../hooks/useAuth";
-import { LoginSuccessModal } from "../../../../shared/components/LoginSuccessModal";
+import { LoginSuccessModal } from "../../../../shared/components/common/modal/LoginSuccessModal";
 import styles from "./signin-form.module.css";
 
 export default function SignInForm() {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./user-dropdown.module.css";
+import styles from "./UserDropdown.module.css";
 
 export interface UserDropdownProps {
   user: {

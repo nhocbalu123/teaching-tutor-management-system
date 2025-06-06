@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import GlobalWelcomeBanner from "@/shared/components/GlobalWelcomeBanner";
+import GlobalWelcomeBanner from "@/shared/components/welcome/GlobalWelcomeBanner";
 
 describe("GlobalWelcomeBanner", () => {
   it("should return null (component is disabled)", () => {

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, CSSProperties } from "react";
-import { User } from "../types/user";
-import Fireworks from "./fireworks/Fireworks";
+import { User } from "../../types/user";
+import Fireworks from "../fireworks/Fireworks";
 import styles from "./WelcomeBanner.module.css";
 
 interface WelcomeBannerProps {
