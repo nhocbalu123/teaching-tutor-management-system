@@ -251,7 +251,7 @@ export default function ReportsPage() {
                                                                 selection: any
                                                             ) => (
                                                                 <div
-                                                                    key={`${selection.candidate.id}-${selection.course.id}`}
+                                                                    key={`${selection.application.id}-${selection.candidate.id}-${selection.course.id}`}
                                                                     className={
                                                                         styles.candidateItem
                                                                     }
