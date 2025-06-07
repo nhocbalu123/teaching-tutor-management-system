@@ -241,20 +241,12 @@ export const GET_ALL_COURSE_ASSIGNMENTS = gql`
 `;
 
 export const GET_UNASSIGNED_LECTURERS = gql`
-    query GetUnassignedLecturers {
-        getUnassignedLecturers {
+    query GetUnassignedLecturers($courseId: Int) {
+        getUnassignedLecturers(courseId: $courseId) {
             id
             firstName
             lastName
             email
-            courseAssignments {
-                id
-                course {
-                    id
-                    courseCode
-                    courseName
-                }
-            }
         }
     }
 `;

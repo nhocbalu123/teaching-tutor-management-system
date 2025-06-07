@@ -65,7 +65,12 @@ export class CourseResolver {
     async getAllCourses(): Promise<Course[]> {
         const courseRepository = AppDataSource.getRepository(Course);
         return await courseRepository.find({
-            relations: ["courseAssignments", "applications"],
+            relations: [
+                "courseAssignments",
+                "courseAssignments.lecturer",
+                "applications",
+                "applications.candidate",
+            ],
             order: { createdAt: "DESC" },
         });
     }
@@ -96,11 +101,28 @@ export class CourseResolver {
     }
 
     @Query(() => [User])
-    async getUnassignedLecturers(): Promise<User[]> {
+    async getUnassignedLecturers(
+        @Arg("courseId", () => Int, { nullable: true }) courseId?: number
+    ): Promise<User[]> {
         const userRepository = AppDataSource.getRepository(User);
+
+        if (courseId) {
+            // Check if this course already has a lecturer assigned
+            const assignmentRepository =
+                AppDataSource.getRepository(CourseAssignment);
+            const existingAssignment = await assignmentRepository.findOne({
+                where: { courseId },
+            });
+
+            // If course already has a lecturer, return empty array
+            if (existingAssignment) {
+                return [];
+            }
+        }
+
+        // Return all lecturers if course has no lecturer assigned
         return await userRepository.find({
             where: { userType: UserType.LECTURER },
-            relations: ["courseAssignments"],
             order: { createdAt: "DESC" },
         });
     }

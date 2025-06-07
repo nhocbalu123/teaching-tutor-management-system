@@ -38,7 +38,7 @@ export class CourseAssignment {
     assignedAt: Date;
 
     // Relationships
-    @Field(() => User)
+    @Field(() => User, { nullable: true })
     @ManyToOne(() => User, {
         onDelete: "CASCADE",
     })

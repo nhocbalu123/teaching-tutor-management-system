@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import {
     GET_ALL_COURSES,
     GET_UNASSIGNED_LECTURERS,
@@ -39,7 +39,7 @@ interface Course {
             firstName: string;
             lastName: string;
             email: string;
-        };
+        } | null;
     }>;
     applications: Array<{
         id: number;
@@ -82,11 +82,22 @@ export default function CoursesManagement() {
     const {
         data: coursesData,
         loading: coursesLoading,
+        error: coursesError,
         refetch: refetchCourses,
     } = useQuery(GET_ALL_COURSES);
-    const { data: lecturersData, refetch: refetchLecturers } = useQuery(
-        GET_UNASSIGNED_LECTURERS
-    );
+    const [
+        getLecturers,
+        {
+            data: lecturersData,
+            error: lecturersError,
+            loading: lecturersLoading,
+        },
+    ] = useLazyQuery(GET_UNASSIGNED_LECTURERS);
+
+    // Log errors for debugging
+    console.log("Courses Error:", coursesError);
+    console.log("Courses Data:", coursesData);
+    console.log("Courses Loading:", coursesLoading);
 
     const [createCourse] = useMutation(CREATE_COURSE, {
         onCompleted: () => {
@@ -115,7 +126,14 @@ export default function CoursesManagement() {
     const [assignLecturer] = useMutation(ASSIGN_LECTURER_TO_COURSE, {
         onCompleted: () => {
             refetchCourses();
-            refetchLecturers();
+            // Refresh lecturers for the current course
+            if (selectedCourse) {
+                getLecturers({
+                    variables: {
+                        courseId: parseInt(selectedCourse.id.toString()),
+                    },
+                });
+            }
             setShowAssignModal(false);
         },
     });
@@ -123,7 +141,14 @@ export default function CoursesManagement() {
     const [removeLecturer] = useMutation(REMOVE_LECTURER_FROM_COURSE, {
         onCompleted: () => {
             refetchCourses();
-            refetchLecturers();
+            // Refresh lecturers for the current course
+            if (selectedCourse) {
+                getLecturers({
+                    variables: {
+                        courseId: parseInt(selectedCourse.id.toString()),
+                    },
+                });
+            }
         },
     });
 
@@ -252,6 +277,10 @@ export default function CoursesManagement() {
     const openAssignModal = (course: Course) => {
         setSelectedCourse(course);
         setShowAssignModal(true);
+        // Fetch available lecturers for this specific course
+        getLecturers({
+            variables: { courseId: parseInt(course.id.toString()) },
+        });
     };
 
     return (
@@ -285,202 +314,210 @@ export default function CoursesManagement() {
                     />
                 </div>
 
+                {/* Error Display */}
+                {coursesError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <strong>Error loading courses:</strong>{" "}
+                        {coursesError.message}
+                    </div>
+                )}
+
                 {/* Courses Grid */}
                 <div className={styles.coursesGrid}>
-                    {coursesLoading
-                        ? [...Array(6)].map((_, i) => (
-                              <div key={i} className={styles.courseCard}>
-                                  <div className={styles.loadingContainer}>
-                                      <div
-                                          className={styles.loadingSkeleton}
-                                      ></div>
-                                      <div
-                                          className={styles.loadingSkeleton}
-                                      ></div>
-                                      <div
-                                          className={styles.loadingSkeleton}
-                                      ></div>
-                                  </div>
-                              </div>
-                          ))
-                        : filteredCourses.map((course: Course) => (
-                              <div
-                                  key={course.id}
-                                  className={styles.courseCard}
-                              >
-                                  <div className={styles.courseHeader}>
-                                      <div className={styles.courseInfo}>
-                                          <h3 className={styles.courseCode}>
-                                              {course.courseCode}
-                                          </h3>
-                                          <p className={styles.courseName}>
-                                              {course.courseName}
-                                          </p>
-                                          <p className={styles.courseSemester}>
-                                              {course.semester}
-                                          </p>
-                                      </div>
-                                      <div className={styles.courseActions}>
-                                          <button
-                                              onClick={() =>
-                                                  openAssignModal(course)
-                                              }
-                                              className={`${styles.actionButton} ${styles.actionButtonPrimary}`}
-                                              title="Assign Lecturer"
-                                          >
-                                              <UserPlusIcon
-                                                  className={styles.actionIcon}
-                                              />
-                                          </button>
-                                          <button
-                                              onClick={() =>
-                                                  openEditModal(course)
-                                              }
-                                              className={styles.actionButton}
-                                              title="Edit Course"
-                                          >
-                                              <PencilIcon
-                                                  className={styles.actionIcon}
-                                              />
-                                          </button>
-                                          <button
-                                              onClick={() =>
-                                                  openDeleteModal(course)
-                                              }
-                                              className={`${styles.actionButton} ${styles.actionButtonDanger}`}
-                                              title="Delete Course"
-                                          >
-                                              <TrashIcon
-                                                  className={styles.actionIcon}
-                                              />
-                                          </button>
-                                      </div>
-                                  </div>
+                    {coursesLoading ? (
+                        [...Array(6)].map((_, i) => (
+                            <div key={i} className={styles.courseCard}>
+                                <div className={styles.loadingContainer}>
+                                    <div
+                                        className={styles.loadingSkeleton}
+                                    ></div>
+                                    <div
+                                        className={styles.loadingSkeleton}
+                                    ></div>
+                                    <div
+                                        className={styles.loadingSkeleton}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))
+                    ) : filteredCourses.length === 0 && !coursesLoading ? (
+                        <div className="col-span-full text-center py-8">
+                            <p className="text-gray-500 text-lg">
+                                No courses found
+                            </p>
+                            <p className="text-gray-400">
+                                Courses data: {JSON.stringify(coursesData)}
+                            </p>
+                        </div>
+                    ) : (
+                        filteredCourses.map((course: Course) => (
+                            <div key={course.id} className={styles.courseCard}>
+                                <div className={styles.courseHeader}>
+                                    <div className={styles.courseInfo}>
+                                        <h3 className={styles.courseCode}>
+                                            {course.courseCode}
+                                        </h3>
+                                        <p className={styles.courseName}>
+                                            {course.courseName}
+                                        </p>
+                                        <p className={styles.courseSemester}>
+                                            {course.semester}
+                                        </p>
+                                    </div>
+                                    <div className={styles.courseActions}>
+                                        {(!course.courseAssignments ||
+                                            course.courseAssignments.length ===
+                                                0) && (
+                                            <button
+                                                onClick={() =>
+                                                    openAssignModal(course)
+                                                }
+                                                className={`${styles.actionButton} ${styles.actionButtonPrimary}`}
+                                                title="Assign Lecturer"
+                                            >
+                                                <UserPlusIcon
+                                                    className={
+                                                        styles.actionIcon
+                                                    }
+                                                />
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() =>
+                                                openEditModal(course)
+                                            }
+                                            className={styles.actionButton}
+                                            title="Edit Course"
+                                        >
+                                            <PencilIcon
+                                                className={styles.actionIcon}
+                                            />
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                openDeleteModal(course)
+                                            }
+                                            className={`${styles.actionButton} ${styles.actionButtonDanger}`}
+                                            title="Delete Course"
+                                        >
+                                            <TrashIcon
+                                                className={styles.actionIcon}
+                                            />
+                                        </button>
+                                    </div>
+                                </div>
 
-                                  {course.description && (
-                                      <p className={styles.courseDescription}>
-                                          {course.description}
-                                      </p>
-                                  )}
+                                {course.description && (
+                                    <p className={styles.courseDescription}>
+                                        {course.description}
+                                    </p>
+                                )}
 
-                                  <div className={styles.courseStats}>
-                                      <div className={styles.courseStat}>
-                                          <h4
-                                              className={styles.courseStatValue}
-                                          >
-                                              {course.maxTutors}
-                                          </h4>
-                                          <p className={styles.courseStatLabel}>
-                                              Max Tutors
-                                          </p>
-                                      </div>
-                                      <div className={styles.courseStat}>
-                                          <h4
-                                              className={styles.courseStatValue}
-                                          >
-                                              {course.maxLabAssistants}
-                                          </h4>
-                                          <p className={styles.courseStatLabel}>
-                                              Max Lab Assistants
-                                          </p>
-                                      </div>
-                                      <div className={styles.courseStat}>
-                                          <h4
-                                              className={styles.courseStatValue}
-                                          >
-                                              {course.applications?.length || 0}
-                                          </h4>
-                                          <p className={styles.courseStatLabel}>
-                                              Applications
-                                          </p>
-                                      </div>
-                                  </div>
+                                <div className={styles.courseStats}>
+                                    <div className={styles.courseStat}>
+                                        <h4 className={styles.courseStatValue}>
+                                            {course.maxTutors}
+                                        </h4>
+                                        <p className={styles.courseStatLabel}>
+                                            Max Tutors
+                                        </p>
+                                    </div>
+                                    <div className={styles.courseStat}>
+                                        <h4 className={styles.courseStatValue}>
+                                            {course.maxLabAssistants}
+                                        </h4>
+                                        <p className={styles.courseStatLabel}>
+                                            Max Lab Assistants
+                                        </p>
+                                    </div>
+                                    <div className={styles.courseStat}>
+                                        <h4 className={styles.courseStatValue}>
+                                            {course.applications?.length || 0}
+                                        </h4>
+                                        <p className={styles.courseStatLabel}>
+                                            Applications
+                                        </p>
+                                    </div>
+                                </div>
 
-                                  {/* Assigned Lecturers */}
-                                  <div className={styles.courseAssignments}>
-                                      <div className={styles.assignmentsHeader}>
-                                          <h4
-                                              className={
-                                                  styles.assignmentsTitle
-                                              }
-                                          >
-                                              Assigned Lecturers (
-                                              {course.courseAssignments
-                                                  ?.length || 0}
-                                              )
-                                          </h4>
-                                          <button
-                                              onClick={() =>
-                                                  openAssignModal(course)
-                                              }
-                                              className={styles.assignButton}
-                                          >
-                                              Assign
-                                          </button>
-                                      </div>
-                                      {course.courseAssignments?.length > 0 ? (
-                                          <div
-                                              className={styles.assignmentsList}
-                                          >
-                                              {course.courseAssignments.map(
-                                                  (assignment) => (
-                                                      <div
-                                                          key={assignment.id}
-                                                          className={
-                                                              styles.assignmentItem
-                                                          }
-                                                      >
-                                                          <span
-                                                              className={
-                                                                  styles.lecturerName
-                                                              }
-                                                          >
-                                                              {
-                                                                  assignment
-                                                                      .lecturer
-                                                                      .firstName
-                                                              }{" "}
-                                                              {
-                                                                  assignment
-                                                                      .lecturer
-                                                                      .lastName
-                                                              }
-                                                          </span>
-                                                          <button
-                                                              onClick={() =>
-                                                                  handleRemoveLecturer(
-                                                                      assignment
-                                                                          .lecturer
-                                                                          .id
-                                                                  )
-                                                              }
-                                                              className={
-                                                                  styles.removeButton
-                                                              }
-                                                              title="Remove lecturer"
-                                                          >
-                                                              <UserMinusIcon
-                                                                  className={
-                                                                      styles.removeIcon
-                                                                  }
-                                                              />
-                                                          </button>
-                                                      </div>
-                                                  )
-                                              )}
-                                          </div>
-                                      ) : (
-                                          <p
-                                              className={
-                                                  styles.emptyAssignments
-                                              }
-                                          >
-                                              No lecturers assigned
-                                          </p>
-                                      )}
-                                  </div>
-                              </div>
-                          ))}
+                                {/* Assigned Lecturers */}
+                                <div className={styles.courseAssignments}>
+                                    <div className={styles.assignmentsHeader}>
+                                        <h4 className={styles.assignmentsTitle}>
+                                            Assigned Lecturer
+                                            {course.courseAssignments?.length >
+                                                0 && <span> (1/1)</span>}
+                                        </h4>
+                                        {(!course.courseAssignments ||
+                                            course.courseAssignments.length ===
+                                                0) && (
+                                            <button
+                                                onClick={() =>
+                                                    openAssignModal(course)
+                                                }
+                                                className={styles.assignButton}
+                                            >
+                                                Assign
+                                            </button>
+                                        )}
+                                    </div>
+                                    {course.courseAssignments?.length > 0 ? (
+                                        <div className={styles.assignmentsList}>
+                                            {course.courseAssignments.map(
+                                                (assignment) => (
+                                                    <div
+                                                        key={assignment.id}
+                                                        className={
+                                                            styles.assignmentItem
+                                                        }
+                                                    >
+                                                        <span
+                                                            className={
+                                                                styles.lecturerName
+                                                            }
+                                                        >
+                                                            {assignment.lecturer ? (
+                                                                `${assignment.lecturer.firstName} ${assignment.lecturer.lastName}`
+                                                            ) : (
+                                                                <span className="text-red-500 italic">
+                                                                    Lecturer not
+                                                                    found
+                                                                </span>
+                                                            )}
+                                                        </span>
+                                                        {assignment.lecturer && (
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleRemoveLecturer(
+                                                                        assignment.lecturer!
+                                                                            .id
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    styles.removeButton
+                                                                }
+                                                                title="Remove lecturer"
+                                                            >
+                                                                <UserMinusIcon
+                                                                    className={
+                                                                        styles.removeIcon
+                                                                    }
+                                                                />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className={styles.emptyAssignments}>
+                                            No lecturer assigned
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {filteredCourses.length === 0 && !coursesLoading && (
@@ -635,13 +672,13 @@ export default function CoursesManagement() {
                                         onClick={() =>
                                             setShowCreateModal(false)
                                         }
-                                        className={`${styles.modalButton} ${styles.modalButtonSecondary}`}
+                                        className={styles.modalButtonSecondary}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        className={`${styles.modalButton} ${styles.modalButtonPrimary}`}
+                                        className={styles.modalButtonPrimary}
                                     >
                                         Create Course
                                     </button>
@@ -653,25 +690,25 @@ export default function CoursesManagement() {
 
                 {/* Edit Course Modal */}
                 {showEditModal && selectedCourse && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                        <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-medium text-gray-900">
+                    <div className={styles.modalOverlay}>
+                        <div className={styles.modal}>
+                            <div className={styles.modalHeader}>
+                                <h3 className={styles.modalTitle}>
                                     Edit Course
                                 </h3>
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="text-gray-400 hover:text-gray-600"
+                                    className={styles.closeButton}
                                 >
-                                    <XMarkIcon className="h-6 w-6" />
+                                    <XMarkIcon className={styles.closeIcon} />
                                 </button>
                             </div>
                             <form
                                 onSubmit={handleUpdateCourse}
-                                className="space-y-4"
+                                className={styles.modalForm}
                             >
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                <div className={styles.formGroup}>
+                                    <label className={styles.formLabel}>
                                         Course Code
                                     </label>
                                     <input
@@ -684,11 +721,12 @@ export default function CoursesManagement() {
                                                 courseCode: e.target.value,
                                             })
                                         }
-                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className={styles.formInput}
+                                        placeholder="e.g., CS101"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                <div className={styles.formGroup}>
+                                    <label className={styles.formLabel}>
                                         Course Name
                                     </label>
                                     <input
@@ -701,11 +739,12 @@ export default function CoursesManagement() {
                                                 courseName: e.target.value,
                                             })
                                         }
-                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className={styles.formInput}
+                                        placeholder="e.g., Introduction to Computer Science"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                <div className={styles.formGroup}>
+                                    <label className={styles.formLabel}>
                                         Semester
                                     </label>
                                     <input
@@ -718,11 +757,12 @@ export default function CoursesManagement() {
                                                 semester: e.target.value,
                                             })
                                         }
-                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className={styles.formInput}
+                                        placeholder="e.g., 2024 Semester 1"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                <div className={styles.formGroup}>
+                                    <label className={styles.formLabel}>
                                         Description
                                     </label>
                                     <textarea
@@ -733,13 +773,14 @@ export default function CoursesManagement() {
                                                 description: e.target.value,
                                             })
                                         }
-                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className={styles.formTextarea}
                                         rows={3}
+                                        placeholder="Course description..."
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
+                                <div className={styles.formRow}>
+                                    <div className={styles.formGroup}>
+                                        <label className={styles.formLabel}>
                                             Max Tutors
                                         </label>
                                         <input
@@ -755,11 +796,11 @@ export default function CoursesManagement() {
                                                     ),
                                                 })
                                             }
-                                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className={styles.formInput}
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
+                                    <div className={styles.formGroup}>
+                                        <label className={styles.formLabel}>
                                             Max Lab Assistants
                                         </label>
                                         <input
@@ -775,21 +816,21 @@ export default function CoursesManagement() {
                                                     ),
                                                 })
                                             }
-                                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className={styles.formInput}
                                         />
                                     </div>
                                 </div>
-                                <div className="flex justify-end space-x-3 mt-6">
+                                <div className={styles.modalActions}>
                                     <button
                                         type="button"
                                         onClick={() => setShowEditModal(false)}
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                                        className={styles.modalButtonSecondary}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                        className={styles.modalButtonPrimary}
                                     >
                                         Update Course
                                     </button>
@@ -801,19 +842,27 @@ export default function CoursesManagement() {
 
                 {/* Delete Confirmation Modal */}
                 {showDeleteModal && selectedCourse && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                        <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                            <div className="mt-3 text-center">
-                                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                                    <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
-                                </div>
-                                <h3 className="text-lg leading-6 font-medium text-gray-900 mt-4">
+                    <div className={styles.modalOverlay}>
+                        <div className={styles.modal}>
+                            <div className={styles.modalHeader}>
+                                <h3 className={styles.modalTitle}>
                                     Delete Course
                                 </h3>
-                                <div className="mt-2 px-7 py-3">
-                                    <p className="text-sm text-gray-500">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className={styles.closeButton}
+                                >
+                                    <XMarkIcon className={styles.closeIcon} />
+                                </button>
+                            </div>
+                            <div className={styles.modalForm}>
+                                <div className="text-center mb-6">
+                                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                        <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300">
                                         Are you sure you want to delete{" "}
-                                        <strong>
+                                        <strong className="text-gray-900 dark:text-white">
                                             {selectedCourse.courseCode} -{" "}
                                             {selectedCourse.courseName}
                                         </strong>
@@ -822,18 +871,18 @@ export default function CoursesManagement() {
                                         action cannot be undone.
                                     </p>
                                 </div>
-                                <div className="flex justify-center space-x-4 mt-4">
+                                <div className={styles.modalActions}>
                                     <button
                                         onClick={() =>
                                             setShowDeleteModal(false)
                                         }
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                                        className={styles.modalButtonSecondary}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={handleDeleteCourse}
-                                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                        className={styles.modalButtonDanger}
                                     >
                                         Delete
                                     </button>
@@ -845,55 +894,71 @@ export default function CoursesManagement() {
 
                 {/* Assign Lecturer Modal */}
                 {showAssignModal && selectedCourse && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                        <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-medium text-gray-900">
+                    <div className={styles.modalOverlay}>
+                        <div className={styles.modal}>
+                            <div className={styles.modalHeader}>
+                                <h3 className={styles.modalTitle}>
                                     Assign Lecturer to{" "}
                                     {selectedCourse.courseCode}
                                 </h3>
                                 <button
                                     onClick={() => setShowAssignModal(false)}
-                                    className="text-gray-400 hover:text-gray-600"
+                                    className={styles.closeButton}
                                 >
-                                    <XMarkIcon className="h-6 w-6" />
+                                    <XMarkIcon className={styles.closeIcon} />
                                 </button>
                             </div>
-                            <div className="space-y-3">
+                            <div className={styles.modalForm}>
                                 {lecturers.length > 0 ? (
-                                    lecturers.map((lecturer: Lecturer) => (
-                                        <div
-                                            key={lecturer.id}
-                                            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
-                                        >
-                                            <div>
-                                                <p className="font-medium text-gray-900">
-                                                    {lecturer.firstName}{" "}
-                                                    {lecturer.lastName}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {lecturer.email}
-                                                </p>
-                                            </div>
-                                            <button
-                                                onClick={() =>
-                                                    handleAssignLecturer(
-                                                        lecturer.id
-                                                    )
-                                                }
-                                                className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors"
+                                    <div className={styles.lecturersList}>
+                                        {lecturers.map((lecturer: Lecturer) => (
+                                            <div
+                                                key={lecturer.id}
+                                                className={styles.lecturerItem}
                                             >
-                                                Assign
-                                            </button>
-                                        </div>
-                                    ))
+                                                <div
+                                                    className={
+                                                        styles.lecturerInfo
+                                                    }
+                                                >
+                                                    <p
+                                                        className={
+                                                            styles.lecturerName
+                                                        }
+                                                    >
+                                                        {lecturer.firstName}{" "}
+                                                        {lecturer.lastName}
+                                                    </p>
+                                                    <p
+                                                        className={
+                                                            styles.lecturerEmail
+                                                        }
+                                                    >
+                                                        {lecturer.email}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() =>
+                                                        handleAssignLecturer(
+                                                            lecturer.id
+                                                        )
+                                                    }
+                                                    className={
+                                                        styles.assignLecturerButton
+                                                    }
+                                                >
+                                                    Assign
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <div className="text-center py-8">
-                                        <UserPlusIcon className="mx-auto h-12 w-12 text-gray-400" />
-                                        <h3 className="mt-2 text-sm font-medium text-gray-900">
+                                    <div className={styles.emptyLecturers}>
+                                        <UserPlusIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                                             No available lecturers
                                         </h3>
-                                        <p className="mt-1 text-sm text-gray-500">
+                                        <p className="text-gray-600 dark:text-gray-300">
                                             All lecturers are already assigned
                                             to courses.
                                         </p>

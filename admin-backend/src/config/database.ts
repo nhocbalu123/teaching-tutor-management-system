@@ -12,11 +12,11 @@ config();
 
 export const AppDataSource = new DataSource({
     type: "mysql",
-    host: process.env.DB_HOST || "209.38.26.237",
+    host: process.env.DB_HOST || "localhost",
     port: parseInt(process.env.DB_PORT || "3306"),
-    username: process.env.DB_USERNAME || "S3959931",
-    password: process.env.DB_PASSWORD || "Eel404101@@",
-    database: process.env.DB_NAME || "S3959931",
+    username: process.env.DB_USERNAME || "",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "",
     synchronize: false, // Don't auto-create tables in admin backend
     logging: process.env.NODE_ENV === "development",
     entities: [
