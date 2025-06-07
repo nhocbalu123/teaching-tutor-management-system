@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
+import Toast from "@/shared/components/common/Toast/Toast";
+import { useToast } from "@/shared/hooks/useToast";
 import {
     GET_ALL_COURSES,
     GET_UNASSIGNED_LECTURERS,
@@ -79,6 +81,9 @@ export default function CoursesManagement() {
         maxLabAssistants: 3,
     });
 
+    // Toast hook
+    const { toast, showError, showSuccess, hideToast } = useToast();
+
     const {
         data: coursesData,
         loading: coursesLoading,
@@ -116,10 +121,22 @@ export default function CoursesManagement() {
     });
 
     const [deleteCourse] = useMutation(DELETE_COURSE, {
-        onCompleted: () => {
-            refetchCourses();
-            setShowDeleteModal(false);
-            setSelectedCourse(null);
+        onCompleted: (data) => {
+            if (data.deleteCourse.success) {
+                refetchCourses();
+                setShowDeleteModal(false);
+                setSelectedCourse(null);
+                showSuccess(
+                    data.deleteCourse.message || "Course deleted successfully"
+                );
+            } else {
+                showError(
+                    data.deleteCourse.message || "Failed to delete course"
+                );
+            }
+        },
+        onError: (error) => {
+            showError(error.message || "Failed to delete course");
         },
     });
 
@@ -857,7 +874,7 @@ export default function CoursesManagement() {
                             </div>
                             <div className={styles.modalForm}>
                                 <div className="text-center mb-6">
-                                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                    <div className={styles.deleteWarningIcon}>
                                         <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
                                     </div>
                                     <p className="text-gray-600 dark:text-gray-300">
@@ -866,10 +883,17 @@ export default function CoursesManagement() {
                                             {selectedCourse.courseCode} -{" "}
                                             {selectedCourse.courseName}
                                         </strong>
-                                        ? This will also remove all related
-                                        applications and assignments. This
-                                        action cannot be undone.
+                                        ?
                                     </p>
+                                    <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                                        <p className="text-sm text-amber-800 dark:text-amber-200">
+                                            <strong>Note:</strong> Courses with
+                                            active applications (pending or
+                                            selected) cannot be deleted. Please
+                                            handle all active applications
+                                            first, then try again.
+                                        </p>
+                                    </div>
                                 </div>
                                 <div className={styles.modalActions}>
                                     <button
@@ -969,6 +993,16 @@ export default function CoursesManagement() {
                     </div>
                 )}
             </div>
+
+            {/* Toast Notification */}
+            <Toast
+                message={toast.message}
+                visible={toast.visible}
+                type={toast.type}
+                onClose={hideToast}
+                title={toast.title}
+                position="bottom-left"
+            />
         </div>
     );
 }

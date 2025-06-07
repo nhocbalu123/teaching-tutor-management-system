@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ApplicationService,
   ApplicationResponse,
@@ -26,9 +26,9 @@ type TabType = "applications" | "rankings" | "stats";
 // Adapter function to convert ApplicationResponse to Application
 const convertToLegacyApplication = (
   appResponse: ApplicationResponse
-): Application & { 
-  role?: { roleName: string }; 
-  course?: { courseCode: string };
+): Application & {
+  role?: { roleName: string };
+  course?: { courseCode: string; courseName: string; semester: string };
   rankedForCourse?: string;
 } => {
   const availabilityValue =
@@ -58,10 +58,21 @@ const convertToLegacyApplication = (
     comment: appResponse.comment || "",
     rank: appResponse.rank, // Preserve rank from backend
     // Extended properties
-    role: appResponse.role ? { roleName: appResponse.role.roleName } : undefined,
-    course: appResponse.course ? { courseCode: appResponse.course.courseCode } : undefined,
+    role: appResponse.role
+      ? { roleName: appResponse.role.roleName }
+      : undefined,
+    course: appResponse.course
+      ? {
+          courseCode: appResponse.course.courseCode,
+          courseName: appResponse.course.courseName,
+          semester: appResponse.course.semester,
+        }
+      : undefined,
     // Add fields needed for ranking
-    selectedForCourses: appResponse.status === "selected" ? [appResponse.course.courseCode] : undefined,
+    selectedForCourses:
+      appResponse.status === "selected"
+        ? [appResponse.course.courseCode]
+        : undefined,
     rankedForCourse: appResponse.rankedForCourse,
   };
 };
@@ -185,59 +196,83 @@ const LecturerDashboardPage: React.FC = () => {
     }
   }, [user, isAuthenticated, authLoading]);
 
+  // Toast function
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" | "info" = "success") => {
+      setToast({ visible: true, message, type });
+      setTimeout(() => {
+        setToast((prev) => ({ ...prev, visible: false }));
+      }, 3000);
+    },
+    []
+  );
+
   // Load available courses and extract skills
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        // First set mock courses to ensure UI works immediately
-        const mockCourseList = [
-          { code: "COSC2758", name: "Full Stack Development" },
-          { code: "COSC2671", name: "Introduction to Web Programming" },
-        ];
-        setCourses(mockCourseList);
+  const loadCourses = useCallback(async () => {
+    try {
+      console.log("🔄 Loading courses for lecturer...");
+
+      // Try to get real data from API first
+      const response = await ApplicationService.getAssignedCoursesForLecturer();
+      if (response.success && response.data && response.data.length > 0) {
+        const courseList = response.data.map((course) => ({
+          code: course.courseCode,
+          name: course.courseName,
+        }));
+        setCourses(courseList);
         console.log(
-          `✅ Set ${mockCourseList.length} mock assigned courses for lecturer`
+          `✅ Updated with ${courseList.length} real assigned courses for lecturer`
         );
-
-        // Try to get real data from API
-        const response =
-          await ApplicationService.getAssignedCoursesForLecturer();
-        if (response.success && response.data && response.data.length > 0) {
-          const courseList = response.data.map((course) => ({
-            code: course.courseCode,
-            name: course.courseName,
-          }));
-          setCourses(courseList);
-          console.log(
-            `✅ Updated with ${courseList.length} real assigned courses for lecturer`
+      } else {
+        console.log("📝 No courses assigned to this lecturer yet");
+        setCourses([]);
+        if (response.message && !response.success) {
+          showToast(
+            "No courses assigned yet. Contact administrator for course assignments.",
+            "info"
           );
-        } else {
-          console.log("📝 Using mock data - API returned no courses or failed");
-          // Keep mock data if API fails or returns empty
-          if (response.message && !response.success) {
-            showToast(
-              "Using demonstration data. Contact administrator for course assignments.",
-              "info"
-            );
-          }
         }
-      } catch (error) {
-        console.error(
-          "Error loading assigned courses, using mock data:",
-          error
-        );
-        // Mock data is already set above, so no need to do anything
-        showToast(
-          "Using demonstration courses. Please check your connection.",
-          "info"
-        );
       }
-    };
+    } catch (error) {
+      console.error("Error loading assigned courses:", error);
+      setCourses([]);
+      showToast(
+        "Error loading courses. Please check your connection.",
+        "error"
+      );
+    }
+  }, [showToast]);
 
+  useEffect(() => {
     if (isInitialized) {
       loadCourses();
     }
-  }, [isInitialized]);
+  }, [isInitialized, loadCourses]);
+
+  // Add a periodic refresh to detect course changes
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const refreshInterval = setInterval(() => {
+      console.log("🔄 Periodic refresh of courses and applications...");
+      loadCourses();
+      loadApplications();
+    }, 60000); // Refresh every 60 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [isInitialized, loadCourses, loadApplications]);
+
+  // Manual refresh function
+  const handleManualRefresh = useCallback(async () => {
+    showToast("Refreshing data...", "info");
+    try {
+      await Promise.all([loadCourses(), loadApplications()]);
+      showToast("Data refreshed successfully", "success");
+    } catch (error) {
+      console.error("Error during manual refresh:", error);
+      showToast("Error refreshing data", "error");
+    }
+  }, [loadCourses, loadApplications, showToast]);
 
   // Extract all unique skills from applications
   useEffect(() => {
@@ -297,17 +332,6 @@ const LecturerDashboardPage: React.FC = () => {
     setSkillsFilter("");
     setSkillsFilterArray([]);
     setSortBy("none");
-  };
-
-  // Toast function
-  const showToast = (
-    message: string,
-    type: "success" | "error" | "info" = "success"
-  ) => {
-    setToast({ visible: true, message, type });
-    setTimeout(() => {
-      setToast((prev) => ({ ...prev, visible: false }));
-    }, 3000);
   };
 
   // Wrap the selection handler to convert back to ApplicationResponse
@@ -402,15 +426,19 @@ const LecturerDashboardPage: React.FC = () => {
       if (selectedApplication?.rank && selectedApplication.rank > 0) {
         console.log("🗑️ Removing from ranking before unselecting:", {
           applicationId: selectedApplication.id,
-          currentRank: selectedApplication.rank
+          currentRank: selectedApplication.rank,
         });
-        
-        const removeRankingResponse = await ApplicationService.removeApplicationFromRanking(
-          parseInt(selectedApplication.id)
-        );
-        
+
+        const removeRankingResponse =
+          await ApplicationService.removeApplicationFromRanking(
+            parseInt(selectedApplication.id)
+          );
+
         if (!removeRankingResponse.success) {
-          console.warn("Failed to remove from ranking:", removeRankingResponse.message);
+          console.warn(
+            "Failed to remove from ranking:",
+            removeRankingResponse.message
+          );
         }
       }
 
@@ -444,7 +472,11 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
 
-    if (selectedApplication.rank !== undefined && selectedApplication.rank !== null && selectedApplication.rank > 0) {
+    if (
+      selectedApplication.rank !== undefined &&
+      selectedApplication.rank !== null &&
+      selectedApplication.rank > 0
+    ) {
       showToast("Applicant is already added to ranking", "info");
       return;
     }
@@ -487,7 +519,7 @@ const LecturerDashboardPage: React.FC = () => {
         applicationId: selectedApplication.id,
         nextRank,
         courseForRanking,
-        currentRankedCount: currentRankedForCourse.length
+        currentRankedCount: currentRankedForCourse.length,
       });
 
       const response = await ApplicationService.addApplicationToRanking(
@@ -597,14 +629,17 @@ const LecturerDashboardPage: React.FC = () => {
 
   const handleRemoveFromRanking = async (id: string) => {
     try {
-      console.log("🗑️ Removing from ranking:", { 
-        applicationId: id, 
-        beforeRemoval: { 
+      console.log("🗑️ Removing from ranking:", {
+        applicationId: id,
+        beforeRemoval: {
           rankedCount: rankedApplications.length,
-          rankedApps: rankedApplications.map(app => ({ id: app.id, rank: app.rank }))
-        }
+          rankedApps: rankedApplications.map((app) => ({
+            id: app.id,
+            rank: app.rank,
+          })),
+        },
       });
-      
+
       const response = await ApplicationService.removeApplicationFromRanking(
         parseInt(id)
       );
@@ -615,7 +650,10 @@ const LecturerDashboardPage: React.FC = () => {
         showToast("Removed from ranking successfully", "success");
         console.log("🔄 Reloading applications after remove...");
         await loadApplications(); // Reload to get updated data
-        console.log("🔄 Applications reloaded, new ranked count:", rankedApplications.length);
+        console.log(
+          "🔄 Applications reloaded, new ranked count:",
+          rankedApplications.length
+        );
       } else {
         console.error("❌ Remove ranking failed:", response.message);
         showToast(response.message || "Failed to remove from ranking", "error");
@@ -660,6 +698,7 @@ const LecturerDashboardPage: React.FC = () => {
           <DashboardHeader
             lecturerName={lecturerName}
             statistics={statistics}
+            onRefresh={handleManualRefresh}
           />
 
           {/* Enhanced Application Filters */}

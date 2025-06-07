@@ -1035,3 +1035,20 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Delete modal warning icon */
+.deleteWarningIcon {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 6rem;
+    width: 6rem;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+/* Dark mode for delete warning icon */
+:global(.dark) .deleteWarningIcon {
+    background-color: rgb(127, 29, 29);
+}

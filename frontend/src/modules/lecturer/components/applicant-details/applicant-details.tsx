@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import type { Application as TutorApplication } from "@/shared/types/application"; // Updated
-import { availableCourses } from "@/shared/data/courses";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./applicant-details.module.css";
 import {
@@ -169,7 +168,11 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       return;
     }
     // Fix: Check if truly ranked (rank > 0), handle null/undefined explicitly
-    if (application.rank !== null && application.rank !== undefined && application.rank > 0) {
+    if (
+      application.rank !== null &&
+      application.rank !== undefined &&
+      application.rank > 0
+    ) {
       console.log("❌ Already ranked:", application.rank);
       showToast("Applicant is already added to ranking", "info");
       return;
@@ -223,10 +226,12 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                       />
                     </svg>
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {((application as any).role?.roleName === "tutor") ? "Tutor" : 
-                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                     ((application as any).role?.roleName === "lab_assistant") ? "Lab Assistant" : 
-                     "Application"}
+                    {(application as any).role?.roleName === "tutor"
+                      ? "Tutor"
+                      : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                        (application as any).role?.roleName === "lab_assistant"
+                        ? "Lab Assistant"
+                        : "Application"}
                   </span>
                 )}
                 <span
@@ -249,7 +254,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   >
                     Unselect
                   </button>
-                  {application.rank !== null && application.rank !== undefined && application.rank > 0 ? (
+                  {application.rank !== null &&
+                  application.rank !== undefined &&
+                  application.rank > 0 ? (
                     <button
                       disabled
                       className={`${styles.actionButton} ${styles.alreadyRankedButton}`}
@@ -293,8 +300,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             </div>
           </div>
 
-
-
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>
               <svg
@@ -315,14 +320,20 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             </h4>
             <div className={styles.coursesContainer}>
               {application.courses.map((courseCode) => {
-                const courseInfo = availableCourses.find(
-                  (course) => course.code === courseCode
-                );
+                // Use embedded course information from the extended application object
+                const extendedApp = application as TutorApplication & {
+                  course?: {
+                    courseCode: string;
+                    courseName: string;
+                    semester: string;
+                  };
+                };
+
                 return (
                   <div key={courseCode} className={styles.courseCard}>
                     <div className={styles.courseCode}>{courseCode}</div>
                     <div className={styles.courseName}>
-                      {courseInfo ? courseInfo.name : "Course not found"}
+                      {extendedApp.course?.courseName || "Course not found"}
                     </div>
                     {application.selectedForCourses?.includes(courseCode) && (
                       <svg
