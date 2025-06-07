@@ -1,42 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
-import type { CourseDetails } from "@/shared/types/courseTypes";
-import type { Application as TutorApplication } from "@/shared/types/application";
-import { saveApplicationToStorage } from "@/modules/tutor/utils/applicationDisplay.utils";
+import React, { useState, useEffect } from "react";
+import { ApplicationService, Course, Role, ApplicationData, ApplicationResponse } from "@/shared/services/applicationService";
+import CourseCard from "@/modules/tutor/components/course-card/course-card";
 import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
-import Toast from "@/shared/components/common/toast/toast";
+import Toast from "@/shared/components/common/toast/Toast";
 import LoadingWrapper from "@/shared/components/common/loading-wrapper/LoadingWrapper";
 import { useToast } from "@/shared/hooks/useNotification";
-import { useTutorAuth } from "@/modules/tutor/hooks/useTutorAuth";
-import { useCourseFiltering } from "@/modules/tutor/hooks/useCourseFiltering";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { redirect } from "next/navigation";
 import TutorHeroSection from "@/modules/tutor/components/hero-section/TutorHeroSection";
 import SearchFilters from "@/modules/tutor/components/search-filters/SearchFilters";
-import CourseGrid from "@/modules/tutor/components/course-grid/CourseGrid";
 import styles from "./TutorPage.module.css";
 
 const TutorDashboardPage: React.FC = () => {
-  // Custom hooks for state management
-  const {
-    userData,
-    existingApplications,
-    isLoading,
-    updateExistingApplications,
-  } = useTutorAuth();
-  const {
-    courses,
-    searchQuery,
-    setSearchQuery,
-    activeFilter,
-    setActiveFilter,
-    filteredCourses,
-  } = useCourseFiltering(existingApplications);
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Data state
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [myApplications, setMyApplications] = useState<ApplicationResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseDetails | null>(
-    null
-  );
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<"all" | "applied" | "available">("all");
 
   // Toast notifications
   const {
@@ -46,75 +40,207 @@ const TutorDashboardPage: React.FC = () => {
   } = useToast();
   const { toast: errorToast, showError, hideToast: hideError } = useToast();
 
-  const openApplyModal = (course: CourseDetails) => {
-    console.log("Apply button clicked for course:", course.code);
-    console.log("User data:", userData);
-    console.log("Existing applications:", existingApplications);
+  // Authentication and authorization check
+  useEffect(() => {
+    if (authLoading) return;
 
-    // Check if user is logged in
-    if (!userData) {
-      console.log("Error: User not logged in");
+    if (!isAuthenticated || !user) {
+      redirect("/signin");
+      return;
+    }
+
+    // Check if user has candidate role (tutors are candidates)
+    if (user.userType !== "candidate") {
+      redirect(user.userType === "lecturer" ? "/lecturer" : "/");
+      return;
+    }
+  }, [user, isAuthenticated, authLoading]);
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user) return;
+
+      try {
+        setIsLoading(true);
+
+        // Load courses, roles, and user's applications in parallel
+        const [coursesResponse, applicationsResponse] = await Promise.all([
+          ApplicationService.getCoursesAndRoles(),
+          ApplicationService.getMyCandidateApplications(),
+        ]);
+
+        if (coursesResponse.success && coursesResponse.data) {
+          setCourses(coursesResponse.data.courses);
+          setRoles(coursesResponse.data.roles);
+        } else {
+          showError(coursesResponse.message || "Failed to load courses and roles");
+        }
+
+        if (applicationsResponse.success && applicationsResponse.data) {
+          setMyApplications(applicationsResponse.data);
+        } else {
+          showError(applicationsResponse.message || "Failed to load your applications");
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        showError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user, showError]);
+
+  // Calculate comprehensive statistics
+  const getComprehensiveStats = () => {
+    const totalRoleCourseCombinations = courses.length * roles.length;
+    const appliedCombinations = myApplications.length;
+    
+    // Calculate available opportunities (role-course combinations the user can apply for)
+    let availableOpportunities = 0;
+    
+    courses.forEach(course => {
+      roles.forEach(role => {
+        const hasApplied = myApplications.some(
+          app => app.courseId === course.id && app.roleId === role.id
+        );
+        
+        if (!hasApplied) {
+          availableOpportunities += 1; // Count each role-course combination as one opportunity
+        }
+      });
+    });
+
+    return {
+      totalCourses: courses.length,
+      totalApplications: myApplications.length,
+      availableOpportunities, // Number of role-course combinations user can still apply for
+      completionRate: totalRoleCourseCombinations > 0 
+        ? Math.round((appliedCombinations / totalRoleCourseCombinations) * 100)
+        : 0
+    };
+  };
+
+  const stats = getComprehensiveStats();
+
+  // Check if user has applied to any role in a course
+  const hasAppliedToCourse = (courseId: number) => {
+    return myApplications.some(app => app.courseId === courseId);
+  };
+
+  // Filter courses based on search query and active filter
+  const filteredCourses = courses.filter((course) => {
+    const matchesSearch = !searchQuery || 
+      course.courseCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.courseName.toLowerCase().includes(searchQuery.toLowerCase());
+
+    let matchesFilter = true;
+    
+    switch (activeFilter) {
+      case "available":
+        // Show courses where user hasn't applied for ANY positions
+        matchesFilter = !hasAppliedToCourse(course.id);
+        break;
+      case "applied":
+        // Show courses where user has applied for ANY positions
+        matchesFilter = hasAppliedToCourse(course.id);
+        break;
+      case "all":
+      default:
+        matchesFilter = true;
+        break;
+    }
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const openApplyModal = (course: Course, role: Role) => {
+    console.log("Apply button clicked for:", course.courseCode, role.roleName);
+
+    if (!user) {
       showError("You must be logged in to apply for courses.");
       return;
     }
 
-    // Check if user has already applied for this course
-    if (existingApplications.includes(course.code)) {
-      console.log("Error: Already applied to this course");
-      showError(`You have already applied for ${course.code}.`);
+    // Check if user has already applied for this specific role-course combination
+    const existingApplication = myApplications.find(
+      (app) => app.courseId === course.id && app.roleId === role.id
+    );
+
+    if (existingApplication) {
+      showError(`You have already applied for ${role.roleName} position in ${course.courseCode}.`);
       return;
     }
 
-    console.log("Opening modal for course:", course.code);
     setSelectedCourse(course);
+    setSelectedRole(role);
     setIsModalOpen(true);
   };
 
   const closeApplyModal = () => {
     setIsModalOpen(false);
     setSelectedCourse(null);
+    setSelectedRole(null);
   };
 
-  const handleSubmitApplication = (applicationData: TutorApplication) => {
-    if (!userData) {
-      showError("You must be logged in to apply for courses.");
+  const handleSubmitApplication = async (applicationData: ApplicationData) => {
+    if (!user || !selectedCourse || !selectedRole) {
+      showError("Missing required information to submit application.");
       return;
     }
 
-    // Add user information
-    applicationData.email = userData.email;
-    applicationData.fullName = userData.fullName;
-
-    // Save application
     try {
-      saveApplicationToStorage(applicationData);
+      setIsSubmitting(true);
 
-      // Update existing applications list
-      updateExistingApplications(applicationData.courses[0]);
+      // Submit application to backend
+      const response = await ApplicationService.createApplication(applicationData);
 
-      // Show success message
-      setIsModalOpen(false);
-      showSuccess("Your application has been submitted successfully!");
+      if (response.success && response.data) {
+        // Add new application to local state
+        setMyApplications((prev) => [...prev, response.data!]);
 
-      // Clear the success message after 5 seconds
-      setTimeout(() => {
-        hideSuccess();
-      }, 5000);
+        // Close modal and show success message
+        setIsModalOpen(false);
+        showSuccess(
+          `Application submitted for ${selectedCourse.courseCode}!`
+        );
+
+        // Clear the success message after 3 seconds
+        setTimeout(() => {
+          hideSuccess();
+        }, 3000);
+      } else {
+        showError(response.message || "Failed to submit your application. Please try again.");
+      }
     } catch (error) {
+      console.error("Error submitting application:", error);
       showError("Failed to submit your application. Please try again.");
-      console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // Show loading while auth is being checked or data is loading
+  if (authLoading || isLoading) {
+    return (
+      <LoadingWrapper
+        isLoading={true}
+        loadingMessage="Loading tutor dashboard..."
+      >
+        <div />
+      </LoadingWrapper>
+    );
+  }
+
   return (
-    <LoadingWrapper
-      isLoading={isLoading}
-      loadingMessage="Loading tutor dashboard..."
-    >
-      {/* Hero Section */}
+    <LoadingWrapper isLoading={false}>
+      {/* Hero Section with improved statistics */}
       <TutorHeroSection
-        totalCourses={courses.length}
-        userApplications={existingApplications.length}
+        totalCourses={stats.totalCourses}
+        userApplications={stats.totalApplications}
+        availableOpportunities={stats.availableOpportunities}
       />
 
       {/* Main Content */}
@@ -149,24 +275,50 @@ const TutorDashboardPage: React.FC = () => {
           onFilterChange={setActiveFilter}
         />
 
-        {/* Course Cards */}
-        <CourseGrid
-          isLoading={false} // We handle loading at the page level now
-          filteredCourses={filteredCourses}
-          existingApplications={existingApplications}
-          searchQuery={searchQuery}
-          activeFilter={activeFilter}
-          onApplyToCourse={openApplyModal}
-        />
+        {/* Course Cards Grid - Modified to show 3 cards per row */}
+        <div className="container mx-auto px-4 py-8">
+          {filteredCourses.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">
+                {searchQuery || activeFilter !== "all"
+                  ? "No courses match your current filters."
+                  : "No courses available at the moment."}
+              </p>
+              {activeFilter === "available" && myApplications.length > 0 && (
+                <p className="text-gray-500 text-sm mt-2">
+                  You have applied to all available courses. Check the &quot;Applied&quot; filter to see your applications.
+                </p>
+              )}
+              {activeFilter === "applied" && myApplications.length === 0 && (
+                <p className="text-gray-500 text-sm mt-2">
+                  You haven&apos;t applied to any courses yet. Check the &quot;Available&quot; filter to see opportunities.
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
+              {filteredCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  roles={roles}
+                  myApplications={myApplications}
+                  onApplyForRole={openApplyModal}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Apply Modal */}
       <ApplyModal
         isOpen={isModalOpen}
         course={selectedCourse}
+        role={selectedRole}
         onClose={closeApplyModal}
         onSubmit={handleSubmitApplication}
-        currentUserId={userData?.id || ""}
+        isSubmitting={isSubmitting}
       />
     </LoadingWrapper>
   );

@@ -1,3 +1,5 @@
+import { AssignedCourse } from "./courseTypes";
+
 export enum UserType {
   CANDIDATE = "candidate",
   LECTURER = "lecturer",
@@ -10,7 +12,6 @@ export interface User {
   firstName: string;
   lastName: string;
   userType: UserType;
-  phone?: string;
   isBlocked: boolean;
   createdAt: string;
   updatedAt: string;
@@ -21,7 +22,8 @@ export interface AuthResponse {
   message: string;
   data?: {
     user: User;
-    token: string;
+    token?: string;
+    assignedCourses?: AssignedCourse[];
   };
   errors?: Record<string, string>;
 }
@@ -33,7 +35,6 @@ export interface SignupData {
   firstName: string;
   lastName: string;
   userType: UserType;
-  phone?: string;
 }
 
 export interface SigninData {

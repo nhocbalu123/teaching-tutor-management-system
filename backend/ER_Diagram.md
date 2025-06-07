@@ -12,7 +12,7 @@
 - **firstName** (VARCHAR(100), NOT NULL)
 - **lastName** (VARCHAR(100), NOT NULL)
 - **userType** (ENUM: 'candidate', 'lecturer', 'admin', NOT NULL)
-- **phone** (VARCHAR(20), NULLABLE)
+
 - **isBlocked** (BOOLEAN, DEFAULT FALSE) - for admin to block/unblock users
 - **createdAt** (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
 - **updatedAt** (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)

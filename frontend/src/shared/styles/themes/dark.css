@@ -15,8 +15,10 @@
   --color-bg-secondary: #111827;
   --color-text-primary: #f9fafb;
   --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
   --color-border: #374151;
   --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-primary-light: rgba(249, 115, 22, 0.2);
 }
 
 .dark .btn-outline {

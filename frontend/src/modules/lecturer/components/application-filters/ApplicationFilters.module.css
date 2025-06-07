@@ -32,37 +32,950 @@
 
 .filterGroup label {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.filterSelect {
-  padding: 0.5rem;
+.filterGroup label::before {
+  content: '▶';
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.filterGroup:hover label::before {
+  transform: rotate(90deg);
+}
+
+.filterTools .filterSelect {
+  padding: 0.875rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-width: 140px;
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="m2 0-2 2h4zm0 5 2-2h-4z"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 0.65em auto;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 400;
+  cursor: pointer;
+  min-width: 180px;
+  appearance: none;
   padding-right: 2.5rem;
+  transition: all 0.2s ease;
+  min-height: 2.75rem;
 }
 
-.filterSelect:focus {
+.filterTools .filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.filterTools .filterSelect:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(249, 115, 22, 0.1));
 }
 
 .filterSelect::-ms-expand {
   display: none;
 }
 
-.dark .filterSelect {
+.filterInput {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  min-width: 140px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(249, 115, 22, 0.1));
+}
+
+.filterInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.dark .filterTools .filterSelect {
+  background: var(--color-bg-primary);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .filterInput {
   background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-dark);
+}
+
+/* Application Filters - Enhanced Version */
+.filtersContainer {
+  background: var(--color-bg-primary);
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px var(--color-shadow);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+/* Filter Header */
+.filtersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(135deg, 
+    var(--color-bg-primary) 0%, 
+    var(--color-bg-secondary) 100%);
+  position: relative;
+}
+
+.headerLeft {
+  flex: 1;
+}
+
+.filtersTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filterIcon {
+  font-size: 1.25rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.filterCount {
+  background: var(--color-primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  margin-left: 0.5rem;
+  animation: bounce 0.5s ease-out;
+}
+
+.filtersSubtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.clearButton {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.clearButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.clearButton:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+.clearButton:hover::before {
+  left: 100%;
+}
+
+.expandButton {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.expandButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.expandButton:hover {
+  background: var(--color-secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3);
+}
+
+.expandButton:hover::before {
+  left: 100%;
+}
+
+.expandButton.expanded {
+  background: var(--color-secondary);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.4);
+}
+
+.expandIcon {
+  transition: transform 0.3s ease;
+  font-size: 0.75rem;
+}
+
+.expandButton.expanded .expandIcon {
+  transform: rotate(180deg);
+}
+
+/* Quick Search Section */
+.quickSearch {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: var(--color-bg-secondary);
+}
+
+.searchGroup,
+.courseGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.searchLabel,
+.selectLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.searchLabel::before,
+.selectLabel::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  z-index: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  min-height: 2.75rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
+}
+
+.clearSearchButton {
+  position: absolute;
+  right: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.clearSearchButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+.selectInput {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  padding-right: 2.5rem;
+  min-height: 2.75rem;
+}
+
+.selectInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.selectInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.noCoursesMessage {
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%);
+  border: 2px dashed var(--color-border);
+  border-radius: 0.75rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.noCoursesMessage::before {
+  content: '📚';
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+/* Advanced Filters */
+.advancedFilters {
+  background: var(--color-bg-primary);
+  border-top: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.filterRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.filterLabel::before {
+  content: '●';
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.labelIcon {
+  font-size: 1.125rem;
+  color: var(--color-primary);
+  filter: drop-shadow(0 1px 2px rgba(249, 115, 22, 0.3));
+}
+
+.filterSelect {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  padding-right: 2.5rem;
+  min-height: 2.75rem;
+}
+
+.filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Skills Section */
+.skillsSection {
+  padding: 2rem;
+}
+
+.skillsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.skillsCount {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.skillsControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skillSearchWrapper {
+  position: relative;
+}
+
+.skillSearchInput {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  width: 240px;
+  min-height: 2.75rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.skillSearchInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.skillSearchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.skillSearchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.clearSkillsButton {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clearSkillsButton:hover {
+  background: rgba(239, 68, 68, 0.15);
+  transform: translateY(-1px);
+}
+
+.skillsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.skillTag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.skillTag:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.skillTag.skillSelected {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.skillCheckbox {
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.skillName {
+  font-weight: 500;
+}
+
+.noSkillsFound {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Active Filters Summary */
+.activeFilters {
+  background: var(--color-bg-secondary);
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.activeFiltersTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.activeFiltersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.activeFilter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(249, 115, 22, 0.1);
+  color: var(--color-primary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.removeFilter {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  margin-left: 0.25rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.removeFilter:hover {
+  opacity: 1;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filterRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .skillsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .skillsControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtersHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .quickSearch {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .filterRow {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+  
+  .skillsSection {
+    padding: 1.5rem;
+  }
+  
+  .skillSearchInput {
+    width: 100%;
+  }
+  
+  .skillsControls {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .activeFiltersList {
+    gap: 0.5rem;
+  }
+  
+  /* Mobile optimizations for labels and selects */
+  .searchLabel,
+  .selectLabel,
+  .filterLabel {
+    font-size: 0.8rem;
+    margin-bottom: 0.375rem;
+  }
+  
+  .selectInput,
+  .filterSelect,
+  .filterTools .filterSelect {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    min-width: auto;
+  }
+  
+  .filterGroup label::before,
+  .searchLabel::before,
+  .selectLabel::before,
+  .filterLabel::before {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtersContainer {
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+  }
+  
+  .filtersHeader,
+  .quickSearch,
+  .filterRow,
+  .skillsSection,
+  .activeFilters {
+    padding: 1rem;
+  }
+  
+  .filtersTitle {
+    font-size: 1.125rem;
+  }
+  
+  .skillsGrid {
+    gap: 0.375rem;
+  }
+  
+  .skillTag {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Enhanced Dark Mode Support */
+:global(.dark) .filtersContainer {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+}
+
+:global(.dark) .filtersHeader {
+  background: linear-gradient(135deg, 
+    var(--color-bg-primary) 0%, 
+    var(--color-bg-secondary) 100%);
+  border-bottom-color: var(--color-border);
+}
+
+:global(.dark) .filtersHeader::before {
+  background: linear-gradient(90deg, 
+    var(--color-primary) 0%, 
+    var(--color-secondary) 50%, 
+    var(--color-accent) 100%);
+  opacity: 0.8;
+}
+
+:global(.dark) .quickSearch {
+  background: var(--color-bg-secondary);
+  backdrop-filter: blur(10px);
+}
+
+:global(.dark) .searchInput {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillSearchInput {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillSearchInput:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .skillSearchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+:global(.dark) .searchInput:focus {
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .searchInput::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
+}
+
+:global(.dark) .selectInput {
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .selectInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+:global(.dark) .selectInput:focus {
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .clearButton {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+:global(.dark) .clearButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+:global(.dark) .expandButton {
+  background: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+:global(.dark) .expandButton:hover {
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+}
+
+:global(.dark) .skillTag {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillTag:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .skillTag.skillSelected {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+:global(.dark) .filterSelect {
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+:global(.dark) .filterSelect:focus {
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .activeFilter {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--color-primary);
+}
+
+:global(.dark) .noCoursesMessage {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+:global(.dark) .advancedFilters {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .filtersContainer,
+  .expandButton,
+  .clearButton,
+  .skillTag,
+  .clearSearchButton {
+    transition: none;
+  }
+  
+  .filterIcon {
+    animation: none;
+  }
+  
+  .filterCount {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .filtersContainer {
+    border-width: 2px;
+  }
+  
+  .skillTag {
+    border-width: 2px;
+  }
+  
+  .activeFilter {
+    border-width: 2px;
+  }
 }

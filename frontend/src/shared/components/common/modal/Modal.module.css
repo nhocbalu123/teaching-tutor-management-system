@@ -13,12 +13,18 @@
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modalOverlayActive {
   opacity: 1;
   visibility: visible;
+}
+
+.modalOverlayClosing {
+  opacity: 0;
+  visibility: visible;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modalContainer {
@@ -29,12 +35,17 @@
   display: flex;
   overflow: hidden;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-  transform: scale(0.8);
-  transition: all 0.3s ease;
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.modalOverlayActive .modalContainer {
-  transform: scale(1);
+.modalContainerActive {
+  transform: scale(1) translateY(0);
+}
+
+.modalContainerClosing {
+  transform: scale(0.95) translateY(10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modalImageSection {
@@ -86,12 +97,15 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1rem;
+  z-index: 10;
 }
 
 .modalClose:hover {
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.1);
+  background-color: #e86207;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
 .modalTitle {

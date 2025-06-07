@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./user-dropdown.module.css";
+import styles from "./UserDropdown.module.css";
 
 export interface UserDropdownProps {
   user: {
@@ -90,7 +90,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   const lastName = nameParts.slice(1).join(" ");
 
   return (
-    <div className={styles.userDropdownContainer} ref={dropdownRef}>
+    <div className={styles.userDropdownContainer} ref={dropdownRef} data-testid="user-dropdown">
       {/* Avatar Button */}
       <div className={styles.avatarButton} onClick={toggleDropdown}>
         <div className={styles.avatarWrapper}>

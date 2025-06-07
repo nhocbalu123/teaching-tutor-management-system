@@ -13,6 +13,9 @@ const LecturerShowcase: React.FC<LecturerShowcaseProps> = ({
   lecturers,
   onOpenLecturerModal,
 }) => {
+  // Display only the first 4 lecturers
+  const displayedLecturers = lecturers.slice(0, 4);
+
   return (
     <section
       className={`py-24`}
@@ -25,7 +28,7 @@ const LecturerShowcase: React.FC<LecturerShowcaseProps> = ({
             subtitle="Meet our exceptional team of computer science lecturers who bring real-world experience and academic excellence to our programs."
           />
           <div className={styles.lecturerGrid}>
-            {lecturers.map((lecturer, index) => (
+            {displayedLecturers.map((lecturer, index) => (
               <LecturerCard
                 key={lecturer.id}
                 lecturer={lecturer}

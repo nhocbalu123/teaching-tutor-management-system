@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./Modal.module.css";
 
 interface ModalProps {
@@ -17,17 +17,27 @@ const Modal: React.FC<ModalProps> = ({
   maxWidth = "500px",
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setIsAnimating(false);
+    // Add gentle animation delay before closing
+    setTimeout(() => {
+      onClose();
+    }, 200);
+  }, [onClose]);
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        handleClose();
       }
     };
 
     if (isOpen) {
       document.body.style.overflow = "hidden";
       document.addEventListener("keydown", handleEscapeKey);
+      setIsAnimating(true);
     } else {
       document.body.style.overflow = "unset";
     }
@@ -36,11 +46,11 @@ const Modal: React.FC<ModalProps> = ({
       document.removeEventListener("keydown", handleEscapeKey);
       document.body.style.overflow = "unset"; // Ensure overflow is reset on unmount
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && e.target === modalRef.current) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -48,16 +58,19 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`${styles.modalOverlay} ${isOpen ? styles.modalOverlayActive : ""}`}
+      className={`${styles.modalOverlay} ${isAnimating ? styles.modalOverlayActive : styles.modalOverlayClosing}`}
       onClick={handleOverlayClick}
       ref={modalRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? "modal-title" : undefined}
     >
-      <div className={styles.modalContainer} style={{ maxWidth }}>
+      <div 
+        className={`${styles.modalContainer} ${isAnimating ? styles.modalContainerActive : styles.modalContainerClosing}`} 
+        style={{ maxWidth }}
+      >
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className={styles.modalClose}
           aria-label="Close modal"
         >

@@ -32,6 +32,28 @@ export interface PasswordStrengthCriteria {
   special: boolean;
 }
 
+// Full name validation
+export const validateFullName = (fullName: string): boolean => {
+  if (!fullName.trim()) return false;
+
+  // Split by spaces and filter out empty strings
+  const words = fullName.trim().split(/\s+/).filter(word => word.length > 0);
+
+  // Must have at least 2 words (first name + last name)
+  if (words.length < 2) return false;
+
+  // Each word must be at least 1 character and contain only valid characters
+  const nameRegex = /^[a-zA-Z'-]+$/;
+  return words.every(word => nameRegex.test(word));
+};
+
+// Check if password contains emojis
+export const containsEmojis = (text: string): boolean => {
+  // More comprehensive emoji detection including surrogate pairs
+  const emojiRegex = /[\u{1F000}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\uD800-\uDBFF][\uDC00-\uDFFF]/u;
+  return emojiRegex.test(text);
+};
+
 export const calculatePasswordStrength = (
   password: string
 ): PasswordStrengthCriteria => {

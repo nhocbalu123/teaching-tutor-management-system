@@ -1,306 +1,325 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import type { Application as TutorApplication } from "@/shared/types/application";
 import {
-  getApplicationsFromStorage as getApplications,
-  saveApplicationToStorage as saveApplication,
-  initializeDetailedApplicationsInStorage,
-} from "@/modules/tutor/utils/applicationDisplay.utils";
-import { availableCourses } from "@/shared/data/courses";
-
-// Cache for applications data using sessionStorage
-const CACHE_DURATION = 30000; // 30 seconds cache for applications
-const LECTURER_APP_CACHE_KEY = "lecturer_app_cache";
-
-interface LecturerApplicationCache {
-  applications: TutorApplication[];
-  lastChecked: number;
-}
-
-// Helper functions for application cache management
-const getApplicationsCache = (): LecturerApplicationCache | null => {
-  if (typeof window === "undefined") return null;
-  try {
-    const cached = sessionStorage.getItem(LECTURER_APP_CACHE_KEY);
-    return cached ? JSON.parse(cached) : null;
-  } catch {
-    return null;
-  }
-};
-
-const setApplicationsCache = (cache: LecturerApplicationCache): void => {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(LECTURER_APP_CACHE_KEY, JSON.stringify(cache));
-  } catch {
-    // Silently fail if sessionStorage is not available
-  }
-};
-
-const clearApplicationsCache = (): void => {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.removeItem(LECTURER_APP_CACHE_KEY);
-  } catch {
-    // Silently fail
-  }
-};
+  ApplicationService,
+  ApplicationResponse,
+  ApplicationFilters,
+  ApplicationStatistics,
+} from "@/shared/services/applicationService";
 
 export const useApplicationManagement = () => {
-  const [applications, setApplications] = useState<TutorApplication[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
-  const [selectedRankingCourse, setSelectedRankingCourse] =
-    useState<string>("");
-  const [selectedApplication, setSelectedApplication] =
-    useState<TutorApplication | null>(null);
-  const [comment, setComment] = useState<string>("");
-  const [rankedApplications, setRankedApplications] = useState<
-    TutorApplication[]
-  >([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>("none");
+  // Data state
+  const [applications, setApplications] = useState<ApplicationResponse[]>([]);
+  const [statistics, setStatistics] = useState<ApplicationStatistics | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Memoized load applications function with caching
-  const loadApplications = useCallback(() => {
+  // Filter state for CR Part
+  const [selectedCourse, setSelectedCourse] = useState<string>("all");
+  const [selectedRankingCourse, setSelectedRankingCourse] =
+    useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [roleTypeFilter, setRoleTypeFilter] = useState<string>("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<string>("all");
+  const [skillsFilter, setSkillsFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("none");
+
+  // Selected application state
+  const [selectedApplication, setSelectedApplication] =
+    useState<ApplicationResponse | null>(null);
+  const [comment, setComment] = useState<string>("");
+
+  // Ranking state (for existing functionality)
+  const [rankedApplications, setRankedApplications] = useState<
+    ApplicationResponse[]
+  >([]);
+
+  // Load applications with filters (CR Part)
+  const loadApplications = useCallback(async () => {
     try {
-      // Check cache first
-      const cache = getApplicationsCache();
-      if (cache && Date.now() - cache.lastChecked < CACHE_DURATION) {
-        setApplications(cache.applications);
-        const ranked = cache.applications.filter(
-          (app) => app.rank !== undefined
+      setIsLoading(true);
+
+      // Build filters object
+      const filters: ApplicationFilters = {};
+
+      if (searchQuery.trim()) filters.candidateName = searchQuery.trim();
+      if (roleTypeFilter !== "all") filters.roleType = roleTypeFilter;
+      if (availabilityFilter !== "all")
+        filters.availability = availabilityFilter;
+      if (skillsFilter.trim()) filters.skills = skillsFilter.trim();
+      if (selectedCourse !== "all") filters.courseCode = selectedCourse;
+      if (statusFilter !== "all") filters.status = statusFilter;
+
+      const response =
+        await ApplicationService.getApplicationsForLecturer(filters);
+
+      if (response.success && response.data) {
+        setApplications(response.data);
+
+        // Update ranked applications - filter for applications with ranking data
+        const ranked = response.data.filter(
+          (app) =>
+            app.status === "selected" &&
+            app.rank !== undefined &&
+            app.rank !== null &&
+            app.rank > 0 // Only show applications with actual rank
+          // Temporarily remove rankedForCourse requirement to debug
+          // && app.rankedForCourse
         );
-        setRankedApplications(
-          ranked.sort((a, b) => (a.rank || 999) - (b.rank || 999))
-        );
-        return;
+
+        // Sort ranked applications by rank for proper display
+        ranked.sort((a, b) => (a.rank || 0) - (b.rank || 0));
+
+        const allSelectedApps = response.data.filter(app => app.status === "selected").map(app => ({
+          id: app.id,
+          name: app.candidate?.firstName + " " + app.candidate?.lastName,
+          rank: app.rank,
+          rankType: typeof app.rank,
+          rankCheck: app.rank !== undefined && app.rank !== null && app.rank > 0,
+          rankedForCourse: app.rankedForCourse,
+          status: app.status
+        }));
+
+        console.log("📊 Ranked applications loaded:");
+        console.log("Total applications:", response.data.length);
+        console.log("Selected applications:", response.data.filter(app => app.status === "selected").length);
+        console.log("All selected apps with rank data:", allSelectedApps);
+        console.log("Filtered ranked applications:", ranked.length);
+        console.log("Ranked apps:", ranked.map(app => ({
+          id: app.id,
+          name: app.candidate?.firstName + " " + app.candidate?.lastName,
+          rank: app.rank,
+          rankedForCourse: app.rankedForCourse,
+          status: app.status
+        })));
+
+        setRankedApplications(ranked);
+      } else {
+        console.error("Failed to load applications:", response.message);
+        setApplications([]);
+        setRankedApplications([]);
       }
-
-      // Load fresh data
-      const appData = getApplications();
-
-      // Update cache
-      const newCache: LecturerApplicationCache = {
-        applications: appData,
-        lastChecked: Date.now(),
-      };
-      setApplicationsCache(newCache);
-
-      setApplications(appData);
-      const ranked = appData.filter((app) => app.rank !== undefined);
-      setRankedApplications(
-        ranked.sort((a, b) => (a.rank || 999) - (b.rank || 999))
-      );
     } catch (error) {
-      console.error("❌ Error loading applications:", error);
+      console.error("Error loading applications:", error);
       setApplications([]);
       setRankedApplications([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    searchQuery,
+    roleTypeFilter,
+    availabilityFilter,
+    skillsFilter,
+    selectedCourse,
+    statusFilter,
+  ]);
+
+  // Load statistics (DI Part)
+  const loadStatistics = useCallback(async () => {
+    try {
+      const response = await ApplicationService.getApplicationStatistics();
+
+      if (response.success && response.data) {
+        setStatistics(response.data);
+      } else {
+        console.error("Failed to load statistics:", response.message);
+        setStatistics(null);
+      }
+    } catch (error) {
+      console.error("Error loading statistics:", error);
+      setStatistics(null);
     }
   }, []);
 
-  // Delayed initialization to prevent blocking initial render
+  // Initialize data
   useEffect(() => {
-    // Allow initial render to complete first
-    const initTimer = setTimeout(() => {
-      // Initialize storage first
-      initializeDetailedApplicationsInStorage();
-
-      // Load applications
-      loadApplications();
-      setIsInitialized(true);
-
-      // Set up event listeners for real-time updates
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === "applications") {
-          clearApplicationsCache(); // Clear cache when storage changes
-          loadApplications();
-        }
-      };
-
-      const handleApplicationUpdate = () => {
-        clearApplicationsCache(); // Clear cache when applications update
-        loadApplications();
-      };
-
-      window.addEventListener("storage", handleStorageChange);
-      window.addEventListener("applicationUpdated", handleApplicationUpdate);
-
-      // Set up periodic refresh
-      const intervalId = setInterval(() => {
-        clearApplicationsCache(); // Clear cache periodically
-        loadApplications();
-      }, 30000); // 30 seconds
-
-      // Cleanup function
-      return () => {
-        window.removeEventListener("storage", handleStorageChange);
-        window.removeEventListener(
-          "applicationUpdated",
-          handleApplicationUpdate
-        );
-        clearInterval(intervalId);
-      };
-    }, 100); // Small delay to allow loading state to show
-
-    return () => {
-      clearTimeout(initTimer);
+    const initializeData = async () => {
+      try {
+        await Promise.all([loadApplications(), loadStatistics()]);
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error initializing data:", error);
+        setIsInitialized(true); // Still mark as initialized to show UI
+      }
     };
-  }, [loadApplications]);
 
-  // Only compute expensive operations after initialization
-  const filteredApplications = useMemo(() => {
-    if (!isInitialized) return [];
+    initializeData();
+  }, [loadApplications, loadStatistics]);
 
-    // Early return for no filters
-    if (!selectedCourse && !searchQuery) {
-      return applications;
+  // Reload when filters change
+  useEffect(() => {
+    if (isInitialized) {
+      loadApplications();
     }
+  }, [
+    isInitialized,
+    loadApplications,
+    searchQuery,
+    roleTypeFilter,
+    availabilityFilter,
+    skillsFilter,
+    selectedCourse,
+    statusFilter,
+  ]);
 
-    // Pre-compute search query processing
-    const hasSearchQuery = searchQuery.trim().length > 0;
-    const normalizedSearchQuery = hasSearchQuery
-      ? searchQuery.toLowerCase()
-      : "";
+  // Sync selectedApplication with updated applications data
+  useEffect(() => {
+    if (selectedApplication && applications.length > 0) {
+      // Find the updated version of the currently selected application
+      const updatedSelectedApplication = applications.find(
+        (app) => app.id === selectedApplication.id
+      );
+      if (updatedSelectedApplication) {
+        const hasCommentChanged =
+          selectedApplication.comment !== updatedSelectedApplication.comment;
+        const hasRankChanged =
+          selectedApplication.rank !== updatedSelectedApplication.rank;
 
-    return applications.filter((app) => {
-      // Course filter (faster check first)
-      if (selectedCourse && !app.courses.includes(selectedCourse)) {
+        console.log("🔄 Syncing selectedApplication with updated data:", {
+          oldComment: selectedApplication.comment,
+          newComment: updatedSelectedApplication.comment,
+          oldRank: selectedApplication.rank,
+          newRank: updatedSelectedApplication.rank,
+          applicationId: selectedApplication.id,
+          hasCommentChanged,
+          hasRankChanged,
+          willUpdate:
+            updatedSelectedApplication !== selectedApplication ||
+            hasCommentChanged ||
+            hasRankChanged,
+        });
+
+        // Update the selectedApplication if it's different OR if the comment/rank has changed
+        if (
+          updatedSelectedApplication !== selectedApplication ||
+          hasCommentChanged ||
+          hasRankChanged
+        ) {
+          setSelectedApplication(updatedSelectedApplication);
+          // Always update the comment to match the latest comment from the updated application
+          setComment(updatedSelectedApplication.comment || "");
+        }
+      }
+    }
+  }, [applications, selectedApplication]); // Include full selectedApplication as dependency
+
+  // Save application (update status)
+  const saveApplication = useCallback(
+    async (application: ApplicationResponse) => {
+      try {
+        const response = await ApplicationService.updateApplicationStatus(
+          application.id,
+          application.status
+        );
+
+        if (response.success) {
+          // Reload applications to get updated data
+          await loadApplications();
+          return true;
+        } else {
+          console.error("Failed to save application:", response.message);
+          return false;
+        }
+      } catch (error) {
+        console.error("Error saving application:", error);
         return false;
       }
+    },
+    [loadApplications]
+  );
 
-      // Search filter optimization
-      if (hasSearchQuery) {
-        // Check name first (most common and fastest)
-        if (app.fullName.toLowerCase().includes(normalizedSearchQuery)) {
-          return true;
-        }
+  // Handle application selection
+  const handleSelectApplication = useCallback(
+    (application: ApplicationResponse) => {
+      setSelectedApplication(application);
+      setComment(application.comment || ""); // Load existing comment when selecting application
+    },
+    []
+  );
 
-        // Check availability (fast string check)
-        if (app.availability.toLowerCase().includes(normalizedSearchQuery)) {
-          return true;
-        }
+  // Sort applications based on sortBy criteria
+  const sortedApplications = useMemo(() => {
+    if (!applications.length) return [];
 
-        // Check skills array (moderate cost)
-        const skillsMatch = app.skills.some((skill) =>
-          skill.toLowerCase().includes(normalizedSearchQuery)
-        );
-        if (skillsMatch) {
-          return true;
-        }
+    const sorted = [...applications];
 
-        // Check course matches last (most expensive operation)
-        const courseMatches = app.courses.some((course) => {
-          const courseInfo = availableCourses.find(
-            (c: { code: string; name: string }) => c.code === course
-          );
+    switch (sortBy) {
+      case "name":
+        return sorted.sort((a, b) => {
+          const nameA =
+            `${a.candidate?.firstName || ""} ${a.candidate?.lastName || ""}`.toLowerCase();
+          const nameB =
+            `${b.candidate?.firstName || ""} ${b.candidate?.lastName || ""}`.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+
+      case "availability":
+        return sorted.sort((a, b) => {
+          const availabilityA =
+            (a.availability as { type: string })?.type || "";
+          const availabilityB =
+            (b.availability as { type: string })?.type || "";
+          return availabilityA.localeCompare(availabilityB);
+        });
+
+      case "date":
+        return sorted.sort((a, b) => {
           return (
-            courseInfo &&
-            (courseInfo.code.toLowerCase().includes(normalizedSearchQuery) ||
-              courseInfo.name.toLowerCase().includes(normalizedSearchQuery))
+            new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
           );
         });
 
-        if (!courseMatches) {
-          return false;
-        }
-      }
+      case "status":
+        return sorted.sort((a, b) => a.status.localeCompare(b.status));
 
-      return true;
-    });
-  }, [applications, selectedCourse, searchQuery, isInitialized]);
-
-  // Optimized sorted applications with stable sort
-  const sortedApplications = useMemo(() => {
-    if (!isInitialized || sortBy === "none") {
-      return filteredApplications;
+      default:
+        return sorted;
     }
-
-    // Use a stable sort to prevent unnecessary re-renders
-    return [...filteredApplications].sort((a, b) => {
-      switch (sortBy) {
-        case "name":
-          return a.fullName.localeCompare(b.fullName);
-        case "availability":
-          return a.availability.localeCompare(b.availability);
-        case "date":
-          return (
-            new Date(b.dateApplied).getTime() -
-            new Date(a.dateApplied).getTime()
-          );
-        default:
-          return 0;
-      }
-    });
-  }, [filteredApplications, sortBy, isInitialized]);
-
-  const handleSelectApplication = useCallback(
-    (application: TutorApplication) => {
-      setSelectedApplication(application);
-      setComment(application.comment || "");
-    },
-    []
-  );
-
-  // Memoized statistics calculation - only after initialization
-  const statistics = useMemo(() => {
-    if (!isInitialized) {
-      return {
-        totalApplications: 0,
-        selectedTutorApplications: 0,
-        pendingTutorApplications: 0,
-        selectionRate: 0,
-      };
-    }
-
-    const totalApplications = applications.length;
-    const selectedTutorApplications = applications.filter(
-      (app) => app.selected
-    ).length;
-    const pendingTutorApplications =
-      totalApplications - selectedTutorApplications;
-    const selectionRate =
-      totalApplications > 0
-        ? Math.round((selectedTutorApplications / totalApplications) * 100)
-        : 0;
-
-    return {
-      totalApplications,
-      selectedTutorApplications,
-      pendingTutorApplications,
-      selectionRate,
-    };
-  }, [applications, isInitialized]);
-
-  // Optimized save function that clears cache
-  const optimizedSaveApplication = useCallback(
-    (application: TutorApplication) => {
-      saveApplication(application);
-      clearApplicationsCache(); // Clear cache when saving
-    },
-    []
-  );
+  }, [applications, sortBy]);
 
   return {
-    applications,
-    selectedCourse,
-    setSelectedCourse,
-    selectedRankingCourse,
-    setSelectedRankingCourse,
+    // Data
+    applications: sortedApplications,
+    statistics,
+    isLoading,
+    isInitialized,
+
+    // Selection state
     selectedApplication,
     setSelectedApplication,
     comment,
     setComment,
     rankedApplications,
     setRankedApplications,
+
+    // Filter state (CR Part)
+    selectedCourse,
+    setSelectedCourse,
+    selectedRankingCourse,
+    setSelectedRankingCourse,
     searchQuery,
     setSearchQuery,
+    roleTypeFilter,
+    setRoleTypeFilter,
+    availabilityFilter,
+    setAvailabilityFilter,
+    skillsFilter,
+    setSkillsFilter,
+    statusFilter,
+    setStatusFilter,
     sortBy,
     setSortBy,
-    sortedApplications,
+
+    // Actions
     loadApplications,
+    loadStatistics,
+    saveApplication,
     handleSelectApplication,
-    statistics,
-    saveApplication: optimizedSaveApplication,
-    isInitialized, // Export this to know when data is ready
+
+    // Computed
+    sortedApplications,
   };
 };

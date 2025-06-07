@@ -1,4 +1,5 @@
 import type { Application as TutorApplication } from "@/shared/types/application";
+import { getMelbourneDateOnly } from "@/shared/utils/dateUtils";
 
 interface UseApplicationActionsProps {
   selectedApplication: TutorApplication | null;
@@ -58,7 +59,7 @@ export const useApplicationActions = ({
         ...selectedApplication,
         selected: true,
         selectedBy: currentLecturerId,
-        selectedDate: new Date().toISOString().split("T")[0],
+        selectedDate: getMelbourneDateOnly(),
         selectedForCourses: selectedCourses,
       };
       saveApplication(updatedApplication);
@@ -103,7 +104,15 @@ export const useApplicationActions = ({
   };
 
   const handleAddToRanking = () => {
-    if (selectedApplication && !selectedApplication.rank) {
+    console.log("🚀 handleAddToRanking called:", {
+      selectedApplication: selectedApplication?.id,
+      currentRank: selectedApplication?.rank,
+      hasRank: !!selectedApplication?.rank,
+      rankCheck: !selectedApplication?.rank,
+      canAddToRank: selectedApplication && !selectedApplication.rank,
+    });
+
+    if (selectedApplication && (selectedApplication.rank === null || selectedApplication.rank === undefined || selectedApplication.rank === 0)) {
       const maxRank = rankedApplications.reduce(
         (max, app) => Math.max(max, app.rank || 0),
         0
@@ -112,10 +121,23 @@ export const useApplicationActions = ({
         ...selectedApplication,
         rank: maxRank + 1,
       };
+
+      console.log("✅ Adding to ranking:", {
+        applicationId: selectedApplication.id,
+        newRank: maxRank + 1,
+        updatedApplication: updatedApplication,
+      });
+
       saveApplication(updatedApplication);
       loadApplications();
       setSelectedApplication(updatedApplication);
       showToast("Applicant added to ranking!", "success");
+    } else {
+      console.log("❌ Cannot add to ranking:", {
+        hasSelectedApplication: !!selectedApplication,
+        currentRank: selectedApplication?.rank,
+        reason: !selectedApplication ? "No selected application" : "Already has rank",
+      });
     }
   };
 
@@ -129,9 +151,9 @@ export const useApplicationActions = ({
         newRankedApplications[currentIndex],
         newRankedApplications[currentIndex - 1],
       ] = [
-        newRankedApplications[currentIndex - 1],
-        newRankedApplications[currentIndex],
-      ];
+          newRankedApplications[currentIndex - 1],
+          newRankedApplications[currentIndex],
+        ];
 
       newRankedApplications.forEach((app, index) => {
         const updatedApp = { ...app, rank: index + 1 };
@@ -154,9 +176,9 @@ export const useApplicationActions = ({
         newRankedApplications[currentIndex],
         newRankedApplications[currentIndex + 1],
       ] = [
-        newRankedApplications[currentIndex + 1],
-        newRankedApplications[currentIndex],
-      ];
+          newRankedApplications[currentIndex + 1],
+          newRankedApplications[currentIndex],
+        ];
 
       newRankedApplications.forEach((app, index) => {
         const updatedApp = { ...app, rank: index + 1 };

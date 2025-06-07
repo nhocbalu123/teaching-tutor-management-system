@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import type { Application as TutorApplication } from "@/shared/types/application"; // Updated
 import { availableCourses } from "@/shared/data/courses";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./applicant-details.module.css";
+import {
+  validateLecturerComment,
+  sanitizeComment,
+  formatValidationErrors,
+  DEFAULT_COMMENT_CONFIG,
+} from "../../utils/lecturerValidation.utils";
 
 interface ApplicantDetailsProps {
   application: TutorApplication | null;
   comment: string;
   setComment: (comment: string) => void;
   onSelectApplicant: (selectedCourses: string[]) => void;
-  onSaveComment: (selectedCourses: string[]) => void;
+  onSaveComment: () => void;
   onDeleteComment: () => void;
   onUnselectApplicant: () => void;
   onAddToRanking: () => void;
@@ -29,6 +35,35 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   showToast,
   title = "Applicant Details",
 }) => {
+  // Validation states
+  const [commentError, setCommentError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+
+  // Note: Course selection logic removed since there's only one course
+
+  // Clear validation errors when application changes
+  useEffect(() => {
+    setCommentError("");
+    setHasUnsavedChanges(false);
+    // Note: Course selection reset removed since there's only one course
+  }, [application?.id, application]);
+
+  // Track unsaved changes
+  useEffect(() => {
+    const originalComment = application?.comment || "";
+    const hasChanges = comment !== originalComment;
+    console.log("📝 Unsaved changes check:", {
+      originalComment,
+      comment,
+      hasChanges,
+      applicationId: application?.id,
+    });
+    setHasUnsavedChanges(hasChanges);
+  }, [comment, application?.comment, application?.id]);
+
+  // Note: Course selection handlers removed since there's only one course
+
   if (!application) {
     return (
       <div className={styles.applicantDetailsPanel}>
@@ -58,36 +93,96 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     );
   }
 
-  const handleSelectButtonClick = () => {
-    if (application) {
-      onSelectApplicant(application.courses);
+  // Handle comment changes with validation
+  const handleCommentChange = (value: string) => {
+    setComment(value);
+    setCommentError(""); // Clear error on change
+  };
+
+  // Validate and save comment
+  const handleSaveComment = async () => {
+    if (!application || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setCommentError("");
+
+    try {
+      // Sanitize comment
+      const sanitizedComment = sanitizeComment(comment);
+
+      // Validate comment
+      const validation = validateLecturerComment(sanitizedComment, {
+        ...DEFAULT_COMMENT_CONFIG,
+        allowEmpty: true,
+        minLength: 3,
+      });
+
+      if (!validation.isValid) {
+        const errorMessages = formatValidationErrors(validation.errors);
+        setCommentError(errorMessages[0] || "Invalid comment");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Update comment value with sanitized version
+      if (sanitizedComment !== comment) {
+        setComment(sanitizedComment);
+      }
+
+      // Call the parent's save function (this should handle the API call)
+      await onSaveComment();
+
+      showToast("Comment saved successfully!", "success");
+      setHasUnsavedChanges(false);
+    } catch {
+      setCommentError("Failed to save comment. Please try again.");
+      showToast("Failed to save comment", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // Handle status updates with validation
+  const handleSelectButtonClick = () => {
+    if (!application) return;
+
+    // Select applicant without any conditions - just select for all their courses
+    onSelectApplicant(application.courses);
+  };
+
   const handleAddToRankingClick = () => {
+    console.log("🎯 handleAddToRankingClick called:", {
+      applicationId: application?.id,
+      selected: application?.selected,
+      rank: application?.rank,
+      rankType: typeof application?.rank,
+      comment: application?.comment,
+      hasComment: !!application?.comment,
+    });
+
     if (!application.selected) {
+      console.log("❌ Not selected");
       showToast(
         "Please select the applicant before adding to ranking",
         "error"
       );
       return;
     }
-    if (application.rank !== undefined) {
+    // Fix: Check if truly ranked (rank > 0), handle null/undefined explicitly
+    if (application.rank !== null && application.rank !== undefined && application.rank > 0) {
+      console.log("❌ Already ranked:", application.rank);
       showToast("Applicant is already added to ranking", "info");
       return;
     }
     if (!application.comment) {
+      console.log("❌ No comment");
       showToast(
         "Please add and save a comment before adding to ranking.",
         "error"
       );
       return;
     }
-    const hasUnsavedComment = comment !== (application.comment || "");
-    if (hasUnsavedComment) {
-      showToast("Please save your comment before adding to ranking.", "error");
-      return;
-    }
+    console.log("✅ Calling onAddToRanking");
     onAddToRanking();
   };
 
@@ -110,6 +205,30 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               </h2>
               <p className={styles.applicantEmail}>{application.email}</p>
               <div className={styles.applicantBadges}>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {(application as any).role && (
+                  <span className={styles.roleBadge}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={styles.roleIconSmall}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {((application as any).role?.roleName === "tutor") ? "Tutor" : 
+                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                     ((application as any).role?.roleName === "lab_assistant") ? "Lab Assistant" : 
+                     "Application"}
+                  </span>
+                )}
                 <span
                   className={`${styles.availabilityBadge} ${application.availability === "Full Time" ? styles.fullTime : styles.partTime}`}
                 >
@@ -130,7 +249,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   >
                     Unselect
                   </button>
-                  {application.rank !== undefined ? (
+                  {application.rank !== null && application.rank !== undefined && application.rank > 0 ? (
                     <button
                       disabled
                       className={`${styles.actionButton} ${styles.alreadyRankedButton}`}
@@ -156,17 +275,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     <button
                       onClick={handleAddToRankingClick}
                       className={`${styles.actionButton} ${styles.addToRankingButton}`}
-                      title={
-                        !application.comment
-                          ? "Please add and save a comment before adding to ranking"
-                          : comment !== (application.comment || "")
-                            ? "Please save your comment before adding to ranking"
-                            : "Add to ranking"
-                      }
-                      disabled={
-                        !application.comment ||
-                        comment !== (application.comment || "")
-                      }
+                      title="Add to ranking"
                     >
                       Add to Ranking
                     </button>
@@ -176,12 +285,15 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 <button
                   onClick={handleSelectButtonClick}
                   className={`${styles.actionButton} ${styles.selectButton}`}
+                  title="Select applicant for all applied courses"
                 >
                   Select Applicant
                 </button>
               )}
             </div>
           </div>
+
+
 
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>
@@ -330,23 +442,91 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               </svg>
               Comments & Notes
             </h4>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add your comments about this applicant..."
-              className={styles.commentTextarea}
-            />
-            <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
+            <div className={styles.commentInputContainer}>
+              <textarea
+                value={comment}
+                onChange={(e) => handleCommentChange(e.target.value)}
+                placeholder="Add your comments about this applicant..."
+                className={`${styles.commentTextarea} ${commentError ? styles.commentTextareaError : ""}`}
+                maxLength={1000}
+                disabled={isSubmitting}
+              />
+              <div className={styles.commentMeta}>
+                <span className={styles.characterCount}>
+                  {comment.length}/1000 characters
+                </span>
+                {hasUnsavedChanges && (
+                  <span className={styles.unsavedIndicator}>
+                    • Unsaved changes
+                  </span>
+                )}
+              </div>
+              {commentError && (
+                <div className={styles.errorMessage}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={styles.errorIcon}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {commentError}
+                </div>
+              )}
+            </div>
+            <div className={styles.commentActions}>
               <button
-                onClick={() => onSaveComment(application.courses)}
+                onClick={handleSaveComment}
+                disabled={
+                  isSubmitting || (!comment.trim() && !application.comment)
+                }
                 className={`${styles.actionButton} ${styles.addToRankingButton}`}
                 style={{ fontSize: "0.875rem" }}
               >
-                Save Comment
+                {isSubmitting ? (
+                  <>
+                    <svg className={styles.spinner} viewBox="0 0 24 24">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeDasharray="32"
+                        strokeDashoffset="32"
+                      >
+                        <animate
+                          attributeName="strokeDasharray"
+                          dur="2s"
+                          values="0 32;16 16;0 32;0 32"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="strokeDashoffset"
+                          dur="2s"
+                          values="0;-16;-32;-32"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Comment"
+                )}
               </button>
               {application.comment && (
                 <button
                   onClick={onDeleteComment}
+                  disabled={isSubmitting}
                   className={`${styles.actionButton} ${styles.unselectButton}`}
                   style={{ fontSize: "0.875rem" }}
                 >

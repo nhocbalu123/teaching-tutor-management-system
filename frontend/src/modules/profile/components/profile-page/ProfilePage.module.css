@@ -1,330 +1,630 @@
-/* Profile Page Styles */
+/* Modern Profile Page - Compact Two-Panel Layout */
 .profileContainer {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  min-height: calc(100vh - 200px);
-}
-
-.profileCard {
-  background-color: var(--color-bg-primary);
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  margin-top: 4rem;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.profileCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-/* Profile Header */
-.profileHeader {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #ea580c 100%);
-  color: white;
-  padding: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.profileHeader::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
+  height: 100vh;
   width: 100%;
-  height: 100%;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
-    repeat;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.profileAvatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  padding: 6rem 2rem 2rem;
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 1;
+}
+
+/* Main Grid Layout */
+.profileGrid {
+  width: 100%;
+  max-width: 1400px;
+  height: calc(100vh - 8rem);
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 2rem;
   overflow: hidden;
+}
+
+/* Left Panel - User Information */
+.userPanel {
+  background: var(--color-bg-surface);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(20px);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Avatar Section */
+.avatarSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--color-primary);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s ease;
+}
+
+.avatarWrapper:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(249, 115, 22, 0.4);
 }
 
 .avatarImage {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
 }
 
-.profileInfo {
-  flex: 1;
-  position: relative;
-  z-index: 1;
+/* User Info */
+.userInfo {
+  text-align: center;
+  width: 100%;
 }
 
-.profileName {
-  font-size: 2rem;
+.userName {
+  font-size: 1.75rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-primary);
   line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.profileType {
-  font-size: 1rem;
+.userRole {
+  margin-bottom: 0.75rem;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.userEmail {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
   margin: 0;
-  color: rgba(255, 255, 255, 0.9);
+  word-break: break-word;
+}
+
+/* Quick Stats */
+.quickStats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.statContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Profile Details */
-.profileDetails {
-  padding: 2rem;
-}
-
-.detailSection {
-  margin-bottom: 2rem;
-}
-
-.detailSection:last-child {
-  margin-bottom: 0;
-}
-
-.detailSection h3 {
-  font-size: 1.25rem;
+.statValue {
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text-primary);
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-primary);
-  display: inline-block;
 }
 
-.detailGrid {
+.statusBadge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.statusBadge.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.statusBadge.blocked {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+}
+
+/* Right Panel - Information Cards */
+.infoPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.infoCard {
+  background: var(--color-bg-surface);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.infoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Info Grid for Account Information */
+.infoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
-.detailItem {
+.infoItem {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.detailItem label {
-  font-size: 0.875rem;
-  font-weight: 600;
+.infoLabel {
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.detailItem span {
-  font-size: 1rem;
+.infoValue {
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--color-text-primary);
-  font-weight: 500;
   word-break: break-word;
 }
 
-/* User Type and Status Badges */
-.userTypeBadge,
-.statusBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-  width: fit-content;
-}
-
-.userTypeBadge {
-  background-color: rgba(249, 115, 22, 0.1);
-  color: var(--color-primary);
-  border: 1px solid rgba(249, 115, 22, 0.3);
-}
-
-.userTypeBadge.candidate {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.userTypeBadge.lecturer {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.userTypeBadge.admin {
-  background-color: rgba(168, 85, 247, 0.1);
-  color: #9333ea;
-  border-color: rgba(168, 85, 247, 0.3);
-}
-
-.statusBadge.active {
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.statusBadge.blocked {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-/* Info Text */
-.infoText {
+/* Role Description */
+.roleDescription {
   color: var(--color-text-secondary);
   line-height: 1.6;
-  font-size: 0.95rem;
-  margin: 0;
-  padding: 1rem;
-  background-color: var(--color-bg-secondary);
-  border-radius: 0.5rem;
-  border-left: 4px solid var(--color-primary);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Feature Grid */
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  transition: all 0.3s ease;
+}
+
+.feature:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+/* Action Button */
+.actionButton {
+  margin-top: auto;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
 }
 
 /* Loading and Error States */
-.profileLoading,
-.profileError {
+.loadingWrapper, 
+.errorWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.5rem;
+  height: 100%;
   text-align: center;
-  min-height: 300px;
 }
 
 .loadingSpinner {
   width: 40px;
   height: 40px;
-  border: 4px solid var(--color-border);
-  border-left-color: var(--color-primary);
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
-.profileError h2 {
-  color: var(--color-text-primary);
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.profileError p {
+.loadingText, 
+.errorMessage {
   color: var(--color-text-secondary);
-  margin: 0;
-}
-
-.profileLoading p {
-  color: var(--color-text-secondary);
-  margin: 0;
   font-size: 1rem;
 }
 
-/* Animations */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.errorIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.errorTitle {
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Course List Styles */
+.courseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.courseItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.courseItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.courseInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.courseCode {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.courseName {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.courseSemester {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.courseDate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  min-width: 80px;
+}
+
+.courseAssignedLabel {
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.courseAssignedDate {
+  font-size: 0.7rem;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.emptyCourses {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--color-bg-primary);
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.emptyCoursesIcon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+.emptyCoursesTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.emptyCoursesText {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.courseCount {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.75rem;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .profileContainer {
-    padding: 1rem;
+    padding: 5rem 1.5rem 1.5rem;
   }
-
-  .profileHeader {
+  
+  .profileGrid {
+    grid-template-columns: 350px 1fr;
+    height: calc(100vh - 6.5rem);
+  }
+  
+  .userPanel {
     padding: 1.5rem;
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-  }
-
-  .profileName {
-    font-size: 1.5rem;
-  }
-
-  .profileDetails {
-    padding: 1.5rem;
-  }
-
-  .detailGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .profileAvatar {
-    width: 70px;
-    height: 70px;
-  }
-
-  .avatarImage {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
   .profileContainer {
-    padding: 0.5rem;
+    padding: 5rem 1rem 1rem;
+    height: auto;
+    min-height: 100vh;
   }
-
-  .profileHeader {
-    padding: 1rem;
+  
+  .profileGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    gap: 1.5rem;
   }
-
-  .profileDetails {
-    padding: 1rem;
+  
+  .userPanel {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    height: auto;
+    padding: 2rem;
   }
+  
+  .avatarSection {
+    margin-bottom: 0;
+  }
+  
+  .userInfo {
+    text-align: left;
+    flex: 1;
+  }
+  
+  .quickStats {
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 0;
+    width: auto;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+}
 
-  .profileName {
+@media (max-width: 768px) {
+  .profileContainer {
+    padding: 4rem 0.75rem 1rem;
+  }
+  
+  .userPanel {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .userInfo {
+    text-align: center;
+  }
+  
+  .quickStats {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .infoCard {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .profileContainer {
+    padding: 4rem 0.5rem 1rem;
+  }
+  
+  .avatarWrapper {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .userName {
+    font-size: 1.5rem;
+  }
+  
+  .cardIcon {
+    width: 36px;
+    height: 36px;
     font-size: 1.25rem;
   }
-
-  .profileType {
-    font-size: 0.875rem;
-  }
-
-  .detailSection h3 {
-    font-size: 1.125rem;
+  
+  .cardTitle {
+    font-size: 1rem;
   }
 }
 
 /* Dark mode support */
-.dark .profileCard {
-  background-color: var(--color-bg-primary);
+:global(.dark) .profileContainer {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+:global(.dark) .userPanel,
+:global(.dark) .infoCard {
+  border-color: var(--color-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .avatarWrapper {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+}
+
+:global(.dark) .statCard,
+:global(.dark) .feature {
   border-color: var(--color-border);
 }
 
-.dark .infoText {
-  background-color: var(--color-bg-secondary);
-}
+

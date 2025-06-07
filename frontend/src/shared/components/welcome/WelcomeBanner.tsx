@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, CSSProperties } from "react";
-import { User } from "../types/user";
+import { User } from "../../types/user";
+import Fireworks from "../fireworks/Fireworks";
 import styles from "./WelcomeBanner.module.css";
 
 interface WelcomeBannerProps {
@@ -19,6 +20,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   const [isHiding, setIsHiding] = useState(false);
   const [topPosition, setTopPosition] = useState('80px'); // Start with expanded header height
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showFireworks, setShowFireworks] = useState(true);
 
   // Handle responsive positioning and scroll position
   useEffect(() => {
@@ -68,6 +70,10 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     };
   }, [autoHideDelay, hideWithAnimation]);
 
+  const handleFireworksComplete = useCallback(() => {
+    setShowFireworks(false);
+  }, []);
+
   const getWelcomeMessage = () => {
     const firstName = user.firstName || "User";
     return `Welcome, ${firstName}!`;
@@ -83,6 +89,19 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
         return "Admin";
       default:
         return "User";
+    }
+  };
+
+  const getRoleIcon = () => {
+    switch (user.userType) {
+      case "candidate":
+        return "🎓";
+      case "lecturer":
+        return "👨‍🏫";
+      case "admin":
+        return "⚙️";
+      default:
+        return "👤";
     }
   };
 
@@ -102,24 +121,55 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   };
 
   return (
-    <div 
-      className={`${styles.welcomeBanner} ${isHiding ? styles.hiding : ""}`}
-      style={bannerStyle}
-      data-scrolled={isScrolled ? "true" : "false"} // For debugging
-    >
-      <div className={styles.welcomeContent}>
-        <h1 className={styles.welcomeMessage}>{getWelcomeMessage()}</h1>
-        <p className={styles.welcomeSubtitle}>
-          You are logged in as a {getUserTypeLabel()}
-        </p>
-        <button
-          className={styles.closeButton}
-          onClick={hideWithAnimation}
-          aria-label="Close welcome banner"
-        >
-          ✕
-        </button>
+    <>
+      <div 
+        className={`${styles.welcomeBanner} ${isHiding ? styles.hiding : ""} ${styles.enhanced}`}
+        style={bannerStyle}
+        data-scrolled={isScrolled ? "true" : "false"} // For debugging
+      >
+        <div className={styles.welcomeContainer}>
+          <div className={styles.welcomeContent}>
+            <div className={styles.celebrationSection}>
+              <div className={styles.celebrationIcon}>
+                🎉
+              </div>
+              <div className={styles.roleIcon}>
+                {getRoleIcon()}
+              </div>
+            </div>
+            <div className={styles.messageSection}>
+              <h1 className={styles.welcomeMessage}>{getWelcomeMessage()}</h1>
+              <p className={styles.welcomeSubtitle}>
+                Successfully logged in as {getUserTypeLabel()}
+              </p>
+            </div>
+            <button
+              className={styles.closeButton}
+              onClick={hideWithAnimation}
+              aria-label="Close welcome banner"
+            >
+              ✕
+            </button>
+          </div>
+          
+          {/* Progress bar showing auto-hide countdown */}
+          <div className={styles.progressBar}>
+            <div 
+              className={styles.progressFill}
+              style={{
+                animationDuration: `${autoHideDelay}ms`
+              }}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+      
+      {/* Fireworks animation */}
+      <Fireworks 
+        isVisible={showFireworks} 
+        onComplete={handleFireworksComplete}
+        duration={3000}
+      />
+    </>
   );
 };

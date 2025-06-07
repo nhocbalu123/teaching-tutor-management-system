@@ -36,11 +36,16 @@
 /* Input container styling */
 .inputContainer {
   margin-bottom: 1rem;
+  position: relative;
+  min-height: 4rem; /* Fixed height to prevent jumping */
 }
 
 .passwordContainer {
   margin-bottom: 1rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 4rem; /* Fixed height to prevent jumping */
 }
 
 .inputField {
@@ -56,6 +61,12 @@
   color: var(--color-text-primary);
 }
 
+.passwordContainer .inputField {
+  padding-right: 3rem; /* Make space for the password toggle button */
+  margin: 0; /* Remove margin for better positioning */
+  height: 3.25rem; /* Fixed height for consistency */
+}
+
 .inputField:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
@@ -66,13 +77,18 @@
 .passwordToggle {
   position: absolute;
   right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0.8125rem; /* Adjusted for fixed input height */
   background: none;
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: color 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .passwordToggle:hover {
@@ -257,6 +273,30 @@
   background-color: #dcfce7;
   border: 1px solid #22c55e;
   color: #166534;
+}
+
+/* Error message styling for individual fields */
+.errorMessage {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.dark .errorMessage {
+  color: #f87171;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Enhanced keyframe animation for pulse */

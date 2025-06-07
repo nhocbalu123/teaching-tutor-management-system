@@ -23,41 +23,43 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
     >
-      {/* Search Bar */}
-      <SearchInput
-        value={searchQuery}
-        onChange={onSearchChange}
-        placeholder="Search courses, skills, or roles..."
-        showLabel={false}
-        variant="rounded"
-      />
+      <div className="container">
+        {/* Search Bar */}
+        <SearchInput
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder="Search courses, skills, or roles..."
+          showLabel={false}
+          variant="rounded"
+        />
 
-      {/* Filter Pills */}
-      <div className={styles.filterPills}>
-        <button
-          className={`${styles.filterPill} ${
-            activeFilter === "all" ? styles.filterPillActive : ""
-          }`}
-          onClick={() => onFilterChange("all")}
-        >
-          All Courses
-        </button>
-        <button
-          className={`${styles.filterPill} ${
-            activeFilter === "available" ? styles.filterPillActive : ""
-          }`}
-          onClick={() => onFilterChange("available")}
-        >
-          Available
-        </button>
-        <button
-          className={`${styles.filterPill} ${
-            activeFilter === "applied" ? styles.filterPillActive : ""
-          }`}
-          onClick={() => onFilterChange("applied")}
-        >
-          Applied
-        </button>
+        {/* Filter Pills */}
+        <div className={styles.filterPills}>
+          <button
+            className={`${styles.filterPill} ${
+              activeFilter === "all" ? styles.filterPillActive : ""
+            }`}
+            onClick={() => onFilterChange("all")}
+          >
+            All Courses
+          </button>
+          <button
+            className={`${styles.filterPill} ${
+              activeFilter === "available" ? styles.filterPillActive : ""
+            }`}
+            onClick={() => onFilterChange("available")}
+          >
+            Available
+          </button>
+          <button
+            className={`${styles.filterPill} ${
+              activeFilter === "applied" ? styles.filterPillActive : ""
+            }`}
+            onClick={() => onFilterChange("applied")}
+          >
+            Applied
+          </button>
+        </div>
       </div>
     </motion.div>
   );

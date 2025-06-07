@@ -11,6 +11,9 @@
   margin: 1px;
   display: inline-block;
   cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .dark .skillTag {

@@ -1,0 +1,36 @@
+{
+    "name": "fullstack-project",
+    "version": "1.0.0",
+    "description": "Fullstack project with frontend and backend",
+    "scripts": {
+        "install": "npm run install:frontend && npm run install:backend",
+        "install:frontend": "cd frontend && npm install",
+        "install:backend": "cd backend && npm install",
+        "dev": "echo \"Choose your OS: npm run dev:windows (Windows) or npm run dev:unix (Mac/Linux) or open 2 terminals and run: npm run dev:frontend & npm run dev:backend\"",
+        "dev:windows": "start \"Frontend\" cmd /c \"npm run dev:frontend\" && start \"Backend\" cmd /c \"npm run dev:backend\"",
+        "dev:unix": "npm run dev:frontend & npm run dev:backend",
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev:backend": "cd backend && npm run dev",
+        "build": "npm run build:frontend && npm run build:backend",
+        "build:frontend": "cd frontend && npm run build",
+        "build:backend": "cd backend && npm run build",
+        "start": "echo \"Choose your OS: npm run start:windows (Windows) or npm run start:unix (Mac/Linux) or open 2 terminals and run: npm run start:frontend & npm run start:backend\"",
+        "start:windows": "start \"Frontend\" cmd /c \"npm run start:frontend\" && start \"Backend\" cmd /c \"npm run start:backend\"",
+        "start:unix": "npm run start:frontend & npm run start:backend",
+        "start:frontend": "cd frontend && npm start",
+        "start:backend": "cd backend && npm start",
+        "test": "npm run test:frontend && npm run test:backend",
+        "test:frontend": "cd frontend && npm test",
+        "test:backend": "cd backend && npm test",
+        "clean": "npm run clean:frontend && npm run clean:backend",
+        "clean:frontend": "cd frontend && rm -rf node_modules",
+        "clean:backend": "cd backend && rm -rf node_modules"
+    },
+    "keywords": [
+        "fullstack",
+        "frontend",
+        "backend"
+    ],
+    "author": "",
+    "license": "ISC"
+}

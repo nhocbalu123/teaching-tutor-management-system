@@ -11,7 +11,6 @@ import { CourseAssignment } from "./CourseAssignment";
 import { Application } from "./Application";
 
 @Entity("courses")
-@Index(["courseCode"], { unique: true })
 export class Course {
     @PrimaryGeneratedColumn()
     id: number;

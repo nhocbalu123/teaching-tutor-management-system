@@ -1,28 +1,45 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthService } from "../../../../shared/services/authService";
 import {
-  validateEmail,
-  validateMinPasswordLength,
+  containsEmojis,
 } from "../../utils/authValidation.utils";
-import { SigninData } from "../../../../shared/types/user";
+import { SigninData, User } from "../../../../shared/types/user";
 import { useAuth } from "../../hooks/useAuth";
+import { LoginSuccessModal } from "../../../../shared/components/common/modal/LoginSuccessModal";
 import styles from "./signin-form.module.css";
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [formData, setFormData] = useState<SigninData>({
     email: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<SigninData>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  
+  // New state for login success modal
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+
+  // Check for success message from signup redirect
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message) {
+      setSuccessMessage(message);
+      // Clear URL parameters after showing message
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchParams]);
 
   const handleInputChange = (field: keyof SigninData, value: string) => {
     setFormData((prev) => ({
@@ -44,24 +61,33 @@ export default function SignInForm() {
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Partial<SigninData> = {};
+
+    // Validate email
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate password
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (containsEmojis(formData.password)) {
+      newErrors.password = "Password cannot contain emojis";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setApiError("");
 
-    // Frontend validation
-    const newErrors: Record<string, string> = {};
-
-    if (!validateEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!validateMinPasswordLength(formData.password)) {
-      newErrors.password = "Password must be at least 8 characters long";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
@@ -79,18 +105,22 @@ export default function SignInForm() {
           "✅ Signin successful, logging in user:",
           response.data.user.email
         );
-        // Use auth context to login
-        login(response.data.user, response.data.token);
-        console.log("🏠 Redirecting to home page...");
-
-        // Redirect to home page where welcome banner will be displayed
-        router.push("/");
+        
+        // Use auth context to login - ensure token exists
+        const token = response.data.token || "";
+        login(response.data.user, token);
+        
+        // Store user data and show success modal
+        setLoggedInUser(response.data.user);
+        setShowLoginSuccess(true);
+        
+        console.log("🎉 Showing login success modal...");
       } else {
         console.log("❌ Signin failed:", response.message);
         // Handle validation errors from backend
         if (response.errors) {
           setErrors(response.errors);
-        } else {
+        } else if (response.message) {
           setApiError(response.message);
         }
       }
@@ -102,104 +132,128 @@ export default function SignInForm() {
     }
   };
 
+  const handleLoginSuccessModalHide = () => {
+    setShowLoginSuccess(false);
+    console.log("🏠 Redirecting to home page...");
+    router.push("/");
+  };
+
   return (
-    <div className={styles.formContainer}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <h2 className={styles.title}>Welcome Back</h2>
+    <>
+      <div className={styles.formContainer}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <h2 className={styles.title}>Welcome Back</h2>
 
-        {apiError && (
-          <div className={`${styles.alert} ${styles.alertError}`}>
-            {apiError}
-          </div>
-        )}
-
-        <div className={styles.inputContainer}>
-          <input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            className={`${styles.inputField} ${errors.email ? styles.inputError : ""}`}
-            placeholder="Email Address"
-            required
-          />
-          {errors.email && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
-              {errors.email}
+          {successMessage && (
+            <div className={`${styles.alert} ${styles.alertSuccess}`}>
+              {successMessage}
             </div>
           )}
-        </div>
 
-        <div className={styles.passwordContainer}>
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            value={formData.password}
-            onChange={(e) => handleInputChange("password", e.target.value)}
-            className={`${styles.inputField} ${errors.password ? styles.inputError : ""}`}
-            placeholder="Password"
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className={styles.passwordToggle}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={styles.icon}
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                <path
-                  fillRule="evenodd"
-                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={styles.icon}
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
-                  clipRule="evenodd"
-                />
-                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-              </svg>
+          {apiError && (
+            <div className={`${styles.alert} ${styles.alertError}`}>
+              {apiError}
+            </div>
+          )}
+
+          <div className={styles.inputContainer}>
+            <input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              className={`${styles.inputField} ${errors.email ? styles.inputError : ""}`}
+              placeholder="Email Address"
+              required
+            />
+            {errors.email && (
+              <div className={styles.errorMessage}>
+                {errors.email}
+              </div>
             )}
+          </div>
+
+          <div className={styles.passwordContainer}>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) => handleInputChange("password", e.target.value)}
+              className={`${styles.inputField} ${errors.password ? styles.inputError : ""}`}
+              placeholder="Password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={styles.passwordToggle}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.icon}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.icon}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
+                    clipRule="evenodd"
+                  />
+                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
+              )}
+            </button>
+            {errors.password && (
+              <div className={styles.errorMessage}>
+                {errors.password}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className={`${styles.submitButton} ${isLoading ? styles.loading : ""}`}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
-          {errors.password && (
-            <div className={`${styles.alert} ${styles.alertError}`}>
-              {errors.password}
-            </div>
-          )}
-        </div>
 
-        <button
-          type="submit"
-          className={`${styles.submitButton} ${isLoading ? styles.loading : ""}`}
-          disabled={isLoading}
-        >
-          {isLoading ? "Signing In..." : "Sign In"}
-        </button>
-
-        <div className={styles.linkSection}>
-          <p className={styles.linkText}>
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className={styles.link}>
-              Create one here
-            </Link>
-          </p>
-        </div>
-      </form>
-    </div>
+          <div className={styles.linkSection}>
+            <p className={styles.linkText}>
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className={styles.link}>
+                Create one here
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+      
+      {/* Login Success Modal */}
+      {showLoginSuccess && loggedInUser && (
+        <LoginSuccessModal
+          user={loggedInUser}
+          isVisible={showLoginSuccess}
+          onHide={handleLoginSuccessModalHide}
+          duration={3000}
+        />
+      )}
+    </>
   );
 }

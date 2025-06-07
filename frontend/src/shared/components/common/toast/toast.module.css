@@ -1,15 +1,64 @@
-/* Toast Notification Styles */
+/* Toast Notification Styles - CHỈ BO NỘI DUNG, KHÔNG CLIP ICON */
 .toastNotification {
+  position: relative;
   display: flex;
-  align-items: center;
-  min-width: 320px;
-  max-width: 600px;
-  width: auto;
-  padding: 1rem;
+  align-items: flex-start;
+  gap: 0.375rem; /* 75% of 0.5rem */
+  border-radius: 0.75rem; /* bo 4 góc rõ ràng */
+  color: rgb(0, 0, 0);
+  min-width: 300px; /* 75% of 400px */
+  max-width: 375px; /* 75% of 500px */
+  overflow: visible; /* để icon floating hiển thị */
+}
+
+/* Thêm pseudo-element để tạo background bo góc */
+.toastNotification::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  background-color: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
+  z-index: -1;
+}
+
+/* Background colors - Light mode sáng hơn */
+.toastSuccess::before {
+  background-color: rgb(240, 253, 244);
+}
+
+.toastError::before {
+  background-color: rgb(254, 242, 242);
+}
+
+.toastInfo::before {
+  background-color: rgb(239, 246, 255);
+}
+
+.toastWarning::before {
+  background-color: rgb(255, 251, 235);
+}
+
+/* Dark Mode backgrounds - EXTREMELY DARK tones for true dark theme integration */
+.toastNotification.darkMode.toastSuccess::before,
+:global(.dark) .toastNotification.toastSuccess::before {
+  background-color: rgb(8, 32, 18); /* EXTREMELY dark green, true dark mode */
+}
+
+.toastNotification.darkMode.toastError::before,
+:global(.dark) .toastNotification.toastError::before {
+  background-color: rgb(32, 10, 10); /* EXTREMELY dark red, true dark mode */
+}
+
+.toastNotification.darkMode.toastInfo::before,
+:global(.dark) .toastNotification.toastInfo::before {
+  background-color: rgb(10, 20, 50); /* EXTREMELY dark blue, true dark mode */
+}
+
+.toastNotification.darkMode.toastWarning::before,
+:global(.dark) .toastNotification.toastWarning::before {
+  background-color: rgb(40, 20, 6); /* EXTREMELY dark amber, true dark mode */
 }
 
 /* Variants */
@@ -48,179 +97,486 @@
   transform: translateX(-50%);
 }
 
-/* Type Variants */
+/* Type Variants - Light mode sáng hơn */
 .toastSuccess {
-  background-color: var(--color-success-light, #ecfdf5);
-  border-color: var(--color-success, #10b981);
+  background-color: rgb(240, 253, 244);
 }
 
 .toastError {
-  background-color: var(--color-error-light, #fef2f2);
-  border-color: var(--color-error, #ef4444);
+  background-color: rgb(254, 242, 242);
 }
 
 .toastInfo {
-  background-color: var(--color-info-light, #eff6ff);
-  border-color: var(--color-info, #3b82f6);
+  background-color: rgb(239, 246, 255);
 }
 
 .toastWarning {
-  background-color: var(--color-warning-light, #fefce8);
-  border-color: var(--color-warning, #f59e0b);
+  background-color: rgb(255, 251, 235);
 }
 
-/* Icon Styles */
-.toastIcon {
+/* Dark Mode - EXTREMELY DARK tones for true dark theme integration */
+.toastNotification.darkMode.toastSuccess,
+:global(.dark) .toastNotification.toastSuccess {
+  background-color: rgb(8, 32, 18); /* EXTREMELY dark green, true dark mode */
+  color: rgb(220, 252, 231); /* bright light green text for excellent contrast */
+}
+
+.toastNotification.darkMode.toastError,
+:global(.dark) .toastNotification.toastError {
+  background-color: rgb(32, 10, 10); /* EXTREMELY dark red, true dark mode */
+  color: rgb(254, 226, 226); /* bright light red text for excellent contrast */
+}
+
+.toastNotification.darkMode.toastInfo,
+:global(.dark) .toastNotification.toastInfo {
+  background-color: rgb(10, 20, 50); /* EXTREMELY dark blue, true dark mode */
+  color: rgb(219, 234, 254); /* bright light blue text for excellent contrast */
+}
+
+.toastNotification.darkMode.toastWarning,
+:global(.dark) .toastNotification.toastWarning {
+  background-color: rgb(40, 20, 6); /* EXTREMELY dark amber, true dark mode */
+  color: rgb(254, 243, 199); /* bright light amber text for excellent contrast */
+}
+
+/* Floating Icon - giảm thêm 10% nữa */
+.toastFloatingIcon {
+  position: absolute;
+  top: -15px; /* 90% of -17px */
+  left: 10px; /* 90% of 11px */
+  border-radius: 50%;
+  padding: 4px; /* 90% of 5px */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 1rem;
+  z-index: 10;
+  width: 31px; /* 90% of 34px */
+  height: 31px;
+}
+
+.toastFloatingIcon svg {
+  width: 17px; 
+  height: 17px;
+  stroke-width: 3.5;
+}
+
+/* Icon backgrounds - 75% BORDER VÀ SHADOW */
+.toastSuccess .toastFloatingIcon {
+  background-color: rgb(34, 197, 94);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(255, 255, 255); /* 75% of 4px */
+  box-shadow: 0 3px 9px rgba(34, 197, 94, 0.2); /* 75% of 4px 12px */
+}
+
+.toastError .toastFloatingIcon {
+  background-color: rgb(239, 68, 68);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(255, 255, 255);
+  box-shadow: 0 3px 9px rgba(239, 68, 68, 0.2);
+}
+
+.toastInfo .toastFloatingIcon {
+  background-color: rgb(59, 130, 246);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(255, 255, 255);
+  box-shadow: 0 3px 9px rgba(59, 130, 246, 0.2);
+}
+
+.toastWarning .toastFloatingIcon {
+  background-color: rgb(245, 158, 11);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(255, 255, 255);
+  box-shadow: 0 3px 9px rgba(245, 158, 11, 0.2);
+}
+
+/* Dark Mode Icons - borders to match EXTREMELY DARK backgrounds */
+.toastNotification.darkMode.toastSuccess .toastFloatingIcon,
+:global(.dark) .toastNotification.toastSuccess .toastFloatingIcon {
+  background-color: rgb(34, 197, 94);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(8, 32, 18); /* match EXTREMELY dark background */
+  box-shadow: 0 3px 9px rgba(34, 197, 94, 0.7), 0 0 0 1px rgba(34, 197, 94, 0.5);
+}
+
+.toastNotification.darkMode.toastError .toastFloatingIcon,
+:global(.dark) .toastNotification.toastError .toastFloatingIcon {
+  background-color: rgb(239, 68, 68);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(32, 10, 10); /* match EXTREMELY dark background */
+  box-shadow: 0 3px 9px rgba(239, 68, 68, 0.7), 0 0 0 1px rgba(239, 68, 68, 0.5);
+}
+
+.toastNotification.darkMode.toastInfo .toastFloatingIcon,
+:global(.dark) .toastNotification.toastInfo .toastFloatingIcon {
+  background-color: rgb(59, 130, 246);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(10, 20, 50); /* match EXTREMELY dark background */
+  box-shadow: 0 3px 9px rgba(59, 130, 246, 0.7), 0 0 0 1px rgba(59, 130, 246, 0.5);
+}
+
+.toastNotification.darkMode.toastWarning .toastFloatingIcon,
+:global(.dark) .toastNotification.toastWarning .toastFloatingIcon {
+  background-color: rgb(245, 158, 11);
+  color: rgb(255, 255, 255);
+  border: 3px solid rgb(40, 20, 6); /* match EXTREMELY dark background */
+  box-shadow: 0 3px 9px rgba(245, 158, 11, 0.7), 0 0 0 1px rgba(245, 158, 11, 0.5);
+}
+
+/* Inner Content - ĐẢM BẢO BO CẢ 4 GÓC */
+.toastInner {
+  display: flex;
+  height: 75px; /* 75% of 100px */
+  max-width: 375px; /* 75% of 500px */
+  align-items: center;
+  overflow: hidden; /* quan trọng - clip nội dung để bo góc */
+  border-radius: 0.75rem; /* bo 4 góc rõ ràng */
+  width: 100%; /* đảm bảo full width */
+}
+
+/* Decorative area - điều chỉnh cho kích thước nhỏ */
+.toastDecorative {
+  position: relative;
+  height: 100%; /* h-full */
+  min-width: 60px; /* nhỏ hơn từ 80px */
+  max-width: 100px; /* nhỏ hơn từ 144px */
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.toastIcon svg {
-  width: 24px;
-  height: 24px;
+.toastDecorative .circle1,
+.toastDecorative .circle2,
+.toastDecorative .circle3 {
+  position: absolute;
+  border-radius: 50%;
 }
 
-.toastSuccess .toastIcon {
-  background-color: var(--color-success-xlight, #d1fae5);
-  color: var(--color-success-dark, #10b981);
+/* Circles - 75% KÍCH THƯỚC */
+.toastSuccess .toastDecorative .circle1 {
+  width: 64px; /* 75% of 85px */
+  height: 64px;
+  background-color: rgba(187, 247, 208, 0.8);
+  bottom: -15px; /* 75% of -20px */
+  left: -26px; /* 75% of -35px */
 }
 
-.toastError .toastIcon {
-  background-color: var(--color-error-xlight, #fee2e2);
-  color: var(--color-error-dark, #ef4444);
+.toastSuccess .toastDecorative .circle2 {
+  width: 41px; /* 75% of 55px */
+  height: 41px;
+  background-color: rgba(134, 239, 172, 0.5);
+  bottom: -11px; /* 75% of -15px */
+  left: 6px; /* 75% of 8px */
 }
 
-.toastInfo .toastIcon {
-  background-color: var(--color-info-xlight, #dbeafe);
-  color: var(--color-info-dark, #3b82f6);
+.toastSuccess .toastDecorative .circle3 {
+  width: 14px; /* 75% of 18px */
+  height: 14px;
+  background-color: rgba(134, 239, 172, 0.7);
+  bottom: 38px; /* 75% of 50px */
+  left: 29px; /* 75% of 38px */
 }
 
-.toastWarning .toastIcon {
-  background-color: var(--color-warning-xlight, #fef3c7);
-  color: var(--color-warning-dark, #f59e0b);
+/* Other circles - 75% kích thước */
+.toastError .toastDecorative .circle1 {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(254, 202, 202, 0.8);
+  bottom: -15px;
+  left: -26px;
 }
 
-/* Content and Close Button */
-.toastContent {
+.toastError .toastDecorative .circle2 {
+  width: 41px;
+  height: 41px;
+  background-color: rgba(252, 165, 165, 0.5);
+  bottom: -11px;
+  left: 6px;
+}
+
+.toastError .toastDecorative .circle3 {
+  width: 14px;
+  height: 14px;
+  background-color: rgba(252, 165, 165, 0.7);
+  bottom: 38px;
+  left: 29px;
+}
+
+.toastInfo .toastDecorative .circle1 {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(191, 219, 254, 0.8);
+  bottom: -15px;
+  left: -26px;
+}
+
+.toastInfo .toastDecorative .circle2 {
+  width: 41px;
+  height: 41px;
+  background-color: rgba(147, 197, 253, 0.5);
+  bottom: -11px;
+  left: 6px;
+}
+
+.toastInfo .toastDecorative .circle3 {
+  width: 14px;
+  height: 14px;
+  background-color: rgba(147, 197, 253, 0.7);
+  bottom: 38px;
+  left: 29px;
+}
+
+.toastWarning .toastDecorative .circle1 {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(254, 215, 170, 0.8);
+  bottom: -15px;
+  left: -26px;
+}
+
+.toastWarning .toastDecorative .circle2 {
+  width: 41px;
+  height: 41px;
+  background-color: rgba(253, 186, 116, 0.5);
+  bottom: -11px;
+  left: 6px;
+}
+
+.toastWarning .toastDecorative .circle3 {
+  width: 14px;
+  height: 14px;
+  background-color: rgba(253, 186, 116, 0.7);
+  bottom: 38px;
+  left: 29px;
+}
+
+/* Dark Mode Circles - màu sáng hơn để hiển thị rõ trên dark background */
+.toastNotification.darkMode.toastSuccess .toastDecorative .circle1,
+:global(.dark) .toastNotification.toastSuccess .toastDecorative .circle1 {
+  background-color: rgba(34, 197, 94, 0.4);
+}
+
+.toastNotification.darkMode.toastSuccess .toastDecorative .circle2,
+:global(.dark) .toastNotification.toastSuccess .toastDecorative .circle2 {
+  background-color: rgba(34, 197, 94, 0.3);
+}
+
+.toastNotification.darkMode.toastSuccess .toastDecorative .circle3,
+:global(.dark) .toastNotification.toastSuccess .toastDecorative .circle3 {
+  background-color: rgba(34, 197, 94, 0.5);
+}
+
+.toastNotification.darkMode.toastError .toastDecorative .circle1,
+:global(.dark) .toastNotification.toastError .toastDecorative .circle1 {
+  background-color: rgba(239, 68, 68, 0.4);
+}
+
+.toastNotification.darkMode.toastError .toastDecorative .circle2,
+:global(.dark) .toastNotification.toastError .toastDecorative .circle2 {
+  background-color: rgba(239, 68, 68, 0.3);
+}
+
+.toastNotification.darkMode.toastError .toastDecorative .circle3,
+:global(.dark) .toastNotification.toastError .toastDecorative .circle3 {
+  background-color: rgba(239, 68, 68, 0.5);
+}
+
+.toastNotification.darkMode.toastInfo .toastDecorative .circle1,
+:global(.dark) .toastNotification.toastInfo .toastDecorative .circle1 {
+  background-color: rgba(59, 130, 246, 0.4);
+}
+
+.toastNotification.darkMode.toastInfo .toastDecorative .circle2,
+:global(.dark) .toastNotification.toastInfo .toastDecorative .circle2 {
+  background-color: rgba(59, 130, 246, 0.3);
+}
+
+.toastNotification.darkMode.toastInfo .toastDecorative .circle3,
+:global(.dark) .toastNotification.toastInfo .toastDecorative .circle3 {
+  background-color: rgba(59, 130, 246, 0.5);
+}
+
+.toastNotification.darkMode.toastWarning .toastDecorative .circle1,
+:global(.dark) .toastNotification.toastWarning .toastDecorative .circle1 {
+  background-color: rgba(245, 158, 11, 0.4);
+}
+
+.toastNotification.darkMode.toastWarning .toastDecorative .circle2,
+:global(.dark) .toastNotification.toastWarning .toastDecorative .circle2 {
+  background-color: rgba(245, 158, 11, 0.3);
+}
+
+.toastNotification.darkMode.toastWarning .toastDecorative .circle3,
+:global(.dark) .toastNotification.toastWarning .toastDecorative .circle3 {
+  background-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Content Area */
+.toastContentArea {
   flex: 1;
-  color: var(--color-text-primary);
-  margin-right: 1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 0 1rem;
 }
 
+/* Header - padding cho close button */
+.toastHeader {
+  margin-bottom: 4px; /* mb-1 */
+  display: flex;
+  align-items: flex-start; /* items-start */
+  gap: 0.5rem; /* gap-2 */
+  padding-right: 1.5rem; /* space cho close button */
+}
+
+/* Typography - 75% FONT SIZE */
+.toastTitle {
+  font-size: 1.03rem; /* 75% of 1.375rem */
+  line-height: 1.31rem; /* 75% of 1.75rem */
+  font-weight: 600;
+  margin: 0;
+  color: rgb(0, 0, 0);
+  letter-spacing: -0.025em;
+}
+
+.toastMessage {
+  margin: 0;
+  font-size: 0.675rem; /* 75% of 0.9rem */
+  line-height: 1.05rem; /* 75% of 1.4rem */
+  color: rgba(0, 0, 0, 0.85);
+  margin-top: 2px; /* 75% of 2px, rounded up */
+}
+
+/* Dark Mode Text - enhanced brightness and contrast for darker backgrounds */
+.toastNotification.darkMode .toastTitle,
+:global(.dark) .toastNotification .toastTitle {
+  color: rgb(255, 255, 255);
+  font-weight: 700; /* bold for better visibility on dark backgrounds */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* subtle shadow for better readability */
+}
+
+.toastNotification.darkMode .toastMessage,
+:global(.dark) .toastNotification .toastMessage {
+  color: rgba(255, 255, 255, 0.95); /* brighter for better contrast on darker backgrounds */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* subtle shadow for enhanced readability */
+}
+
+/* Close button - 75% KÍCH THƯỚC */
 .toastClose {
+  position: absolute;
+  top: 6px; /* 75% of 8px */
+  right: 6px; /* 75% of 8px */
   background: none;
   border: none;
-  color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
+  padding: 0.28rem; /* 75% of 0.375rem */
+  border-radius: 0.19rem; /* 75% of 0.25rem */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 1rem;
-  transition: all 0.3s ease;
-  width: 32px;
-  height: 32px;
+  transition: all 0.2s ease;
   flex-shrink: 0;
-}
-
-.toastClose svg {
-  width: 16px;
-  height: 16px;
+  z-index: 10;
 }
 
 .toastClose:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: scale(1.05);
 }
 
-/* Dark Mode Adjustments */
-:global(.dark) .toastNotification {
-  background-color: var(--color-bg-secondary);
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.4),
-    0 4px 10px rgba(0, 0, 0, 0.3);
-  border-color: var(--color-border);
-  border-width: 2px;
+.toastClose svg {
+  width: 15px; /* 75% of 20px */
+  height: 15px;
+  stroke-width: 2.5;
 }
 
-:global(.dark) .toastSuccess {
-  background-color: #065f46;
-  border-color: #10b981;
-  border-width: 2px;
-}
-:global(.dark) .toastSuccess .toastIcon {
-  background-color: #047857;
-  color: #34d399;
+/* Close button colors - light mode */
+.toastSuccess .toastClose {
+  color: rgb(34, 197, 94); /* text-green-500 */
 }
 
-:global(.dark) .toastError {
-  background-color: #7f1d1d;
-  border-color: #ef4444;
-  border-width: 2px;
-}
-:global(.dark) .toastError .toastIcon {
-  background-color: #991b1b;
-  color: #f87171;
+.toastError .toastClose {
+  color: rgb(239, 68, 68); /* text-red-500 */
 }
 
-:global(.dark) .toastInfo {
-  background-color: #1e40af;
-  border-color: #3b82f6;
-  border-width: 2px;
-}
-:global(.dark) .toastInfo .toastIcon {
-  background-color: #1d4ed8;
-  color: #60a5fa;
+.toastInfo .toastClose {
+  color: rgb(59, 130, 246); /* text-blue-500 */
 }
 
-:global(.dark) .toastWarning {
-  background-color: #92400e;
-  border-color: #f59e0b;
-  border-width: 2px;
-}
-:global(.dark) .toastWarning .toastIcon {
-  background-color: #b45309;
-  color: #fbbf24;
+.toastWarning .toastClose {
+  color: rgb(245, 158, 11); /* text-orange-500 */
 }
 
-:global(.dark) .toastContent {
-  color: var(--color-text-primary);
-  font-weight: 500;
+/* Dark Mode Close Button - tương thích màu với icon */
+.toastNotification.darkMode.toastSuccess .toastClose {
+  color: rgb(34, 197, 94);
 }
 
-:global(.dark) .toastClose {
-  color: var(--color-text-secondary);
-  border: 1px solid transparent;
+.toastNotification.darkMode.toastError .toastClose {
+  color: rgb(239, 68, 68);
 }
 
-:global(.dark) .toastClose:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
-  border-color: var(--color-border);
+.toastNotification.darkMode.toastInfo .toastClose {
+  color: rgb(59, 130, 246);
 }
 
-/* Responsive adjustments */
+.toastNotification.darkMode.toastWarning .toastClose {
+  color: rgb(245, 158, 11);
+}
+
+.toastNotification.darkMode .toastClose:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments - 75% KÍCH THƯỚC */
 @media (max-width: 640px) {
+  .toastNotification {
+    min-width: 225px; /* 75% of 300px */
+    max-width: calc(100vw - 32px);
+  }
+  
   .toastNotification.toast {
     left: 16px;
     right: 16px;
-    min-width: auto;
-    max-width: calc(100% - 32px);
     width: calc(100% - 32px);
   }
 
   .toastNotification.bottom-center,
   .toastNotification.top-center {
-    transform: none;
-    left: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+     .toastFloatingIcon {
+     width: 28px; /* 90% of 31px */
+     height: 28px;
+     top: -14px; /* 90% of -15px */
+     padding: 4px; /* giữ nguyên cho mobile */
+   }
+   
+   .toastFloatingIcon svg {
+     width: 15px; /* 90% of 17px */
+     height: 15px;
+   }
+  
+  .toastInner {
+    height: 56px; /* 75% of 75px */
+    max-width: none;
+  }
+  
+  .toastClose {
+    top: 4px; /* 75% of 6px */
+    right: 4px;
+    padding: 0.21rem; /* 75% of 0.28rem */
+  }
+  
+  .toastClose svg {
+    width: 11px; /* 75% of 15px */
+    height: 11px;
+  }
+  
+  .toastTitle {
+    font-size: 0.77rem; /* 75% of 1.03rem */
+    line-height: 0.98rem;
+  }
+  
+  .toastMessage {
+    font-size: 0.51rem; /* 75% of 0.675rem */
+    line-height: 0.79rem;
   }
 }
