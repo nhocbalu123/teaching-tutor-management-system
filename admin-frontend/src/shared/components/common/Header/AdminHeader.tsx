@@ -14,6 +14,7 @@ import {
     SunIcon,
     MoonIcon,
     ChevronDownIcon,
+    DocumentChartBarIcon,
 } from "@heroicons/react/24/outline";
 import DarkModeToggle from "../DarkModeToggle";
 import styles from "./AdminHeader.module.css";
@@ -70,6 +71,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ user, onLogout }) => {
         { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
         { name: "Users", href: "/dashboard/users", icon: UsersIcon },
         { name: "Courses", href: "/dashboard/courses", icon: AcademicCapIcon },
+        {
+            name: "Reports",
+            href: "/dashboard/reports",
+            icon: DocumentChartBarIcon,
+        },
         { name: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
     ];
 

@@ -10,6 +10,7 @@ import { initializeDatabase } from "./config/database";
 import { AuthResolver } from "./resolvers/AuthResolver";
 import { UserResolver } from "./resolvers/UserResolver";
 import { CourseResolver } from "./resolvers/CourseResolver";
+import { ReportResolver } from "./resolvers/ReportResolver";
 import "./types/session";
 
 config();
@@ -37,7 +38,12 @@ async function startServer() {
 
         // Build GraphQL schema
         const schema = await buildSchema({
-            resolvers: [AuthResolver, UserResolver, CourseResolver],
+            resolvers: [
+                AuthResolver,
+                UserResolver,
+                CourseResolver,
+                ReportResolver,
+            ],
             validate: false,
         });
 

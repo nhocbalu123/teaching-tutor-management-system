@@ -297,6 +297,123 @@ export const DELETE_COURSE = gql`
     }
 `;
 
+// Report Queries
+export const GET_CANDIDATES_CHOSEN_PER_COURSE = gql`
+    query GetCandidatesChosenPerCourse {
+        getCandidatesChosenPerCourse {
+            course {
+                id
+                courseCode
+                courseName
+                semester
+            }
+            selectedCandidates {
+                candidate {
+                    id
+                    firstName
+                    lastName
+                    email
+                    fullName
+                }
+                course {
+                    id
+                    courseCode
+                    courseName
+                }
+                selectedAt
+                selectedBy {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                application {
+                    id
+                    status
+                    role {
+                        id
+                        roleName
+                    }
+                }
+            }
+            totalSelected
+        }
+    }
+`;
+
+export const GET_CANDIDATES_WITH_MULTIPLE_SELECTIONS = gql`
+    query GetCandidatesWithMultipleSelections {
+        getCandidatesWithMultipleSelections {
+            candidate {
+                id
+                firstName
+                lastName
+                email
+                fullName
+            }
+            selections {
+                candidate {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                course {
+                    id
+                    courseCode
+                    courseName
+                    semester
+                }
+                selectedAt
+                selectedBy {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                application {
+                    id
+                    role {
+                        id
+                        roleName
+                    }
+                }
+            }
+            totalSelections
+        }
+    }
+`;
+
+export const GET_UNSELECTED_CANDIDATES = gql`
+    query GetUnselectedCandidates {
+        getUnselectedCandidates {
+            candidate {
+                id
+                firstName
+                lastName
+                email
+                fullName
+            }
+            applications {
+                id
+                status
+                appliedAt
+                course {
+                    id
+                    courseCode
+                    courseName
+                    semester
+                }
+                role {
+                    id
+                    roleName
+                }
+            }
+            totalApplications
+        }
+    }
+`;
+
 export const ASSIGN_LECTURER_TO_COURSE = gql`
     mutation AssignLecturerToCourse($lecturerId: Int!, $courseId: Int!) {
         assignLecturerToCourse(lecturerId: $lecturerId, courseId: $courseId) {
