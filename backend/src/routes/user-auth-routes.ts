@@ -67,16 +67,16 @@ const validateSignupFields = (req: any, res: any, next: any) => {
     // Name validation
     if (!firstName) {
         errors.firstName = "First name is required";
-    } else if (firstName.length < 2) {
-        errors.firstName = "First name must be at least 2 characters long";
+    } else if (firstName.length < 1) {
+        errors.firstName = "First name must be at least 1 character long";
     } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
         errors.firstName = "First name can only contain letters and spaces";
     }
 
     if (!lastName) {
         errors.lastName = "Last name is required";
-    } else if (lastName.length < 2) {
-        errors.lastName = "Last name must be at least 2 characters long";
+    } else if (lastName.length < 1) {
+        errors.lastName = "Last name must be at least 1 character long";
     } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
         errors.lastName = "Last name can only contain letters and spaces";
     }
