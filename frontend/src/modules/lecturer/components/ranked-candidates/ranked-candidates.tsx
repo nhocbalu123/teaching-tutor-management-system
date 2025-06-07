@@ -22,9 +22,10 @@ const RankedCandidates: React.FC<RankedCandidatesProps> = ({
   onMoveDown,
   onRemove,
   title = "Ranked Candidates",
-  showCourseFilter = false,
-  onCourseChange,
-  availableCourses = [],
+  // Removed unused props
+  // showCourseFilter = false,
+  // onCourseChange,
+  // availableCourses = [],
 }) => {
   // Function to format rank display with proper sequential numbering
   const formatRankDisplay = (index: number) => {
@@ -51,29 +52,7 @@ const RankedCandidates: React.FC<RankedCandidatesProps> = ({
     <div className={styles.rankingsContainer}>
       <h2 className={styles.rankingsTitle}>{title}</h2>
 
-      {showCourseFilter && (
-        <div className={styles.courseFilter}>
-          <label htmlFor="rankingCourseFilter">Filter by Course:</label>
-          <select
-            id="rankingCourseFilter"
-            value={
-              selectedCourse ||
-              (availableCourses.length > 0 ? availableCourses[0].code : "")
-            }
-            onChange={(e) => onCourseChange?.(e.target.value)}
-            className={styles.filterSelect}
-          >
-            {availableCourses.length === 0 && (
-              <option value="">No courses available</option>
-            )}
-            {availableCourses.map((course) => (
-              <option key={course.code} value={course.code}>
-                {course.code} - {course.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+
 
       {/* Course Selection Info */}
       {selectedCourse && (

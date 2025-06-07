@@ -294,8 +294,9 @@
 }
 
 .dark .rankingStats {
-  background-color: #4b5563;
-  border-color: #6b7280;
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
 }
 
 .dark .rankedItem {

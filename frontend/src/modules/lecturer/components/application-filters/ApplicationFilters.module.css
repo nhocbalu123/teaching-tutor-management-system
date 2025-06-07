@@ -32,31 +32,55 @@
 
 .filterGroup label {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.filterSelect {
-  padding: 0.5rem;
+.filterGroup label::before {
+  content: '▶';
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.filterGroup:hover label::before {
+  transform: rotate(90deg);
+}
+
+.filterTools .filterSelect {
+  padding: 0.875rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-width: 140px;
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="m2 0-2 2h4zm0 5 2-2h-4z"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 0.65em auto;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 400;
+  cursor: pointer;
+  min-width: 180px;
+  appearance: none;
   padding-right: 2.5rem;
+  transition: all 0.2s ease;
+  min-height: 2.75rem;
 }
 
-.filterSelect:focus {
+.filterTools .filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+.filterTools .filterSelect:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(249, 115, 22, 0.1));
 }
 
 .filterSelect::-ms-expand {
@@ -84,8 +108,12 @@
   color: var(--color-text-tertiary);
 }
 
-.dark .filterSelect {
-  background-color: var(--color-bg-secondary);
+.dark .filterTools .filterSelect {
+  background: var(--color-bg-primary);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .dark .filterInput {
@@ -98,10 +126,11 @@
   background: var(--color-bg-primary);
   border-radius: 1rem;
   border: 1px solid var(--color-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px var(--color-shadow);
   margin-bottom: 2rem;
   overflow: hidden;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 /* Filter Header */
@@ -114,6 +143,7 @@
   background: linear-gradient(135deg, 
     var(--color-bg-primary) 0%, 
     var(--color-bg-secondary) 100%);
+  position: relative;
 }
 
 .headerLeft {
@@ -169,12 +199,30 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.clearButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
 .clearButton:hover {
   background: rgba(239, 68, 68, 0.15);
   border-color: rgba(239, 68, 68, 0.5);
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+.clearButton:hover::before {
+  left: 100%;
 }
 
 .expandButton {
@@ -191,6 +239,19 @@
   gap: 0.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.expandButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
 .expandButton:hover {
@@ -199,8 +260,13 @@
   box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3);
 }
 
+.expandButton:hover::before {
+  left: 100%;
+}
+
 .expandButton.expanded {
   background: var(--color-secondary);
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.4);
 }
 
 .expandIcon {
@@ -231,9 +297,23 @@
 .searchLabel,
 .selectLabel {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.searchLabel::before,
+.selectLabel::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 .searchInputWrapper {
@@ -252,19 +332,24 @@
 
 .searchInput {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  padding: 0.875rem 1rem 0.875rem 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   transition: all 0.2s ease;
+  min-height: 2.75rem;
 }
 
 .searchInput:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
 }
 
 .clearSearchButton {
@@ -290,31 +375,53 @@
 }
 
 .selectInput {
-  padding: 0.75rem;
+  padding: 0.875rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  font-size: 0.95rem;
-  background: var(--color-bg-primary);
+  font-size: 0.9rem;
+  font-weight: 400;
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
   color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
+  appearance: none;
+  padding-right: 2.5rem;
+  min-height: 2.75rem;
+}
+
+.selectInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 .selectInput:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .noCoursesMessage {
-  padding: 0.75rem;
-  background: rgba(156, 163, 175, 0.1);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(156, 163, 175, 0.05) 100%);
+  border: 2px dashed var(--color-border);
+  border-radius: 0.75rem;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
   text-align: center;
   font-style: italic;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.noCoursesMessage::before {
+  content: '📚';
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
 }
 
 /* Advanced Filters */
@@ -340,32 +447,57 @@
 
 .filterLabel {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.filterLabel::before {
+  content: '●';
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .labelIcon {
-  font-size: 1rem;
+  font-size: 1.125rem;
+  color: var(--color-primary);
+  filter: drop-shadow(0 1px 2px rgba(249, 115, 22, 0.3));
 }
 
 .filterSelect {
-  padding: 0.625rem 0.75rem;
+  padding: 0.875rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   font-size: 0.9rem;
-  background: var(--color-bg-secondary);
+  font-weight: 400;
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
   color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
+  appearance: none;
+  padding-right: 2.5rem;
+  min-height: 2.75rem;
+}
+
+.filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 .filterSelect:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 /* Skills Section */
@@ -398,20 +530,30 @@
 }
 
 .skillSearchInput {
-  padding: 0.5rem 0.75rem;
+  padding: 0.875rem 1rem;
   border: 1px solid var(--color-border);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
-  background: var(--color-bg-secondary);
+  background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  width: 200px;
+  width: 240px;
+  min-height: 2.75rem;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.skillSearchInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
 }
 
 .skillSearchInput:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+}
+
+.skillSearchInput::placeholder {
+  color: var(--color-text-tertiary);
 }
 
 .clearSkillsButton {
@@ -607,6 +749,29 @@
   .activeFiltersList {
     gap: 0.5rem;
   }
+  
+  /* Mobile optimizations for labels and selects */
+  .searchLabel,
+  .selectLabel,
+  .filterLabel {
+    font-size: 0.8rem;
+    margin-bottom: 0.375rem;
+  }
+  
+  .selectInput,
+  .filterSelect,
+  .filterTools .filterSelect {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    min-width: auto;
+  }
+  
+  .filterGroup label::before,
+  .searchLabel::before,
+  .selectLabel::before,
+  .filterLabel::before {
+    font-size: 0.7rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -637,29 +802,148 @@
   }
 }
 
-/* Dark Mode Support */
+/* Enhanced Dark Mode Support */
 :global(.dark) .filtersContainer {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
 }
 
 :global(.dark) .filtersHeader {
   background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.05) 0%, 
-    rgba(255, 255, 255, 0.02) 100%);
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+    var(--color-bg-primary) 0%, 
+    var(--color-bg-secondary) 100%);
+  border-bottom-color: var(--color-border);
+}
+
+:global(.dark) .filtersHeader::before {
+  background: linear-gradient(90deg, 
+    var(--color-primary) 0%, 
+    var(--color-secondary) 50%, 
+    var(--color-accent) 100%);
+  opacity: 0.8;
 }
 
 :global(.dark) .quickSearch {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-bg-secondary);
+  backdrop-filter: blur(10px);
+}
+
+:global(.dark) .searchInput {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillSearchInput {
+  background-color: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillSearchInput:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .skillSearchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+:global(.dark) .searchInput:focus {
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .searchInput::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
+}
+
+:global(.dark) .selectInput {
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .selectInput:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+:global(.dark) .selectInput:focus {
+  border-color: var(--color-primary);
 }
 
 :global(.dark) .clearButton {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+:global(.dark) .clearButton:hover {
   background: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+:global(.dark) .expandButton {
+  background: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+:global(.dark) .expandButton:hover {
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+}
+
+:global(.dark) .skillTag {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .skillTag:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-primary);
 }
 
 :global(.dark) .skillTag.skillSelected {
-  background: rgba(249, 115, 22, 0.2);
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+:global(.dark) .filterSelect {
+  background-color: var(--color-bg-primary);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>');
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+:global(.dark) .filterSelect:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-secondary);
+}
+
+:global(.dark) .filterSelect:focus {
+  border-color: var(--color-primary);
+}
+
+:global(.dark) .activeFilter {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--color-primary);
+}
+
+:global(.dark) .noCoursesMessage {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+:global(.dark) .advancedFilters {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
 }
 
 /* Accessibility */

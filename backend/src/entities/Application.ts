@@ -99,26 +99,26 @@ export class Application {
         type: "int",
         nullable: true,
     })
-    rank?: number;
+    rank?: number | null;
 
     @Column({
         type: "int",
         nullable: true,
     })
-    rankedBy?: number;
+    rankedBy?: number | null;
 
     @Column({
         type: "datetime",
         nullable: true,
     })
-    rankedAt?: Date;
+    rankedAt?: Date | null;
 
     @Column({
         type: "varchar",
         length: 20,
         nullable: true,
     })
-    rankedForCourse?: string;
+    rankedForCourse?: string | null;
 
     @CreateDateColumn()
     appliedAt: Date;

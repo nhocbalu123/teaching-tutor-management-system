@@ -12,4 +12,5 @@ export const availableCourses = [
   { code: "COSC2391", name: "Further Programming" },
   { code: "COSC2758", name: "Full Stack Development" },
   { code: "COSC2663", name: "IT Security" },
+  { code: "COSC2671", name: "Introduction to Web Programming" },
 ];

@@ -21,8 +21,10 @@
   --color-bg-secondary: #f9fafb;
   --color-text-primary: #3d4451;
   --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
   --color-border: #e5e7eb;
   --color-shadow: rgba(0, 0, 0, 0.05);
+  --color-primary-light: rgba(249, 115, 22, 0.1);
 }
 
 body {

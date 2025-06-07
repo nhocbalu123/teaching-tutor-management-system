@@ -740,6 +740,12 @@ export class ApplicationController {
     }
 
     async removeApplicationFromRanking(req: AuthenticatedRequest, res: Response): Promise<void> {
+        console.log("🗑️ DELETE /ranking endpoint hit:", {
+            applicationId: req.params.id,
+            lecturerId: req.user?.userId,
+            timestamp: new Date().toISOString()
+        });
+
         try {
             const { id } = req.params;
             const lecturerId = req.user?.userId;
@@ -773,13 +779,34 @@ export class ApplicationController {
                 return;
             }
 
-            // Remove ranking
-            application.rank = undefined;
-            application.rankedBy = undefined;
-            application.rankedAt = undefined;
-            application.rankedForCourse = undefined;
+            // Remove ranking - set to null for MySQL compatibility
+            console.log("🗑️ Before removing ranking:", {
+                applicationId: application.id,
+                currentRank: application.rank,
+                currentRankedBy: application.rankedBy,
+                currentRankedForCourse: application.rankedForCourse
+            });
+
+            application.rank = null;
+            application.rankedBy = null;
+            application.rankedAt = null;
+            application.rankedForCourse = null;
+
+            console.log("🗑️ After setting to null:", {
+                applicationId: application.id,
+                newRank: application.rank,
+                newRankedBy: application.rankedBy,
+                newRankedForCourse: application.rankedForCourse
+            });
 
             const updatedApplication = await this.applicationRepository.save(application);
+
+            console.log("🗑️ After saving to database:", {
+                applicationId: updatedApplication.id,
+                savedRank: updatedApplication.rank,
+                savedRankedBy: updatedApplication.rankedBy,
+                savedRankedForCourse: updatedApplication.rankedForCourse
+            });
 
             res.status(200).json({
                 success: true,

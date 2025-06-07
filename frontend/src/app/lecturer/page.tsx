@@ -26,7 +26,11 @@ type TabType = "applications" | "rankings" | "stats";
 // Adapter function to convert ApplicationResponse to Application
 const convertToLegacyApplication = (
   appResponse: ApplicationResponse
-): Application => {
+): Application & { 
+  role?: { roleName: string }; 
+  course?: { courseCode: string };
+  rankedForCourse?: string;
+} => {
   const availabilityValue =
     (appResponse.availability as { type: string })?.type || "Part Time";
   const availability: "Full Time" | "Part Time" =
@@ -52,7 +56,13 @@ const convertToLegacyApplication = (
       | "hired",
     selected: appResponse.status === "selected",
     comment: appResponse.comment || "",
-    rank: undefined,
+    rank: appResponse.rank, // Preserve rank from backend
+    // Extended properties
+    role: appResponse.role ? { roleName: appResponse.role.roleName } : undefined,
+    course: appResponse.course ? { courseCode: appResponse.course.courseCode } : undefined,
+    // Add fields needed for ranking
+    selectedForCourses: appResponse.status === "selected" ? [appResponse.course.courseCode] : undefined,
+    rankedForCourse: appResponse.rankedForCourse,
   };
 };
 
@@ -388,14 +398,31 @@ const LecturerDashboardPage: React.FC = () => {
     if (!rawSelectedApplication) return;
 
     try {
+      // First, remove from ranking if ranked
+      if (selectedApplication?.rank && selectedApplication.rank > 0) {
+        console.log("🗑️ Removing from ranking before unselecting:", {
+          applicationId: selectedApplication.id,
+          currentRank: selectedApplication.rank
+        });
+        
+        const removeRankingResponse = await ApplicationService.removeApplicationFromRanking(
+          parseInt(selectedApplication.id)
+        );
+        
+        if (!removeRankingResponse.success) {
+          console.warn("Failed to remove from ranking:", removeRankingResponse.message);
+        }
+      }
+
+      // Then unselect the application
       const response = await ApplicationService.updateApplicationStatus(
         rawSelectedApplication.id,
         "pending"
       );
 
       if (response.success) {
-        showToast("Applicant unselected", "info");
-        await loadApplications();
+        showToast("Applicant unselected and removed from ranking", "success");
+        await loadApplications(); // Reload to get updated data
       } else {
         showToast(response.message || "Failed to unselect applicant", "error");
       }
@@ -417,7 +444,7 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
 
-    if (selectedApplication.rank !== undefined) {
+    if (selectedApplication.rank !== undefined && selectedApplication.rank !== null && selectedApplication.rank > 0) {
       showToast("Applicant is already added to ranking", "info");
       return;
     }
@@ -436,8 +463,14 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
 
-    if (!selectedRankingCourse) {
-      showToast("Please select a course for ranking", "error");
+    // Auto-select the course since there's only one course
+    let courseForRanking = selectedRankingCourse;
+    if (!courseForRanking && selectedApplication.courses.length > 0) {
+      courseForRanking = selectedApplication.courses[0];
+    }
+
+    if (!courseForRanking) {
+      showToast("No course found for ranking", "error");
       return;
     }
 
@@ -445,15 +478,22 @@ const LecturerDashboardPage: React.FC = () => {
       // Calculate next rank (add to end of list)
       const currentRankedForCourse = rankedApplications.filter(
         (app) =>
-          app.selectedForCourses?.includes(selectedRankingCourse) ||
-          app.courses.includes(selectedRankingCourse)
+          app.selectedForCourses?.includes(courseForRanking) ||
+          app.courses.includes(courseForRanking)
       );
       const nextRank = currentRankedForCourse.length + 1;
+
+      console.log("🎯 Adding to ranking:", {
+        applicationId: selectedApplication.id,
+        nextRank,
+        courseForRanking,
+        currentRankedCount: currentRankedForCourse.length
+      });
 
       const response = await ApplicationService.addApplicationToRanking(
         parseInt(selectedApplication.id),
         nextRank,
-        selectedRankingCourse
+        courseForRanking
       );
 
       if (response.success) {
@@ -557,17 +597,31 @@ const LecturerDashboardPage: React.FC = () => {
 
   const handleRemoveFromRanking = async (id: string) => {
     try {
+      console.log("🗑️ Removing from ranking:", { 
+        applicationId: id, 
+        beforeRemoval: { 
+          rankedCount: rankedApplications.length,
+          rankedApps: rankedApplications.map(app => ({ id: app.id, rank: app.rank }))
+        }
+      });
+      
       const response = await ApplicationService.removeApplicationFromRanking(
         parseInt(id)
       );
 
+      console.log("🗑️ Remove ranking response:", response);
+
       if (response.success) {
-        showToast("Removed from ranking", "info");
+        showToast("Removed from ranking successfully", "success");
+        console.log("🔄 Reloading applications after remove...");
         await loadApplications(); // Reload to get updated data
+        console.log("🔄 Applications reloaded, new ranked count:", rankedApplications.length);
       } else {
+        console.error("❌ Remove ranking failed:", response.message);
         showToast(response.message || "Failed to remove from ranking", "error");
       }
-    } catch {
+    } catch (error) {
+      console.error("❌ Remove ranking error:", error);
       showToast("Error removing from ranking", "error");
     }
   };
@@ -639,33 +693,6 @@ const LecturerDashboardPage: React.FC = () => {
               <div className={styles.applicationsSection}>
                 <div className={styles.applicationsGrid}>
                   <div className={styles.applicantListSection}>
-                    {/* Course Selection for Applications Tab */}
-                    <div className={styles.courseSelector}>
-                      <label htmlFor="applicationsCourseSelect">
-                        View Applications for:
-                      </label>
-                      {courses.length > 0 ? (
-                        <select
-                          id="applicationsCourseSelect"
-                          value={selectedCourse}
-                          onChange={(e) => setSelectedCourse(e.target.value)}
-                          className={styles.courseSelect}
-                        >
-                          <option value="all">All Assigned Courses</option>
-                          {courses.map((course) => (
-                            <option key={course.code} value={course.code}>
-                              {course.code} - {course.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <div className={styles.noCourseMessage}>
-                          <span className={styles.warningIcon}>⚠️</span>
-                          No courses assigned. Contact administrator.
-                        </div>
-                      )}
-                    </div>
-
                     <ApplicantList
                       applications={applications}
                       selectedApplication={selectedApplication}

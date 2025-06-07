@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import styles from "./applicant-details.module.css";
 import {
   validateLecturerComment,
-  validateStatusUpdate,
   sanitizeComment,
   formatValidationErrors,
   DEFAULT_COMMENT_CONFIG,
@@ -41,19 +40,13 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
-  // Course selection states
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [courseSelectionError, setCourseSelectionError] = useState<string>("");
+  // Note: Course selection logic removed since there's only one course
 
   // Clear validation errors when application changes
   useEffect(() => {
     setCommentError("");
-    setCourseSelectionError("");
     setHasUnsavedChanges(false);
-    // Reset course selection when application changes
-    if (application) {
-      setSelectedCourses([]);
-    }
+    // Note: Course selection reset removed since there's only one course
   }, [application?.id, application]);
 
   // Track unsaved changes
@@ -69,29 +62,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
     setHasUnsavedChanges(hasChanges);
   }, [comment, application?.comment, application?.id]);
 
-  // Course selection handlers
-  const handleCourseToggle = (courseCode: string) => {
-    setCourseSelectionError("");
-    setSelectedCourses((prev) => {
-      if (prev.includes(courseCode)) {
-        return prev.filter((code) => code !== courseCode);
-      } else {
-        return [...prev, courseCode];
-      }
-    });
-  };
-
-  const handleSelectAllCourses = () => {
-    setCourseSelectionError("");
-    if (application) {
-      setSelectedCourses([...application.courses]);
-    }
-  };
-
-  const handleDeselectAllCourses = () => {
-    setCourseSelectionError("");
-    setSelectedCourses([]);
-  };
+  // Note: Course selection handlers removed since there's only one course
 
   if (!application) {
     return (
@@ -175,61 +146,43 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   const handleSelectButtonClick = () => {
     if (!application) return;
 
-    // Validate course selection
-    if (selectedCourses.length === 0) {
-      setCourseSelectionError(
-        "Please select at least one course before selecting the applicant."
-      );
-      showToast("Please select at least one course", "error");
-      return;
-    }
-
-    // Validate status update
-    const validation = validateStatusUpdate(
-      application.id,
-      "selected",
-      selectedCourses,
-      comment,
-      {
-        allowedStatuses: ["pending", "shortlisted", "selected", "rejected"],
-        requireComment: false,
-        requireCourseSelection: true,
-      }
-    );
-
-    if (!validation.isValid) {
-      const errorMessages = formatValidationErrors(validation.errors);
-      showToast(errorMessages[0] || "Please select at least one course", "error");
-      return;
-    }
-
-    onSelectApplicant(selectedCourses);
+    // Select applicant without any conditions - just select for all their courses
+    onSelectApplicant(application.courses);
   };
 
   const handleAddToRankingClick = () => {
+    console.log("🎯 handleAddToRankingClick called:", {
+      applicationId: application?.id,
+      selected: application?.selected,
+      rank: application?.rank,
+      rankType: typeof application?.rank,
+      comment: application?.comment,
+      hasComment: !!application?.comment,
+    });
+
     if (!application.selected) {
+      console.log("❌ Not selected");
       showToast(
         "Please select the applicant before adding to ranking",
         "error"
       );
       return;
     }
-    if (application.rank !== undefined) {
+    // Fix: Check if truly ranked (rank > 0), handle null/undefined explicitly
+    if (application.rank !== null && application.rank !== undefined && application.rank > 0) {
+      console.log("❌ Already ranked:", application.rank);
       showToast("Applicant is already added to ranking", "info");
       return;
     }
-    if (!application.comment || !comment.trim()) {
+    if (!application.comment) {
+      console.log("❌ No comment");
       showToast(
         "Please add and save a comment before adding to ranking.",
         "error"
       );
       return;
     }
-    const hasUnsavedComment = comment !== (application.comment || "");
-    if (hasUnsavedComment) {
-      showToast("Please save your comment before adding to ranking.", "error");
-      return;
-    }
+    console.log("✅ Calling onAddToRanking");
     onAddToRanking();
   };
 
@@ -252,6 +205,30 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               </h2>
               <p className={styles.applicantEmail}>{application.email}</p>
               <div className={styles.applicantBadges}>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {(application as any).role && (
+                  <span className={styles.roleBadge}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={styles.roleIconSmall}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {((application as any).role?.roleName === "tutor") ? "Tutor" : 
+                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                     ((application as any).role?.roleName === "lab_assistant") ? "Lab Assistant" : 
+                     "Application"}
+                  </span>
+                )}
                 <span
                   className={`${styles.availabilityBadge} ${application.availability === "Full Time" ? styles.fullTime : styles.partTime}`}
                 >
@@ -272,7 +249,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   >
                     Unselect
                   </button>
-                  {application.rank !== undefined ? (
+                  {application.rank !== null && application.rank !== undefined && application.rank > 0 ? (
                     <button
                       disabled
                       className={`${styles.actionButton} ${styles.alreadyRankedButton}`}
@@ -298,29 +275,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     <button
                       onClick={handleAddToRankingClick}
                       className={`${styles.actionButton} ${styles.addToRankingButton}`}
-                      title={
-                        !application.comment
-                          ? "Please add and save a comment before adding to ranking"
-                          : comment !== (application.comment || "")
-                            ? "Please save your comment before adding to ranking"
-                            : "Add to ranking"
-                      }
-                      disabled={
-                        !application.comment ||
-                        comment !== (application.comment || "")
-                      }
-                      onMouseEnter={() => {
-                        console.log("🎯 Add to Ranking button debug:", {
-                          "application.comment": application.comment,
-                          "comment (local state)": comment,
-                          hasApplicationComment: !!application.comment,
-                          commentMatch: comment === (application.comment || ""),
-                          isDisabled:
-                            !application.comment ||
-                            comment !== (application.comment || ""),
-                          comparison: `"${comment}" === "${application.comment || ""}"`,
-                        });
-                      }}
+                      title="Add to ranking"
                     >
                       Add to Ranking
                     </button>
@@ -330,12 +285,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                 <button
                   onClick={handleSelectButtonClick}
                   className={`${styles.actionButton} ${styles.selectButton}`}
-                  disabled={selectedCourses.length === 0}
-                  title={
-                    selectedCourses.length === 0
-                      ? "Please select at least one course"
-                      : "Select applicant for chosen courses"
-                  }
+                  title="Select applicant for all applied courses"
                 >
                   Select Applicant
                 </button>
@@ -343,127 +293,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             </div>
           </div>
 
-          {/* Course Selection Section - Only show if not selected */}
-          {!application.selected && (
-            <div className={styles.section}>
-              <h4 className={styles.sectionTitle}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={styles.sectionIcon}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Course Selection
-              </h4>
-              <p className={styles.sectionDescription}>
-                Select the courses you want to consider this applicant for:
-              </p>
 
-              {courseSelectionError && (
-                <div className={styles.errorMessage}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={styles.errorIcon}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {courseSelectionError}
-                </div>
-              )}
-
-              <div className={styles.courseSelectionControls}>
-                <button
-                  onClick={handleSelectAllCourses}
-                  className={`${styles.courseControlButton} ${styles.selectAllButton}`}
-                  disabled={
-                    selectedCourses.length === application.courses.length
-                  }
-                >
-                  Select All
-                </button>
-                <button
-                  onClick={handleDeselectAllCourses}
-                  className={`${styles.courseControlButton} ${styles.deselectAllButton}`}
-                  disabled={selectedCourses.length === 0}
-                >
-                  Deselect All
-                </button>
-              </div>
-
-              <div className={styles.courseSelectionContainer}>
-                {application.courses.map((courseCode) => {
-                  const courseInfo = availableCourses.find(
-                    (course) => course.code === courseCode
-                  );
-                  const isSelected = selectedCourses.includes(courseCode);
-
-                  return (
-                    <div
-                      key={courseCode}
-                      className={`${styles.courseSelectionCard} ${isSelected ? styles.courseSelected : ""}`}
-                      onClick={() => handleCourseToggle(courseCode)}
-                    >
-                      <div className={styles.courseCheckbox}>
-                        <input
-                          type="checkbox"
-                          id={`course-${courseCode}`}
-                          checked={isSelected}
-                          onChange={() => handleCourseToggle(courseCode)}
-                          className={styles.courseCheckboxInput}
-                        />
-                        <label
-                          htmlFor={`course-${courseCode}`}
-                          className={styles.courseCheckboxLabel}
-                        >
-                          <svg
-                            className={styles.courseCheckboxIcon}
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </label>
-                      </div>
-                      <div className={styles.courseInfo}>
-                        <div className={styles.courseCode}>{courseCode}</div>
-                        <div className={styles.courseName}>
-                          {courseInfo ? courseInfo.name : "Course not found"}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className={styles.selectionSummary}>
-                <span className={styles.selectionCount}>
-                  {selectedCourses.length} of {application.courses.length}{" "}
-                  courses selected
-                </span>
-              </div>
-            </div>
-          )}
 
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>
