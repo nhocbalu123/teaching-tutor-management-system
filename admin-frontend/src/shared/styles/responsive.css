@@ -1,0 +1,213 @@
+/* ========================================
+   RESPONSIVE UTILITIES & BREAKPOINTS
+   ======================================== */
+
+/* 
+   Standardized breakpoints used across the application:
+   - Mobile: 480px and below
+   - Tablet: 768px and below  
+   - Desktop: 769px and above
+   - Large Desktop: 1024px and above
+*/
+
+:root {
+    /* Responsive breakpoint variables */
+    --bp-mobile: 480px;
+    --bp-tablet: 768px;
+    --bp-desktop: 1024px;
+    --bp-large: 1200px;
+}
+
+/* ========================================
+   COMMON RESPONSIVE UTILITIES
+   ======================================== */
+
+/* Center content utility for mobile */
+@media (max-width: 768px) {
+    .mobile-center {
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .mobile-center-flex {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    /* Common mobile typography adjustments */
+    .mobile-text-sm {
+        font-size: 0.9rem !important;
+    }
+
+    .mobile-text-base {
+        font-size: 1rem !important;
+    }
+
+    .mobile-text-lg {
+        font-size: 1.2rem !important;
+    }
+
+    .mobile-text-xl {
+        font-size: 1.5rem !important;
+    }
+
+    .mobile-text-2xl {
+        font-size: 2rem !important;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .mobile-hide {
+        display: none !important;
+    }
+
+    .mobile-full-width {
+        width: 100% !important;
+    }
+
+    /* Even smaller text on very small screens */
+    .mobile-text-xs {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Tablet and above utilities */
+@media (min-width: 769px) {
+    .desktop-show {
+        display: block !important;
+    }
+
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   ADMIN DASHBOARD RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile responsive styles for admin dashboard */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 1rem !important;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .admin-card {
+        margin-bottom: 1rem !important;
+    }
+
+    .admin-table {
+        font-size: 0.875rem !important;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 0.5rem !important;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 0.5rem !important;
+    }
+
+    .admin-button {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .admin-form-group {
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* ========================================
+   RESPONSIVE GRID UTILITIES
+   ======================================== */
+
+.responsive-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.responsive-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVE FLEX UTILITIES
+   ======================================== */
+
+.responsive-flex-column {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-flex-column {
+        flex-direction: column;
+    }
+}
+
+/* ========================================
+   RESPONSIVE SPACING UTILITIES
+   ======================================== */
+
+.responsive-padding {
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-padding {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .responsive-padding {
+        padding: 0.5rem;
+    }
+}
+
+.responsive-margin {
+    margin: 2rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-margin {
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .responsive-margin {
+        margin: 0.5rem;
+    }
+}
