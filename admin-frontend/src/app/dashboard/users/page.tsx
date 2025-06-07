@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
     GET_ALL_USERS,
@@ -36,6 +36,15 @@ export default function UsersManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+    // Get current user from localStorage
+    useEffect(() => {
+        const userData = localStorage.getItem("admin-user");
+        if (userData) {
+            setCurrentUser(JSON.parse(userData));
+        }
+    }, []);
 
     const {
         data: usersData,
@@ -86,15 +95,33 @@ export default function UsersManagement() {
     });
 
     const handleBlockToggle = async (user: User) => {
+        // Prevent admin from blocking themselves
+        if (currentUser && user.id === currentUser.id) {
+            console.warn("Attempted self-block prevented");
+            return;
+        }
+
         try {
             if (user.isBlocked) {
-                await unblockUser({
+                const result = await unblockUser({
                     variables: { id: parseInt(user.id.toString()) },
                 });
+                if (!result.data?.unblockUser.success) {
+                    console.error(
+                        "Failed to unblock user:",
+                        result.data?.unblockUser.message
+                    );
+                }
             } else {
-                await blockUser({
+                const result = await blockUser({
                     variables: { id: parseInt(user.id.toString()) },
                 });
+                if (!result.data?.blockUser.success) {
+                    console.error(
+                        "Failed to block user:",
+                        result.data?.blockUser.message
+                    );
+                }
             }
         } catch (error) {
             console.error("Error toggling user block status:", error);
@@ -102,6 +129,12 @@ export default function UsersManagement() {
     };
 
     const handleDeleteClick = (user: User) => {
+        // Prevent admin from deleting themselves
+        if (currentUser && user.id === currentUser.id) {
+            console.warn("Attempted self-delete prevented");
+            return;
+        }
+
         setUserToDelete(user);
         setShowDeleteModal(true);
     };
@@ -397,10 +430,18 @@ export default function UsersManagement() {
                                                           styles.actionsContainer
                                                       }
                                                   >
+                                                      {/* Block/Unblock Button */}
                                                       <button
                                                           onClick={() =>
                                                               handleBlockToggle(
                                                                   user
+                                                              )
+                                                          }
+                                                          disabled={
+                                                              !!(
+                                                                  currentUser &&
+                                                                  user.id ===
+                                                                      currentUser.id
                                                               )
                                                           }
                                                           className={`${
@@ -409,9 +450,19 @@ export default function UsersManagement() {
                                                               user.isBlocked
                                                                   ? styles.actionButtonSuccess
                                                                   : styles.actionButtonDanger
+                                                          } ${
+                                                              currentUser &&
+                                                              user.id ===
+                                                                  currentUser.id
+                                                                  ? styles.actionButtonDisabled
+                                                                  : ""
                                                           }`}
                                                           title={
-                                                              user.isBlocked
+                                                              currentUser &&
+                                                              user.id ===
+                                                                  currentUser.id
+                                                                  ? "You cannot block yourself"
+                                                                  : user.isBlocked
                                                                   ? "Unblock user"
                                                                   : "Block user"
                                                           }
@@ -430,24 +481,31 @@ export default function UsersManagement() {
                                                               />
                                                           )}
                                                       </button>
+
+                                                      {/* Delete Button - Hide for current user and other admins */}
                                                       {user.userType !==
-                                                          "ADMIN" && (
-                                                          <button
-                                                              onClick={() =>
-                                                                  handleDeleteClick(
-                                                                      user
-                                                                  )
-                                                              }
-                                                              className={`${styles.actionButton} ${styles.actionButtonDanger}`}
-                                                              title="Delete user"
-                                                          >
-                                                              <TrashIcon
-                                                                  className={
-                                                                      styles.actionIcon
+                                                          "ADMIN" &&
+                                                          !(
+                                                              currentUser &&
+                                                              user.id ===
+                                                                  currentUser.id
+                                                          ) && (
+                                                              <button
+                                                                  onClick={() =>
+                                                                      handleDeleteClick(
+                                                                          user
+                                                                      )
                                                                   }
-                                                              />
-                                                          </button>
-                                                      )}
+                                                                  className={`${styles.actionButton} ${styles.actionButtonDanger}`}
+                                                                  title="Delete user"
+                                                              >
+                                                                  <TrashIcon
+                                                                      className={
+                                                                          styles.actionIcon
+                                                                      }
+                                                                  />
+                                                              </button>
+                                                          )}
                                                   </div>
                                               </td>
                                           </tr>

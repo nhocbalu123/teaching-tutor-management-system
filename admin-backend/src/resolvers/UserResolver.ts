@@ -6,6 +6,7 @@ import {
     Int,
     ObjectType,
     Field,
+    Ctx,
 } from "type-graphql";
 import { User, UserType } from "../types/User";
 import { AppDataSource } from "../config/database";
@@ -100,7 +101,10 @@ export class UserResolver {
     }
 
     @Mutation(() => UserResponse)
-    async blockUser(@Arg("id", () => Int) id: number): Promise<UserResponse> {
+    async blockUser(
+        @Arg("id", () => Int) id: number,
+        @Ctx() ctx: any
+    ): Promise<UserResponse> {
         try {
             const userRepository = AppDataSource.getRepository(User);
             const user = await userRepository.findOne({ where: { id } });
@@ -109,6 +113,14 @@ export class UserResolver {
                 return {
                     success: false,
                     message: "User not found",
+                };
+            }
+
+            // Prevent admin from blocking themselves
+            if (ctx.user && ctx.user.id === id) {
+                return {
+                    success: false,
+                    message: "You cannot block yourself",
                 };
             }
 
@@ -167,7 +179,10 @@ export class UserResolver {
     }
 
     @Mutation(() => UserResponse)
-    async deleteUser(@Arg("id", () => Int) id: number): Promise<UserResponse> {
+    async deleteUser(
+        @Arg("id", () => Int) id: number,
+        @Ctx() ctx: any
+    ): Promise<UserResponse> {
         try {
             const userRepository = AppDataSource.getRepository(User);
             const user = await userRepository.findOne({ where: { id } });
@@ -176,6 +191,14 @@ export class UserResolver {
                 return {
                     success: false,
                     message: "User not found",
+                };
+            }
+
+            // Prevent admin from deleting themselves
+            if (ctx.user && ctx.user.id === id) {
+                return {
+                    success: false,
+                    message: "You cannot delete yourself",
                 };
             }
 
