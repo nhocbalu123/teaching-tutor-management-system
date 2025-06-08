@@ -183,15 +183,10 @@
     transform: translateY(-2px);
 }
 
-.navLink:hover::after {
-    width: 100%;
-    opacity: 1;
-}
-
 .navLink.active {
     color: var(--color-primary);
     font-weight: 600;
-    background: rgba(249, 115, 22, 0.1);
+    background: transparent;
 }
 
 .navLink.active::after {

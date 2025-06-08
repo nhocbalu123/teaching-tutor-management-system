@@ -42,12 +42,13 @@
 }
 
 .subtitle {
-    font-size: 1.5rem;
-    color: var(--color-text-primary);
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: #f97316; /* Màu cam */
+    font-weight: bold;
+    margin: 1.5rem 0 0.5rem 0; /* Tăng margin-top */
     line-height: 1.4;
     letter-spacing: -0.025em;
+    text-align: center;
 }
 
 /* Stats Grid */
@@ -774,6 +775,10 @@
     color: var(--color-text-secondary);
 }
 
+:global(.dark) .subtitle {
+    color: #fb923c; /* Màu cam sáng hơn cho dark mode */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .usersManagement {
@@ -857,8 +862,9 @@
     }
 
     .subtitle {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         margin-bottom: 0.75rem;
+        text-align: center;
     }
 
     .modal {
