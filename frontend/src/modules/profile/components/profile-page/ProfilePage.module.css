@@ -4,7 +4,7 @@
   width: 100%;
   padding: 6rem 2rem 2rem;
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 2rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Left Panel - User Information */
@@ -34,7 +34,7 @@
   border: 1px solid var(--color-border);
   backdrop-filter: blur(20px);
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 /* Avatar Section */
@@ -120,68 +120,116 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.25rem;
   background: var(--color-bg-primary);
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .statCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.statIconWrapper {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .statIcon {
-  width: 40px;
-  height: 40px;
-  background: var(--color-primary);
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
   color: white;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s ease;
+}
+
+.statIcon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+
+.statIcon.statusActive {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.statIcon.statusBlocked {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.statCard:hover .statIcon {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+.statCard:hover .statIcon.statusActive {
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+.statCard:hover .statIcon.statusBlocked {
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 .statContent {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .statLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  font-weight: 500;
+  font-size: 0.7rem;
+  color: var(--color-text-tertiary);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+  position: relative;
 }
 
 .statValue {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  line-height: 1.2;
 }
 
 .statusBadge {
   font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
   width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .statusBadge.active {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--color-success);
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--color-primary);
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 .statusBadge.blocked {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--color-danger);
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--color-primary);
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 /* Right Panel - Information Cards */
@@ -190,8 +238,7 @@
   flex-direction: column;
   gap: 1.25rem;
   height: 100%;
-  overflow-y: auto;
-  padding-right: 0.5rem;
+  overflow: visible;
 }
 
 .infoCard {
@@ -201,10 +248,21 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
+  flex: 0 1 auto;
+}
+
+.infoCardExpandable {
+  background: var(--color-bg-surface);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
   flex: 1;
 }
 
-.infoCard:hover {
+.infoCard:hover,
+.infoCardExpandable:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
@@ -212,22 +270,11 @@
 .cardHeader {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--color-border);
-}
-
-.cardIcon {
-  font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
 }
 
 .cardTitle {
@@ -238,10 +285,17 @@
 }
 
 .cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardContentExpandable {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
 }
 
 /* Info Grid for Account Information */
@@ -307,6 +361,133 @@
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+/* Candidate Specific Styles */
+.candidateOverview {
+  margin-bottom: 1.5rem;
+}
+
+.candidateStatsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.candidateStat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.candidateStat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.candidateStatIcon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s ease;
+}
+
+.candidateStatIcon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+
+.candidateStat:hover .candidateStatIcon {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+}
+
+.candidateStatContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.candidateStatLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.candidateStatValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.candidateFeatures {
+  margin-bottom: 1.5rem;
+}
+
+.candidateSectionTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.candidateActions {
+  margin-top: auto;
+}
+
+.actionButtonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.secondaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.secondaryButton svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
 }
 
 /* Action Button */
@@ -384,7 +565,32 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-top: 0.75rem;
+  max-height: 207px;
+  overflow-y: auto;
+  width: calc(100% + 3rem);
+  margin: 0 -1.5rem;
+  padding: 2px 1.5rem;
+}
+
+/* Custom scrollbar for course list */
+.courseList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.courseList::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+  border-radius: 3px;
+}
+
+.courseList::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.courseList::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+  opacity: 1;
 }
 
 .courseItem {
@@ -396,6 +602,8 @@
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .courseItem:hover {
@@ -481,15 +689,29 @@
   font-size: 0.9rem;
   color: var(--color-text-secondary);
   line-height: 1.5;
-  max-width: 300px;
+  max-width: 500px;
 }
 
 .courseCount {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
-  margin-bottom: 0.75rem;
-  text-align: center;
+  margin: 0;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Courses card specific styles */
+.coursesCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.coursesCard .cardContent {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Responsive Design */
@@ -553,6 +775,14 @@
   .featureGrid {
     grid-template-columns: 1fr;
   }
+  
+  .candidateStatsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .actionButtonGroup {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 768px) {
@@ -579,6 +809,10 @@
   .infoCard {
     padding: 1.25rem;
   }
+  
+  .courseList {
+    max-height: 300px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -595,14 +829,12 @@
     font-size: 1.5rem;
   }
   
-  .cardIcon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.25rem;
-  }
-  
   .cardTitle {
     font-size: 1rem;
+  }
+  
+  .courseList {
+    max-height: 250px;
   }
 }
 
@@ -626,5 +858,3 @@
 :global(.dark) .feature {
   border-color: var(--color-border);
 }
-
-

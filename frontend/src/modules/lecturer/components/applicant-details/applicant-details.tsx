@@ -245,9 +245,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     ? "Pending Review"
                     : (application.status as string) === "selected"
                       ? "Selected"
-                      : (application.status as string) === "rejected"
-                        ? "Rejected"
-                        : application.status}
+                      : application.status}
                 </span>
               </div>
             </div>

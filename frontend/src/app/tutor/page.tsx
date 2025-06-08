@@ -268,6 +268,7 @@ const TutorDashboardPage: React.FC = () => {
     return [normalized];
   };
 
+
   const calculateSearchScore = (
     course: Course,
     searchTerms: string[]
@@ -397,6 +398,7 @@ const TutorDashboardPage: React.FC = () => {
       .sort((a, b) => b.score - a.score)
       .map((item) => item.course);
   }, [courses, searchQuery, activeFilter, myApplications, hasAppliedToCourse]);
+
 
   const openApplyModal = (course: Course, role: Role) => {
     console.log("Apply button clicked for:", course.courseCode, role.roleName);

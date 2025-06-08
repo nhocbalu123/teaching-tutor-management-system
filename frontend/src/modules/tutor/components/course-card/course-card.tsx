@@ -102,6 +102,7 @@ const CourseCard: React.FC<CombinedCourseCardProps> = (props) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 console.log("Expand skills list");
+
               }
             }}
           >
@@ -372,6 +373,7 @@ const CourseCard: React.FC<CombinedCourseCardProps> = (props) => {
               });
             })()}
           </div>
+
         </div>
       </motion.div>
     );
