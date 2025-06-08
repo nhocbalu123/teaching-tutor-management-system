@@ -947,4 +947,51 @@ export class ApplicationController {
             });
         }
     }
+
+    // Test endpoint for debugging course validation
+    async testCourseValidation(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
+        try {
+            const { selectedCourses } = req.body;
+
+            console.log("🧪 Test course validation endpoint called:", {
+                selectedCourses,
+                selectedCoursesType: typeof selectedCourses,
+                isArray: Array.isArray(selectedCourses),
+                length: selectedCourses?.length,
+                body: req.body,
+            });
+
+            // Test the regex validation
+            const testResults = selectedCourses?.map((course: string) => ({
+                course,
+                courseType: typeof course,
+                trimmed: course?.trim(),
+                regexTest: course
+                    ? /^[A-Z]{4}\d{4}$/.test(course.trim())
+                    : false,
+                isValid:
+                    course &&
+                    typeof course === "string" &&
+                    /^[A-Z]{4}\d{4}$/.test(course.trim()),
+            }));
+
+            res.status(200).json({
+                success: true,
+                data: {
+                    input: selectedCourses,
+                    testResults,
+                    message: "Course validation test completed",
+                },
+            });
+        } catch (error) {
+            console.error("💥 Error in test course validation:", error);
+            res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    }
 }

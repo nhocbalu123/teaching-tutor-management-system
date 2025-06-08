@@ -397,4 +397,25 @@ export class ApplicationService {
       };
     }
   }
+
+  // Test method for debugging course validation
+  static async testCourseValidation(
+    selectedCourses: string[]
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await applicationAPI.post("/test-course-validation", {
+        selectedCourses,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ApiResponse<any>>;
+      if (axiosError.response?.data) {
+        return axiosError.response.data;
+      }
+      return {
+        success: false,
+        message: "Network error occurred during course validation test.",
+      };
+    }
+  }
 }

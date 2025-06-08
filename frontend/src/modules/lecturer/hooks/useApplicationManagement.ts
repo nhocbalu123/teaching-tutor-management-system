@@ -72,28 +72,37 @@ export const useApplicationManagement = () => {
         // Sort ranked applications by rank for proper display
         ranked.sort((a, b) => (a.rank || 0) - (b.rank || 0));
 
-        const allSelectedApps = response.data.filter(app => app.status === "selected").map(app => ({
-          id: app.id,
-          name: app.candidate?.firstName + " " + app.candidate?.lastName,
-          rank: app.rank,
-          rankType: typeof app.rank,
-          rankCheck: app.rank !== undefined && app.rank !== null && app.rank > 0,
-          rankedForCourse: app.rankedForCourse,
-          status: app.status
-        }));
+        const allSelectedApps = response.data
+          .filter((app) => app.status === "selected")
+          .map((app) => ({
+            id: app.id,
+            name: app.candidate?.firstName + " " + app.candidate?.lastName,
+            rank: app.rank,
+            rankType: typeof app.rank,
+            rankCheck:
+              app.rank !== undefined && app.rank !== null && app.rank > 0,
+            rankedForCourse: app.rankedForCourse,
+            status: app.status,
+          }));
 
         console.log("📊 Ranked applications loaded:");
         console.log("Total applications:", response.data.length);
-        console.log("Selected applications:", response.data.filter(app => app.status === "selected").length);
+        console.log(
+          "Selected applications:",
+          response.data.filter((app) => app.status === "selected").length
+        );
         console.log("All selected apps with rank data:", allSelectedApps);
         console.log("Filtered ranked applications:", ranked.length);
-        console.log("Ranked apps:", ranked.map(app => ({
-          id: app.id,
-          name: app.candidate?.firstName + " " + app.candidate?.lastName,
-          rank: app.rank,
-          rankedForCourse: app.rankedForCourse,
-          status: app.status
-        })));
+        console.log(
+          "Ranked apps:",
+          ranked.map((app) => ({
+            id: app.id,
+            name: app.candidate?.firstName + " " + app.candidate?.lastName,
+            rank: app.rank,
+            rankedForCourse: app.rankedForCourse,
+            status: app.status,
+          }))
+        );
 
         setRankedApplications(ranked);
       } else {
@@ -177,26 +186,41 @@ export const useApplicationManagement = () => {
           selectedApplication.comment !== updatedSelectedApplication.comment;
         const hasRankChanged =
           selectedApplication.rank !== updatedSelectedApplication.rank;
+        const hasBlockedStatusChanged =
+          selectedApplication.candidate?.isBlocked !==
+          updatedSelectedApplication.candidate?.isBlocked;
+        const hasStatusChanged =
+          selectedApplication.status !== updatedSelectedApplication.status;
 
         console.log("🔄 Syncing selectedApplication with updated data:", {
           oldComment: selectedApplication.comment,
           newComment: updatedSelectedApplication.comment,
           oldRank: selectedApplication.rank,
           newRank: updatedSelectedApplication.rank,
+          oldBlocked: selectedApplication.candidate?.isBlocked,
+          newBlocked: updatedSelectedApplication.candidate?.isBlocked,
+          oldStatus: selectedApplication.status,
+          newStatus: updatedSelectedApplication.status,
           applicationId: selectedApplication.id,
           hasCommentChanged,
           hasRankChanged,
+          hasBlockedStatusChanged,
+          hasStatusChanged,
           willUpdate:
             updatedSelectedApplication !== selectedApplication ||
             hasCommentChanged ||
-            hasRankChanged,
+            hasRankChanged ||
+            hasBlockedStatusChanged ||
+            hasStatusChanged,
         });
 
-        // Update the selectedApplication if it's different OR if the comment/rank has changed
+        // Update the selectedApplication if it's different OR if any important field has changed
         if (
           updatedSelectedApplication !== selectedApplication ||
           hasCommentChanged ||
-          hasRankChanged
+          hasRankChanged ||
+          hasBlockedStatusChanged ||
+          hasStatusChanged
         ) {
           setSelectedApplication(updatedSelectedApplication);
           // Always update the comment to match the latest comment from the updated application

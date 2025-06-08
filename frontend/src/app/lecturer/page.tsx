@@ -150,6 +150,22 @@ const LecturerDashboardInner: React.FC = () => {
     showToast("Test notification: Candidate unblocked", "success");
   }, [showToast]);
 
+  // Test course validation endpoint
+  const testCourseValidation = useCallback(async () => {
+    console.log("🧪 Testing course validation...");
+
+    try {
+      const response = await ApplicationService.testCourseValidation([
+        "COSC2758",
+      ]);
+      console.log("✅ Course validation test response:", response);
+      showToast("Course validation test completed", "success");
+    } catch (error) {
+      console.error("❌ Course validation test error:", error);
+      showToast("Course validation test failed", "error");
+    }
+  }, [showToast]);
+
   // Test backend connectivity first
   const testBackendConnectivity = useCallback(async () => {
     console.log("🧪 Testing backend connectivity...");
@@ -204,6 +220,7 @@ const LecturerDashboardInner: React.FC = () => {
     statistics: rawStatistics,
     isInitialized,
     selectedApplication: rawSelectedApplication,
+    setSelectedApplication: setRawSelectedApplication,
     comment,
     setComment,
     rankedApplications: rawRankedApplications,
@@ -233,16 +250,55 @@ const LecturerDashboardInner: React.FC = () => {
     (event: CandidateBlockedEvent) => {
       console.log("🔔 Candidate blocking event received:", event);
       console.log("🔄 Refreshing applications after blocking event...");
+
+      // Check if the currently selected application is affected by this blocking event
+      const isCurrentlySelectedAffected =
+        rawSelectedApplication &&
+        rawSelectedApplication.candidateId === event.candidateId;
+
+      if (isCurrentlySelectedAffected) {
+        console.log(
+          "⚠️ Currently selected application is affected by blocking event"
+        );
+        console.log("🔄 Clearing selected application state to force refresh");
+        // Clear the selected application to force a proper refresh
+        setRawSelectedApplication(null);
+      }
+
       // Refresh applications to get updated data
       loadApplications()
         .then(() => {
           console.log("✅ Applications refreshed after blocking event");
+
+          // If we cleared a selected application and it was unblocked, try to re-select it
+          if (isCurrentlySelectedAffected && !event.isBlocked) {
+            console.log("🔄 Re-selecting application after unblock event");
+            setTimeout(() => {
+              // Find the updated application by candidate ID
+              const updatedApplication = rawApplications.find(
+                (app) => app.candidateId === event.candidateId
+              );
+              if (updatedApplication) {
+                console.log(
+                  "✅ Re-selecting unblocked application:",
+                  updatedApplication.id
+                );
+                rawHandleSelectApplication(updatedApplication);
+              }
+            }, 100); // Small delay to ensure applications are loaded
+          }
         })
         .catch((error) => {
           console.error("❌ Failed to refresh applications:", error);
         });
     },
-    [loadApplications]
+    [
+      loadApplications,
+      rawSelectedApplication,
+      setRawSelectedApplication,
+      rawHandleSelectApplication,
+      rawApplications,
+    ]
   );
 
   // Candidate blocking subscription with memoized callbacks
@@ -528,11 +584,31 @@ const LecturerDashboardInner: React.FC = () => {
 
   // Wrap the selection handler to convert back to ApplicationResponse
   const handleSelectApplication = (app: Application) => {
+    console.log("🎯 handleSelectApplication called:", {
+      appId: app.id,
+      appName: app.fullName,
+      rawApplicationsCount: rawApplications.length,
+    });
+
     const originalApp = rawApplications.find(
       (rawApp) => rawApp.id.toString() === app.id
     );
+
+    console.log("🔍 Looking for original app:", {
+      found: !!originalApp,
+      originalAppId: originalApp?.id,
+      searchingFor: app.id,
+      rawAppIds: rawApplications.map((raw) => ({
+        id: raw.id,
+        stringId: raw.id.toString(),
+      })),
+    });
+
     if (originalApp) {
+      console.log("✅ Found original app, calling rawHandleSelectApplication");
       rawHandleSelectApplication(originalApp);
+    } else {
+      console.error("❌ Could not find original app in rawApplications");
     }
   };
 
@@ -589,23 +665,73 @@ const LecturerDashboardInner: React.FC = () => {
   };
 
   const handleSelectApplicantButton = async (selectedCourses: string[]) => {
-    if (!rawSelectedApplication) return;
+    console.log("🎯 handleSelectApplicantButton called:", {
+      rawSelectedApplication: !!rawSelectedApplication,
+      rawSelectedAppId: rawSelectedApplication?.id,
+      rawSelectedAppName:
+        rawSelectedApplication?.candidate?.firstName +
+        " " +
+        rawSelectedApplication?.candidate?.lastName,
+      selectedApplication: !!selectedApplication,
+      selectedAppId: selectedApplication?.id,
+      selectedCourses,
+      selectedCoursesType: typeof selectedCourses,
+      selectedCoursesLength: selectedCourses?.length,
+      selectedCoursesContent: selectedCourses,
+      comment: comment,
+    });
+
+    // Try to get the raw application from rawSelectedApplication first
+    let targetApplication: ApplicationResponse | null = rawSelectedApplication;
+
+    // If rawSelectedApplication is null but we have selectedApplication, try to find it
+    if (!targetApplication && selectedApplication) {
+      console.log(
+        "🔍 rawSelectedApplication is null, trying to find from selectedApplication"
+      );
+      targetApplication =
+        rawApplications.find(
+          (rawApp) => rawApp.id.toString() === selectedApplication.id
+        ) || null;
+      console.log("🔍 Found target application:", !!targetApplication);
+
+      // If we found it, set it as the selected application for future use
+      if (targetApplication) {
+        console.log("✅ Setting rawSelectedApplication for future use");
+        rawHandleSelectApplication(targetApplication);
+      }
+    }
+
+    if (!targetApplication) {
+      console.error("❌ No application found - cannot select applicant");
+      showToast(
+        "No application found. Please try selecting the applicant from the list first.",
+        "error"
+      );
+      return;
+    }
 
     try {
+      console.log("🌐 Calling updateApplicationStatus API...");
       const response = await ApplicationService.updateApplicationStatus(
-        rawSelectedApplication.id,
+        targetApplication.id,
         "selected",
         comment,
         selectedCourses
       );
 
+      console.log("🌐 API response:", response);
+
       if (response.success) {
+        console.log("✅ Applicant selected successfully");
         showToast("Applicant selected successfully", "success");
         await loadApplications(); // Reload to get updated data
       } else {
+        console.error("❌ API returned error:", response.message);
         showToast(response.message || "Failed to select applicant", "error");
       }
-    } catch {
+    } catch (error) {
+      console.error("❌ Error in handleSelectApplicantButton:", error);
       showToast("Error selecting applicant", "error");
     }
   };
