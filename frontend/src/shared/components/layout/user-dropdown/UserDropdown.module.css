@@ -39,43 +39,6 @@
   animation: pulse 1.5s infinite;
 }
 
-/* Avatar connector */
-.avatarConnector {
-  position: absolute;
-  bottom: calc(35px / 2 * (-1));
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 12px solid #fef5ef;
-  z-index: 52;
-  opacity: 1;
-}
-
-.avatarConnector2 {
-  position: absolute;
-  bottom: calc(35px / 2 * (-1));
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 13px solid transparent;
-  border-right: 13px solid transparent;
-  border-bottom: 13px solid #e5e7eb;
-  border-radius: 8px;
-  z-index: 51;
-  opacity: 1;
-}
-
-/* Dark mode support for the connector */
-:global(.dark) .avatarConnector {
-  border-bottom-color: #403432;
-}
-
-:global(.dark) .avatarConnector2 {
-  border-bottom-color: #374151;
-}
-
 /* Dropdown Menu */
 .userDropdownMenu {
   position: absolute;

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { AuthService } from "../../../../shared/services/authService";
+import { ApplicationService } from "../../../../shared/services/applicationService";
 import { User, UserType } from "../../../../shared/types/user";
 import { AssignedCourse } from "../../../../shared/types/courseTypes";
 import { useAuth } from "../../../auth/hooks/useAuth";
@@ -12,6 +13,8 @@ export const ProfilePage: React.FC = () => {
   const { user: contextUser, updateUser, isLoading: authLoading } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [assignedCourses, setAssignedCourses] = useState<AssignedCourse[]>([]);
+  const [availablePositions, setAvailablePositions] = useState<number>(0);
+  const [appliedApplications, setAppliedApplications] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -48,6 +51,45 @@ export const ProfilePage: React.FC = () => {
               apiError
             );
             setAssignedCourses([]);
+          }
+        }
+
+        // For candidates, fetch courses and applications data (same as tutor page)
+        if (savedUser.userType === UserType.CANDIDATE) {
+          try {
+            // Use same service as tutor page for consistency
+            const [coursesResponse, applicationsResponse] = await Promise.all([
+              ApplicationService.getCoursesAndRoles(),
+              ApplicationService.getMyCandidateApplications(),
+            ]);
+
+            if (coursesResponse.success && coursesResponse.data) {
+              const courses = coursesResponse.data.courses || [];
+              const roles = coursesResponse.data.roles || [];
+              
+              // Calculate available opportunities (same logic as tutor page)
+              let availableOpportunities = 0;
+              courses.forEach((course: any) => {
+                roles.forEach((role: any) => {
+                  const hasApplied = (applicationsResponse.data || []).some(
+                    (app: any) => app.courseId === course.id && app.roleId === role.id
+                  );
+                  if (!hasApplied) {
+                    availableOpportunities += 1;
+                  }
+                });
+              });
+
+              setAvailablePositions(availableOpportunities);
+            }
+
+            if (applicationsResponse.success && applicationsResponse.data) {
+              setAppliedApplications(applicationsResponse.data.length || 0);
+            }
+          } catch (apiError) {
+            console.error("Failed to fetch candidate data:", apiError);
+            setAvailablePositions(0);
+            setAppliedApplications(0);
           }
         }
 
@@ -106,18 +148,7 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  const getUserTypeIcon = (userType: UserType) => {
-    switch (userType) {
-      case UserType.CANDIDATE:
-        return "🎓";
-      case UserType.LECTURER:
-        return "👨‍🏫";
-      case UserType.ADMIN:
-        return "⚙️";
-      default:
-        return "👤";
-    }
-  };
+
 
   // Function to get avatar path - same logic as user dropdown
   const getAvatarPath = (userData: User) => {
@@ -182,7 +213,6 @@ export const ProfilePage: React.FC = () => {
             </h1>
             <div className={styles.userRole}>
               <span className={`${styles.roleBadge} ${styles[user.userType]}`}>
-                {getUserTypeIcon(user.userType)}{" "}
                 {getUserTypeLabel(user.userType)}
               </span>
             </div>
@@ -191,20 +221,41 @@ export const ProfilePage: React.FC = () => {
 
           <div className={styles.quickStats}>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>📅</div>
+              <div className={styles.statIconWrapper}>
+                <div className={styles.statIcon}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+              </div>
               <div className={styles.statContent}>
-                <span className={styles.statLabel}>Member Since</span>
+                <span className={styles.statLabel}>MEMBER SINCE</span>
                 <span className={styles.statValue}>
                   {formatDate(user.createdAt)}
                 </span>
               </div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>
-                {user.isBlocked ? "🔒" : "✅"}
+              <div className={styles.statIconWrapper}>
+                <div className={`${styles.statIcon} ${user.isBlocked ? styles.statusBlocked : styles.statusActive}`}>
+                  {user.isBlocked ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <polyline points="22,4 12,14.01 9,11.01"/>
+                    </svg>
+                  )}
+                </div>
               </div>
               <div className={styles.statContent}>
-                <span className={styles.statLabel}>Status</span>
+                <span className={styles.statLabel}>STATUS</span>
                 <span
                   className={`${styles.statusBadge} ${user.isBlocked ? styles.blocked : styles.active}`}
                 >
@@ -212,17 +263,6 @@ export const ProfilePage: React.FC = () => {
                 </span>
               </div>
             </div>
-            {user.userType === UserType.LECTURER && (
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>📚</div>
-                <div className={styles.statContent}>
-                  <span className={styles.statLabel}>Assigned Courses</span>
-                  <span className={styles.statValue}>
-                    {assignedCourses.length}
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -231,7 +271,6 @@ export const ProfilePage: React.FC = () => {
           {/* Account Information */}
           <div className={styles.infoCard}>
             <div className={styles.cardHeader}>
-              <div className={styles.cardIcon}>🛠️</div>
               <h3 className={styles.cardTitle}>Account Information</h3>
             </div>
             <div className={styles.cardContent}>
@@ -263,26 +302,25 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* Role-Specific Information */}
-          <div className={styles.infoCard}>
+          <div className={styles.infoCardExpandable}>
             <div className={styles.cardHeader}>
-              <div className={styles.cardIcon}>
-                {getUserTypeIcon(user.userType)}
-              </div>
               <h3 className={styles.cardTitle}>
                 {user.userType === UserType.LECTURER
                   ? "Assigned Courses"
                   : "Role Details"}
               </h3>
+              {user.userType === UserType.LECTURER && assignedCourses.length > 0 && (
+                <p className={styles.courseCount}>
+                  You are currently assigned to {assignedCourses.length}{" "}
+                  course{assignedCourses.length !== 1 ? "s" : ""}
+                </p>
+              )}
             </div>
-            <div className={styles.cardContent}>
+            <div className={styles.cardContentExpandable}>
               {user.userType === UserType.LECTURER ? (
                 <>
                   {assignedCourses.length > 0 ? (
                     <>
-                      <p className={styles.courseCount}>
-                        You are currently assigned to {assignedCourses.length}{" "}
-                        course{assignedCourses.length !== 1 ? "s" : ""}
-                      </p>
                       <div className={styles.courseList}>
                         {assignedCourses.map((course) => (
                           <div key={course.id} className={styles.courseItem}>
@@ -328,14 +366,54 @@ export const ProfilePage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <p className={styles.roleDescription}>
-                    Explore and apply for tutor and lab assistant positions
-                    across various courses.
-                  </p>
-                  <div className={styles.actionButton}>
-                    <a href="/tutor" className={styles.primaryButton}>
-                      View Opportunities
-                    </a>
+                  <div className={styles.candidateOverview}>
+                    <div className={styles.candidateStatsGrid}>
+                      <div className={styles.candidateStat}>
+                        <div className={styles.candidateStatIcon}>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6"/>
+                            <path d="m15.5 7.5 3 3-3 3"/>
+                            <path d="m8.5 16.5-3-3 3-3"/>
+                          </svg>
+                        </div>
+                        <div className={styles.candidateStatContent}>
+                          <span className={styles.candidateStatLabel}>Available Postions</span>
+                          <span className={styles.candidateStatValue}>
+                            {availablePositions} Position{availablePositions !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className={styles.candidateStat}>
+                        <div className={styles.candidateStatIcon}>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                          </svg>
+                        </div>
+                        <div className={styles.candidateStatContent}>
+                          <span className={styles.candidateStatLabel}>Applied</span>
+                          <span className={styles.candidateStatValue}>
+                            {appliedApplications} Application{appliedApplications !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.candidateActions}>
+                    <p className={styles.roleDescription}>
+                      Explore and apply for tutor and lab assistant positions across various courses. Browse available opportunities and submit your applications.
+                    </p>
+                    <div className={styles.actionButton}>
+                      <a href="/tutor" className={styles.primaryButton}>
+                        View Opportunities
+                      </a>
+                    </div>
                   </div>
                 </>
               )}

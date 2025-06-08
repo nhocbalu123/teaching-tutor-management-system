@@ -105,12 +105,6 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
               className={styles.avatarImage}
             />
           </div>
-          {isOpen && (
-            <>
-              <div className={styles.avatarConnector}></div>
-              <div className={styles.avatarConnector2}></div>
-            </>
-          )}
         </div>
       </div>
 
