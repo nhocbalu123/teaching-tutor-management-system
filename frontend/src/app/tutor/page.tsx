@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ApplicationService, Course, Role, ApplicationData, ApplicationResponse } from "@/shared/services/applicationService";
+import {
+  ApplicationService,
+  Course,
+  Role,
+  ApplicationData,
+  ApplicationResponse,
+} from "@/shared/services/applicationService";
 import CourseCard from "@/modules/tutor/components/course-card/course-card";
 import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
 import Toast from "@/shared/components/common/toast/Toast";
@@ -20,7 +26,9 @@ const TutorDashboardPage: React.FC = () => {
   // Data state
   const [courses, setCourses] = useState<Course[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [myApplications, setMyApplications] = useState<ApplicationResponse[]>([]);
+  const [myApplications, setMyApplications] = useState<ApplicationResponse[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal state
@@ -31,7 +39,9 @@ const TutorDashboardPage: React.FC = () => {
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<"all" | "applied" | "available">("all");
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "applied" | "available"
+  >("all");
 
   // Toast notifications
   const {
@@ -75,13 +85,17 @@ const TutorDashboardPage: React.FC = () => {
           setCourses(coursesResponse.data.courses);
           setRoles(coursesResponse.data.roles);
         } else {
-          showError(coursesResponse.message || "Failed to load courses and roles");
+          showError(
+            coursesResponse.message || "Failed to load courses and roles"
+          );
         }
 
         if (applicationsResponse.success && applicationsResponse.data) {
           setMyApplications(applicationsResponse.data);
         } else {
-          showError(applicationsResponse.message || "Failed to load your applications");
+          showError(
+            applicationsResponse.message || "Failed to load your applications"
+          );
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -98,16 +112,16 @@ const TutorDashboardPage: React.FC = () => {
   const getComprehensiveStats = () => {
     const totalRoleCourseCombinations = courses.length * roles.length;
     const appliedCombinations = myApplications.length;
-    
+
     // Calculate available opportunities (role-course combinations the user can apply for)
     let availableOpportunities = 0;
-    
-    courses.forEach(course => {
-      roles.forEach(role => {
+
+    courses.forEach((course) => {
+      roles.forEach((role) => {
         const hasApplied = myApplications.some(
-          app => app.courseId === course.id && app.roleId === role.id
+          (app) => app.courseId === course.id && app.roleId === role.id
         );
-        
+
         if (!hasApplied) {
           availableOpportunities += 1; // Count each role-course combination as one opportunity
         }
@@ -118,9 +132,12 @@ const TutorDashboardPage: React.FC = () => {
       totalCourses: courses.length,
       totalApplications: myApplications.length,
       availableOpportunities, // Number of role-course combinations user can still apply for
-      completionRate: totalRoleCourseCombinations > 0 
-        ? Math.round((appliedCombinations / totalRoleCourseCombinations) * 100)
-        : 0
+      completionRate:
+        totalRoleCourseCombinations > 0
+          ? Math.round(
+              (appliedCombinations / totalRoleCourseCombinations) * 100
+            )
+          : 0,
     };
   };
 
@@ -128,25 +145,25 @@ const TutorDashboardPage: React.FC = () => {
 
   // Check if user has applied to any role in a course
   const hasAppliedToCourse = (courseId: number) => {
-    return myApplications.some(app => app.courseId === courseId);
+    return myApplications.some((app) => app.courseId === courseId);
   };
-
-
 
   // Filter courses based on search query and active filter with memoization
   const filteredCourses = React.useMemo(() => {
     return courses.filter((course) => {
       const searchTerm = searchQuery.toLowerCase();
-      
+
       // Search only in courseCode, courseName, semester, and description
-      const matchesSearch = !searchQuery || 
+      const matchesSearch =
+        !searchQuery ||
         course.courseCode.toLowerCase().includes(searchTerm) ||
         course.courseName.toLowerCase().includes(searchTerm) ||
         course.semester.toLowerCase().includes(searchTerm) ||
-        (course.description && course.description.toLowerCase().includes(searchTerm));
+        (course.description &&
+          course.description.toLowerCase().includes(searchTerm));
 
       let matchesFilter = true;
-      
+
       switch (activeFilter) {
         case "available":
           // Show courses where user hasn't applied for ANY positions
@@ -164,7 +181,7 @@ const TutorDashboardPage: React.FC = () => {
 
       return matchesSearch && matchesFilter;
     });
-  }, [courses, searchQuery, activeFilter, myApplications]);
+  }, [courses, searchQuery, activeFilter, myApplications, hasAppliedToCourse]);
 
   const openApplyModal = (course: Course, role: Role) => {
     console.log("Apply button clicked for:", course.courseCode, role.roleName);
@@ -180,7 +197,9 @@ const TutorDashboardPage: React.FC = () => {
     );
 
     if (existingApplication) {
-      showError(`You have already applied for ${role.roleName} position in ${course.courseCode}.`);
+      showError(
+        `You have already applied for ${role.roleName} position in ${course.courseCode}.`
+      );
       return;
     }
 
@@ -205,7 +224,8 @@ const TutorDashboardPage: React.FC = () => {
       setIsSubmitting(true);
 
       // Submit application to backend
-      const response = await ApplicationService.createApplication(applicationData);
+      const response =
+        await ApplicationService.createApplication(applicationData);
 
       if (response.success && response.data) {
         // Add new application to local state
@@ -213,16 +233,17 @@ const TutorDashboardPage: React.FC = () => {
 
         // Close modal and show success message
         setIsModalOpen(false);
-        showSuccess(
-          `Application submitted for ${selectedCourse.courseCode}!`
-        );
+        showSuccess(`Application submitted for ${selectedCourse.courseCode}!`);
 
         // Clear the success message after 3 seconds
         setTimeout(() => {
           hideSuccess();
         }, 3000);
       } else {
-        showError(response.message || "Failed to submit your application. Please try again.");
+        showError(
+          response.message ||
+            "Failed to submit your application. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -298,17 +319,21 @@ const TutorDashboardPage: React.FC = () => {
               </p>
               {activeFilter === "available" && myApplications.length > 0 && (
                 <p className="text-gray-500 text-sm mt-2">
-                  You have applied to all available courses. Check the &quot;Applied&quot; filter to see your applications.
+                  You have applied to all available courses. Check the
+                  &quot;Applied&quot; filter to see your applications.
                 </p>
               )}
               {activeFilter === "applied" && myApplications.length === 0 && (
                 <p className="text-gray-500 text-sm mt-2">
-                  You haven&apos;t applied to any courses yet. Check the &quot;Available&quot; filter to see opportunities.
+                  You haven&apos;t applied to any courses yet. Check the
+                  &quot;Available&quot; filter to see opportunities.
                 </p>
               )}
             </div>
           ) : (
-            <div className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
+            <div
+              className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}
+            >
               {filteredCourses.map((course) => (
                 <CourseCard
                   key={course.id}

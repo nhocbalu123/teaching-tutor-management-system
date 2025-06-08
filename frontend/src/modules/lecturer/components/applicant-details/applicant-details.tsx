@@ -9,17 +9,29 @@ import {
   DEFAULT_COMMENT_CONFIG,
 } from "../../utils/lecturerValidation.utils";
 
+interface Course {
+  courseCode: string;
+  courseName: string;
+  availableTutors?: number;
+  availableLabAssistants?: number;
+  maxTutors?: number;
+  maxLabAssistants?: number;
+  selectedTutors?: number;
+  selectedLabAssistants?: number;
+}
+
 interface ApplicantDetailsProps {
   application: TutorApplication | null;
   comment: string;
   setComment: (comment: string) => void;
-  onSelectApplicant: (selectedCourses: string[]) => void;
-  onSaveComment: () => void;
-  onDeleteComment: () => void;
-  onUnselectApplicant: () => void;
-  onAddToRanking: () => void;
+  onSelectApplicant: (selectedCourses: string[]) => Promise<void>;
+  onSaveComment: () => Promise<void>;
+  onDeleteComment: () => Promise<void>;
+  onUnselectApplicant: () => Promise<void>;
+  onAddToRanking: () => Promise<void>;
   showToast: (message: string, type?: "success" | "error" | "info") => void;
   title?: string;
+  courses?: Course[];
 }
 
 const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
@@ -33,6 +45,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   onAddToRanking,
   showToast,
   title = "Applicant Details",
+  courses = [],
 }) => {
   // Validation states
   const [commentError, setCommentError] = useState<string>("");
@@ -351,7 +364,16 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     courseName: string;
                     semester: string;
                   };
+                  role?: {
+                    roleName: string;
+                  };
                 };
+
+                // Find course data with position information
+                const courseData = courses.find(
+                  (course) => course.courseCode === courseCode
+                );
+                const roleName = extendedApp.role?.roleName;
 
                 return (
                   <div key={courseCode} className={styles.courseCard}>
@@ -359,6 +381,29 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                     <div className={styles.courseName}>
                       {extendedApp.course?.courseName || "Course not found"}
                     </div>
+
+                    {/* Position Information */}
+                    {courseData && roleName && (
+                      <div className={styles.positionInfo}>
+                        {roleName === "tutor" && (
+                          <span className={styles.positionBadge}>
+                            Tutors:{" "}
+                            {(courseData.maxTutors ?? 0) -
+                              (courseData.availableTutors ?? 0)}
+                            /{courseData.maxTutors ?? 0}
+                          </span>
+                        )}
+                        {roleName === "lab_assistant" && (
+                          <span className={styles.positionBadge}>
+                            Lab Assistants:{" "}
+                            {(courseData.maxLabAssistants ?? 0) -
+                              (courseData.availableLabAssistants ?? 0)}
+                            /{courseData.maxLabAssistants ?? 0}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     {application.selectedForCourses?.includes(courseCode) && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

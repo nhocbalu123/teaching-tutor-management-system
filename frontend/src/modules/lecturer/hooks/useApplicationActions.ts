@@ -8,7 +8,9 @@ interface UseApplicationActionsProps {
   currentLecturerId: string;
   loadApplications: () => void;
   showToast: (message: string, type?: "success" | "error" | "info") => void;
-  saveApplication: (application: TutorApplication) => void;
+  saveApplication: (
+    application: TutorApplication
+  ) => Promise<{ success: boolean; message?: string }>;
   setSelectedApplication: (application: TutorApplication | null) => void;
   rankedApplications: TutorApplication[];
   setRankedApplications: (applications: TutorApplication[]) => void;
@@ -26,34 +28,42 @@ export const useApplicationActions = ({
   rankedApplications,
   setRankedApplications,
 }: UseApplicationActionsProps) => {
-  const handleSaveComment = () => {
+  const handleSaveComment = async () => {
     if (selectedApplication) {
       const updatedApplication = {
         ...selectedApplication,
         comment: comment,
       };
-      saveApplication(updatedApplication);
-      loadApplications();
-      setSelectedApplication(updatedApplication);
-      showToast("Comment saved!", "success");
+      const result = await saveApplication(updatedApplication);
+      if (result.success) {
+        loadApplications();
+        setSelectedApplication(updatedApplication);
+        showToast("Comment saved!", "success");
+      } else {
+        showToast(result.message || "Failed to save comment.", "error");
+      }
     }
   };
 
-  const handleDeleteComment = () => {
+  const handleDeleteComment = async () => {
     if (selectedApplication) {
       const updatedApplication = {
         ...selectedApplication,
         comment: "",
       };
-      saveApplication(updatedApplication);
-      loadApplications();
-      setSelectedApplication(updatedApplication);
-      setComment("");
-      showToast("Comment deleted!", "success");
+      const result = await saveApplication(updatedApplication);
+      if (result.success) {
+        loadApplications();
+        setSelectedApplication(updatedApplication);
+        setComment("");
+        showToast("Comment deleted!", "success");
+      } else {
+        showToast(result.message || "Failed to delete comment.", "error");
+      }
     }
   };
 
-  const handleSelectApplicantButton = (selectedCourses: string[]) => {
+  const handleSelectApplicantButton = async (selectedCourses: string[]) => {
     if (selectedApplication) {
       const updatedApplication = {
         ...selectedApplication,
@@ -62,14 +72,25 @@ export const useApplicationActions = ({
         selectedDate: getMelbourneDateOnly(),
         selectedForCourses: selectedCourses,
       };
-      saveApplication(updatedApplication);
-      loadApplications();
-      setSelectedApplication(updatedApplication);
-      showToast("Applicant selected!", "success");
+
+      try {
+        const result = await saveApplication(updatedApplication);
+        if (result.success) {
+          loadApplications();
+          setSelectedApplication(updatedApplication);
+          showToast("Applicant selected!", "success");
+        } else {
+          // Show the specific error message from the backend
+          showToast(result.message || "Failed to select applicant.", "error");
+        }
+      } catch (error) {
+        console.error("Error selecting applicant:", error);
+        showToast("Failed to select applicant. Please try again.", "error");
+      }
     }
   };
 
-  const handleUnselectApplicant = () => {
+  const handleUnselectApplicant = async () => {
     if (selectedApplication) {
       const updatedApplication = {
         ...selectedApplication,
@@ -79,31 +100,36 @@ export const useApplicationActions = ({
         selectedForCourses: undefined,
         rank: undefined,
       };
-      saveApplication(updatedApplication);
+      const result = await saveApplication(updatedApplication);
 
-      if (selectedApplication.rank !== undefined) {
-        const newRankedApplications = rankedApplications
-          .filter(
-            (app) =>
-              app.id !== selectedApplication.id &&
-              app.userId !== selectedApplication.userId
-          )
-          .map((app, index) => ({ ...app, rank: index + 1 }));
+      if (result.success) {
+        if (selectedApplication.rank !== undefined) {
+          const newRankedApplications = rankedApplications
+            .filter(
+              (app) =>
+                app.id !== selectedApplication.id &&
+                app.userId !== selectedApplication.userId
+            )
+            .map((app, index) => ({ ...app, rank: index + 1 }));
 
-        newRankedApplications.forEach((app) => {
-          saveApplication(app);
-        });
+          // Update rankings
+          for (const app of newRankedApplications) {
+            await saveApplication(app);
+          }
 
-        setRankedApplications(newRankedApplications);
+          setRankedApplications(newRankedApplications);
+        }
+
+        loadApplications();
+        setSelectedApplication(updatedApplication);
+        showToast("Applicant unselected and removed from ranking!", "success");
+      } else {
+        showToast(result.message || "Failed to unselect applicant.", "error");
       }
-
-      loadApplications();
-      setSelectedApplication(updatedApplication);
-      showToast("Applicant unselected and removed from ranking!", "success");
     }
   };
 
-  const handleAddToRanking = () => {
+  const handleAddToRanking = async () => {
     console.log("🚀 handleAddToRanking called:", {
       selectedApplication: selectedApplication?.id,
       currentRank: selectedApplication?.rank,
@@ -112,7 +138,12 @@ export const useApplicationActions = ({
       canAddToRank: selectedApplication && !selectedApplication.rank,
     });
 
-    if (selectedApplication && (selectedApplication.rank === null || selectedApplication.rank === undefined || selectedApplication.rank === 0)) {
+    if (
+      selectedApplication &&
+      (selectedApplication.rank === null ||
+        selectedApplication.rank === undefined ||
+        selectedApplication.rank === 0)
+    ) {
       const maxRank = rankedApplications.reduce(
         (max, app) => Math.max(max, app.rank || 0),
         0
@@ -128,20 +159,26 @@ export const useApplicationActions = ({
         updatedApplication: updatedApplication,
       });
 
-      saveApplication(updatedApplication);
-      loadApplications();
-      setSelectedApplication(updatedApplication);
-      showToast("Applicant added to ranking!", "success");
+      const result = await saveApplication(updatedApplication);
+      if (result.success) {
+        loadApplications();
+        setSelectedApplication(updatedApplication);
+        showToast("Applicant added to ranking!", "success");
+      } else {
+        showToast(result.message || "Failed to add to ranking.", "error");
+      }
     } else {
       console.log("❌ Cannot add to ranking:", {
         hasSelectedApplication: !!selectedApplication,
         currentRank: selectedApplication?.rank,
-        reason: !selectedApplication ? "No selected application" : "Already has rank",
+        reason: !selectedApplication
+          ? "No selected application"
+          : "Already has rank",
       });
     }
   };
 
-  const handleMoveUp = (application: TutorApplication) => {
+  const handleMoveUp = async (application: TutorApplication) => {
     const currentIndex = rankedApplications.findIndex(
       (app) => app.id === application.id || app.userId === application.userId
     );
@@ -151,14 +188,16 @@ export const useApplicationActions = ({
         newRankedApplications[currentIndex],
         newRankedApplications[currentIndex - 1],
       ] = [
-          newRankedApplications[currentIndex - 1],
-          newRankedApplications[currentIndex],
-        ];
+        newRankedApplications[currentIndex - 1],
+        newRankedApplications[currentIndex],
+      ];
 
-      newRankedApplications.forEach((app, index) => {
+      // Update rankings one by one
+      for (let index = 0; index < newRankedApplications.length; index++) {
+        const app = newRankedApplications[index];
         const updatedApp = { ...app, rank: index + 1 };
-        saveApplication(updatedApp);
-      });
+        await saveApplication(updatedApp);
+      }
 
       setRankedApplications(newRankedApplications);
       loadApplications();
@@ -166,7 +205,7 @@ export const useApplicationActions = ({
     }
   };
 
-  const handleMoveDown = (application: TutorApplication) => {
+  const handleMoveDown = async (application: TutorApplication) => {
     const currentIndex = rankedApplications.findIndex(
       (app) => app.id === application.id || app.userId === application.userId
     );
@@ -176,14 +215,16 @@ export const useApplicationActions = ({
         newRankedApplications[currentIndex],
         newRankedApplications[currentIndex + 1],
       ] = [
-          newRankedApplications[currentIndex + 1],
-          newRankedApplications[currentIndex],
-        ];
+        newRankedApplications[currentIndex + 1],
+        newRankedApplications[currentIndex],
+      ];
 
-      newRankedApplications.forEach((app, index) => {
+      // Update rankings one by one
+      for (let index = 0; index < newRankedApplications.length; index++) {
+        const app = newRankedApplications[index];
         const updatedApp = { ...app, rank: index + 1 };
-        saveApplication(updatedApp);
-      });
+        await saveApplication(updatedApp);
+      }
 
       setRankedApplications(newRankedApplications);
       loadApplications();
@@ -191,22 +232,23 @@ export const useApplicationActions = ({
     }
   };
 
-  const handleRemoveFromRanking = (applicationId: string) => {
+  const handleRemoveFromRanking = async (applicationId: string) => {
     const appToRemove = rankedApplications.find(
       (app) => app.id === applicationId || app.userId === applicationId
     );
     if (appToRemove) {
       const updatedApplication = { ...appToRemove, rank: undefined };
-      saveApplication(updatedApplication);
+      await saveApplication(updatedApplication);
       const newRankedApplications = rankedApplications
         .filter(
           (app) => app.id !== applicationId && app.userId !== applicationId
         )
         .map((app, index) => ({ ...app, rank: index + 1 }));
 
-      newRankedApplications.forEach((app) => {
-        saveApplication(app);
-      });
+      // Update rankings one by one
+      for (const app of newRankedApplications) {
+        await saveApplication(app);
+      }
 
       setRankedApplications(newRankedApplications);
       loadApplications();

@@ -266,6 +266,16 @@ const LecturerDashboardInner: React.FC = () => {
   const [courses, setCourses] = useState<Array<{ code: string; name: string }>>(
     []
   );
+  const [fullCourseData, setFullCourseData] = useState<
+    Array<{
+      courseCode: string;
+      courseName: string;
+      availableTutors?: number;
+      availableLabAssistants?: number;
+      maxTutors?: number;
+      maxLabAssistants?: number;
+    }>
+  >([]);
   const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const [skillsFilterArray, setSkillsFilterArray] = useState<string[]>([]);
 
@@ -294,8 +304,20 @@ const LecturerDashboardInner: React.FC = () => {
           name: course.courseName,
         }));
         setCourses(courseList);
+
+        // Store full course data with position information
+        const fullCourses = response.data.map((course) => ({
+          courseCode: course.courseCode,
+          courseName: course.courseName,
+          availableTutors: course.availableTutors,
+          availableLabAssistants: course.availableLabAssistants,
+          maxTutors: course.maxTutors,
+          maxLabAssistants: course.maxLabAssistants,
+        }));
+        setFullCourseData(fullCourses);
       } else {
         setCourses([]);
+        setFullCourseData([]);
         if (response.message && !response.success) {
           showToast(
             "No courses assigned yet. Contact administrator for course assignments.",
@@ -306,6 +328,7 @@ const LecturerDashboardInner: React.FC = () => {
     } catch (error) {
       console.error("Error loading assigned courses:", error);
       setCourses([]);
+      setFullCourseData([]);
       showToast(
         "Error loading courses. Please check your connection.",
         "error"
@@ -428,7 +451,7 @@ const LecturerDashboardInner: React.FC = () => {
 
       if (response.success) {
         showToast("Comment saved successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to save comment", "error");
       }
@@ -449,7 +472,7 @@ const LecturerDashboardInner: React.FC = () => {
       if (response.success) {
         setComment("");
         showToast("Comment deleted", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to delete comment", "error");
       }
@@ -490,7 +513,7 @@ const LecturerDashboardInner: React.FC = () => {
 
       if (response.success) {
         showToast("Applicant selected successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to select applicant", "error");
       }
@@ -525,7 +548,7 @@ const LecturerDashboardInner: React.FC = () => {
 
       if (response.success) {
         showToast("Applicant unselected and removed from ranking", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to unselect applicant", "error");
       }
@@ -595,7 +618,7 @@ const LecturerDashboardInner: React.FC = () => {
 
       if (response.success) {
         showToast("Added to ranking successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to add to ranking", "error");
       }
@@ -637,7 +660,7 @@ const LecturerDashboardInner: React.FC = () => {
         );
 
         showToast("Ranking updated successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to update ranking", "error");
       }
@@ -679,7 +702,7 @@ const LecturerDashboardInner: React.FC = () => {
         );
 
         showToast("Ranking updated successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to update ranking", "error");
       }
@@ -696,7 +719,7 @@ const LecturerDashboardInner: React.FC = () => {
 
       if (response.success) {
         showToast("Removed from ranking successfully", "success");
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCourses()]);
       } else {
         showToast(response.message || "Failed to remove from ranking", "error");
       }
@@ -791,6 +814,7 @@ const LecturerDashboardInner: React.FC = () => {
                       onUnselectApplicant={handleUnselectApplicant}
                       onAddToRanking={handleAddToRanking}
                       showToast={showToast}
+                      courses={fullCourseData}
                     />
                   </div>
                 </div>

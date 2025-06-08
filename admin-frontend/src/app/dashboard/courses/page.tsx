@@ -33,6 +33,10 @@ interface Course {
     description?: string;
     maxTutors: number;
     maxLabAssistants: number;
+    selectedTutors?: number;
+    selectedLabAssistants?: number;
+    availableTutors?: number;
+    availableLabAssistants?: number;
     createdAt: string;
     courseAssignments: Array<{
         id: number;
@@ -77,8 +81,8 @@ export default function CoursesManagement() {
         courseName: "",
         semester: "",
         description: "",
-        maxTutors: 5,
-        maxLabAssistants: 3,
+        maxTutors: 0,
+        maxLabAssistants: 0,
     });
 
     // Toast hook
@@ -204,8 +208,8 @@ export default function CoursesManagement() {
             courseName: "",
             semester: "",
             description: "",
-            maxTutors: 5,
-            maxLabAssistants: 3,
+            maxTutors: 0,
+            maxLabAssistants: 0,
         });
     };
 
@@ -453,18 +457,27 @@ export default function CoursesManagement() {
                                 <div className={styles.courseStats}>
                                     <div className={styles.courseStat}>
                                         <h4 className={styles.courseStatValue}>
-                                            {course.maxTutors}
+                                            {(course.maxTutors ?? 0) -
+                                                (course.availableTutors ??
+                                                    course.maxTutors ??
+                                                    0)}
+                                            /{course.maxTutors}
                                         </h4>
                                         <p className={styles.courseStatLabel}>
-                                            Max Tutors
+                                            Current Applicants/Total Tutors
                                         </p>
                                     </div>
                                     <div className={styles.courseStat}>
                                         <h4 className={styles.courseStatValue}>
-                                            {course.maxLabAssistants}
+                                            {(course.maxLabAssistants ?? 0) -
+                                                (course.availableLabAssistants ??
+                                                    course.maxLabAssistants ??
+                                                    0)}
+                                            /{course.maxLabAssistants}
                                         </h4>
                                         <p className={styles.courseStatLabel}>
-                                            Max Lab Assistants
+                                            Current Applicants/Total Lab
+                                            Assistants
                                         </p>
                                     </div>
                                     <div className={styles.courseStat}>
@@ -669,7 +682,7 @@ export default function CoursesManagement() {
                                         </label>
                                         <input
                                             type="number"
-                                            min="1"
+                                            min="0"
                                             required
                                             value={formData.maxTutors}
                                             onChange={(e) =>
@@ -689,7 +702,7 @@ export default function CoursesManagement() {
                                         </label>
                                         <input
                                             type="number"
-                                            min="1"
+                                            min="0"
                                             required
                                             value={formData.maxLabAssistants}
                                             onChange={(e) =>
@@ -823,7 +836,7 @@ export default function CoursesManagement() {
                                         </label>
                                         <input
                                             type="number"
-                                            min="1"
+                                            min="0"
                                             required
                                             value={formData.maxTutors}
                                             onChange={(e) =>
@@ -843,7 +856,7 @@ export default function CoursesManagement() {
                                         </label>
                                         <input
                                             type="number"
-                                            min="1"
+                                            min="0"
                                             required
                                             value={formData.maxLabAssistants}
                                             onChange={(e) =>

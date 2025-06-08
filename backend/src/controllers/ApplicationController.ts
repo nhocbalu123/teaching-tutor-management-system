@@ -171,9 +171,58 @@ export class ApplicationController {
                 order: { roleName: "ASC" },
             });
 
+            // Calculate available positions for each course by subtracting selected applications
+            const coursesWithAvailablePositions = await Promise.all(
+                courses.map(async (course) => {
+                    // Count selected applications for tutors
+                    const selectedTutors =
+                        await this.applicationRepository.count({
+                            where: {
+                                courseId: course.id,
+                                status: ApplicationStatus.SELECTED,
+                                role: { roleName: "tutor" },
+                            },
+                            relations: ["role"],
+                        });
+
+                    // Count selected applications for lab assistants
+                    const selectedLabAssistants =
+                        await this.applicationRepository.count({
+                            where: {
+                                courseId: course.id,
+                                status: ApplicationStatus.SELECTED,
+                                role: { roleName: "lab_assistant" },
+                            },
+                            relations: ["role"],
+                        });
+
+                    // Calculate available positions
+                    const availableTutors = Math.max(
+                        0,
+                        course.maxTutors - selectedTutors
+                    );
+                    const availableLabAssistants = Math.max(
+                        0,
+                        course.maxLabAssistants - selectedLabAssistants
+                    );
+
+                    return {
+                        ...course,
+                        // Keep original max positions
+                        maxTutors: course.maxTutors,
+                        maxLabAssistants: course.maxLabAssistants,
+                        // Add available positions as separate fields
+                        availableTutors,
+                        availableLabAssistants,
+                        selectedTutors,
+                        selectedLabAssistants,
+                    };
+                })
+            );
+
             res.status(200).json({
                 success: true,
-                data: { courses, roles },
+                data: { courses: coursesWithAvailablePositions, roles },
             });
         } catch (error) {
             console.error("💥 Error fetching courses and roles:", error);
@@ -447,6 +496,36 @@ export class ApplicationController {
                 return;
             }
 
+            // If selecting an application, check if positions are available
+            if (status === ApplicationStatus.SELECTED) {
+                // Get the course to check max positions
+                const course = application.course;
+
+                // Count currently selected applications for this role in this course
+                const selectedCount = await this.applicationRepository.count({
+                    where: {
+                        courseId: application.courseId,
+                        status: ApplicationStatus.SELECTED,
+                        role: { roleName: application.role.roleName },
+                    },
+                    relations: ["role"],
+                });
+
+                // Check if positions are available
+                const maxPositions =
+                    application.role.roleName === "tutor"
+                        ? course.maxTutors
+                        : course.maxLabAssistants;
+
+                if (selectedCount >= maxPositions) {
+                    res.status(400).json({
+                        success: false,
+                        message: `No positions available for ${application.role.roleName} role in ${course.courseCode}. All ${maxPositions} positions are filled.`,
+                    });
+                    return;
+                }
+            }
+
             // Update application status
             application.status = status;
             const updatedApplication = await this.applicationRepository.save(
@@ -581,13 +660,58 @@ export class ApplicationController {
 
             const assignedCourses = courseAssignments.map((ca) => ca.course);
 
+            // Add position availability information for lecturers
+            const coursesWithAvailability = await Promise.all(
+                assignedCourses.map(async (course) => {
+                    // Count selected applications for tutors
+                    const selectedTutors =
+                        await this.applicationRepository.count({
+                            where: {
+                                courseId: course.id,
+                                status: ApplicationStatus.SELECTED,
+                                role: { roleName: "tutor" },
+                            },
+                            relations: ["role"],
+                        });
+
+                    // Count selected applications for lab assistants
+                    const selectedLabAssistants =
+                        await this.applicationRepository.count({
+                            where: {
+                                courseId: course.id,
+                                status: ApplicationStatus.SELECTED,
+                                role: { roleName: "lab_assistant" },
+                            },
+                            relations: ["role"],
+                        });
+
+                    // Calculate available positions
+                    const availableTutors = Math.max(
+                        0,
+                        course.maxTutors - selectedTutors
+                    );
+                    const availableLabAssistants = Math.max(
+                        0,
+                        course.maxLabAssistants - selectedLabAssistants
+                    );
+
+                    return {
+                        ...course,
+                        selectedTutors,
+                        selectedLabAssistants,
+                        availableTutors,
+                        availableLabAssistants,
+                    };
+                })
+            );
+
             console.log(
-                `✅ Found ${assignedCourses.length} assigned courses for lecturer`
+                `✅ Found ${coursesWithAvailability.length} assigned courses for lecturer`
             );
 
             res.status(200).json({
                 success: true,
-                data: assignedCourses,
+                data: coursesWithAvailability,
             });
         } catch (error) {
             console.error("💥 Error fetching assigned courses:", error);
