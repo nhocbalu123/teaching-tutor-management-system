@@ -85,24 +85,7 @@ export const useApplicationManagement = () => {
             status: app.status,
           }));
 
-        console.log("📊 Ranked applications loaded:");
-        console.log("Total applications:", response.data.length);
-        console.log(
-          "Selected applications:",
-          response.data.filter((app) => app.status === "selected").length
-        );
-        console.log("All selected apps with rank data:", allSelectedApps);
-        console.log("Filtered ranked applications:", ranked.length);
-        console.log(
-          "Ranked apps:",
-          ranked.map((app) => ({
-            id: app.id,
-            name: app.candidate?.firstName + " " + app.candidate?.lastName,
-            rank: app.rank,
-            rankedForCourse: app.rankedForCourse,
-            status: app.status,
-          }))
-        );
+        // Applications loaded successfully
 
         setRankedApplications(ranked);
       } else {
@@ -192,27 +175,7 @@ export const useApplicationManagement = () => {
         const hasStatusChanged =
           selectedApplication.status !== updatedSelectedApplication.status;
 
-        console.log("🔄 Syncing selectedApplication with updated data:", {
-          oldComment: selectedApplication.comment,
-          newComment: updatedSelectedApplication.comment,
-          oldRank: selectedApplication.rank,
-          newRank: updatedSelectedApplication.rank,
-          oldBlocked: selectedApplication.candidate?.isBlocked,
-          newBlocked: updatedSelectedApplication.candidate?.isBlocked,
-          oldStatus: selectedApplication.status,
-          newStatus: updatedSelectedApplication.status,
-          applicationId: selectedApplication.id,
-          hasCommentChanged,
-          hasRankChanged,
-          hasBlockedStatusChanged,
-          hasStatusChanged,
-          willUpdate:
-            updatedSelectedApplication !== selectedApplication ||
-            hasCommentChanged ||
-            hasRankChanged ||
-            hasBlockedStatusChanged ||
-            hasStatusChanged,
-        });
+        // Sync selectedApplication with updated data
 
         // Update the selectedApplication if it's different OR if any important field has changed
         if (

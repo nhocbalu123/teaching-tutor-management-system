@@ -58,26 +58,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
 
-  // Debug logging for user info
-  useEffect(() => {
-    console.log("📬 NotificationProvider user state:", {
-      userId: user?.id,
-      userType: user?.userType,
-      isLecturer: user?.userType === "lecturer",
-    });
-  }, [user?.id, user?.userType]);
-
   // Load notifications from localStorage on mount (lecturer-specific)
   useEffect(() => {
     if (user?.userType === "lecturer" && user?.id) {
       const storageKey = `lecturer_notifications_${user.id}`;
       const savedNotifications = localStorage.getItem(storageKey);
-      console.log(
-        "📬 Loading notifications for lecturer:",
-        user.id,
-        "from key:",
-        storageKey
-      );
       if (savedNotifications) {
         try {
           const parsed = JSON.parse(savedNotifications);
@@ -86,16 +71,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
             timestamp: new Date(n.timestamp),
           }));
           setNotifications(notificationsWithDates);
-          console.log(
-            "📬 Loaded",
-            notificationsWithDates.length,
-            "notifications from localStorage"
-          );
         } catch (error) {
           console.error("Failed to parse saved notifications:", error);
         }
-      } else {
-        console.log("📬 No saved notifications found in localStorage");
       }
     }
   }, [user?.userType, user?.id]);
@@ -105,12 +83,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     if (user?.userType === "lecturer" && user?.id) {
       const storageKey = `lecturer_notifications_${user.id}`;
       localStorage.setItem(storageKey, JSON.stringify(notifications));
-      console.log(
-        "📬 Saved",
-        notifications.length,
-        "notifications to localStorage with key:",
-        storageKey
-      );
     }
   }, [notifications, user?.userType, user?.id]);
 
@@ -123,21 +95,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         read: false,
       };
 
-      console.log("📬 Adding new notification:", newNotification);
-      setNotifications((prev) => {
-        const updated = [newNotification, ...prev];
-        console.log(
-          "📬 Updated notifications array, total count:",
-          updated.length
-        );
-        return updated;
-      });
+      setNotifications((prev) => [newNotification, ...prev]);
     },
     []
   );
 
   const markAsRead = useCallback((notificationId: string) => {
-    console.log("📬 Marking notification as read:", notificationId);
     setNotifications((prev) =>
       prev.map((notification) =>
         notification.id === notificationId
@@ -148,38 +111,22 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   }, []);
 
   const markAllAsRead = useCallback(() => {
-    console.log("📬 Marking all notifications as read");
     setNotifications((prev) =>
       prev.map((notification) => ({ ...notification, read: true }))
     );
   }, []);
 
   const removeNotification = useCallback((notificationId: string) => {
-    console.log("📬 Removing notification:", notificationId);
     setNotifications((prev) =>
       prev.filter((notification) => notification.id !== notificationId)
     );
   }, []);
 
   const clearAllNotifications = useCallback(() => {
-    console.log("📬 Clearing all notifications");
     setNotifications([]);
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  // Debug logging for notification state
-  useEffect(() => {
-    console.log("📬 NotificationProvider state updated:", {
-      totalNotifications: notifications.length,
-      unreadCount,
-      notifications: notifications.map((n) => ({
-        id: n.id,
-        title: n.title,
-        read: n.read,
-      })),
-    });
-  }, [notifications, unreadCount]);
 
   const contextValue: NotificationContextType = {
     notifications,

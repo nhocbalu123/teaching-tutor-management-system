@@ -19,18 +19,6 @@ const Header: React.FC = () => {
   const [isThemeToggleRemoving, setIsThemeToggleRemoving] = useState(false);
   const [isThemeToggleAdding, setIsThemeToggleAdding] = useState(false);
 
-  // Debug logging for user state in header
-  useEffect(() => {
-    console.log("🏠 Header user state:", {
-      isAuthenticated,
-      userId: user?.id,
-      userType: user?.userType,
-      isLecturer: user?.userType === "lecturer",
-      shouldShowNotificationBell:
-        isAuthenticated && user?.userType === "lecturer",
-    });
-  }, [isAuthenticated, user?.id, user?.userType]);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -153,15 +141,7 @@ const Header: React.FC = () => {
             )}
             {isAuthenticated && user ? (
               <div className={styles.userSection}>
-                {user.userType === "lecturer" && (
-                  <>
-                    {console.log(
-                      "🔔 Rendering NotificationBell for lecturer:",
-                      user.id
-                    )}
-                    <NotificationBell />
-                  </>
-                )}
+                {user.userType === "lecturer" && <NotificationBell />}
                 <UserDropdown
                   user={{
                     fullName: `${user.firstName} ${user.lastName}`,

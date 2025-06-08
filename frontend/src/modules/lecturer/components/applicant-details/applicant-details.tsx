@@ -52,12 +52,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   useEffect(() => {
     const originalComment = application?.comment || "";
     const hasChanges = comment !== originalComment;
-    console.log("📝 Unsaved changes check:", {
-      originalComment,
-      comment,
-      hasChanges,
-      applicationId: application?.id,
-    });
     setHasUnsavedChanges(hasChanges);
   }, [comment, application?.comment, application?.id]);
 
@@ -150,17 +144,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   };
 
   const handleAddToRankingClick = () => {
-    console.log("🎯 handleAddToRankingClick called:", {
-      applicationId: application?.id,
-      selected: application?.selected,
-      rank: application?.rank,
-      rankType: typeof application?.rank,
-      comment: application?.comment,
-      hasComment: !!application?.comment,
-    });
-
     if (!application.selected) {
-      console.log("❌ Not selected");
       showToast(
         "Please select the applicant before adding to ranking",
         "error"
@@ -173,19 +157,16 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       application.rank !== undefined &&
       application.rank > 0
     ) {
-      console.log("❌ Already ranked:", application.rank);
       showToast("Applicant is already added to ranking", "info");
       return;
     }
     if (!application.comment) {
-      console.log("❌ No comment");
       showToast(
         "Please add and save a comment before adding to ranking.",
         "error"
       );
       return;
     }
-    console.log("✅ Calling onAddToRanking");
     onAddToRanking();
   };
 

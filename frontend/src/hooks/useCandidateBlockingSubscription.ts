@@ -24,16 +24,6 @@ export function useCandidateBlockingSubscription({
   const { user } = useAuth();
   const { addNotification } = useNotifications();
 
-  // Debug logging for user state
-  useEffect(() => {
-    console.log("🎯 useCandidateBlockingSubscription - User state:", {
-      userId: user?.id,
-      userType: user?.userType,
-      hasUser: !!user,
-      isLecturer: user?.userType === "lecturer",
-    });
-  }, [user?.id, user?.userType]);
-
   // Update refs when callbacks change
   useEffect(() => {
     onCandidateBlockedRef.current = onCandidateBlocked;
@@ -53,15 +43,6 @@ export function useCandidateBlockingSubscription({
   // Process subscription data - stable callback
   const processSubscriptionData = useCallback(
     (event: CandidateBlockedEvent) => {
-      console.log("🎯 processSubscriptionData called with event:", {
-        candidateId: event.candidateId,
-        candidateName: event.candidateName,
-        isBlocked: event.isBlocked,
-        affectedLecturerIds: event.affectedLecturerIds,
-        currentUserId: user?.id,
-        currentUserType: user?.userType,
-      });
-
       // Update state to show data received
       setSubscriptionState((prev) => ({
         ...prev,
@@ -73,17 +54,6 @@ export function useCandidateBlockingSubscription({
         user?.userType === "lecturer" &&
         event.affectedLecturerIds &&
         event.affectedLecturerIds.includes(user.id);
-
-      console.log("🔔 Processing candidate blocking event:", {
-        candidateName: event.candidateName,
-        isBlocked: event.isBlocked,
-        currentUserId: user?.id,
-        currentUserType: user?.userType,
-        affectedLecturerIds: event.affectedLecturerIds,
-        shouldReceiveNotification,
-        hasNotificationSystem: !!addNotification,
-        userIdInArray: event.affectedLecturerIds?.includes(user?.id || -1),
-      });
 
       // Add notification for affected lecturers
       if (shouldReceiveNotification) {
@@ -109,14 +79,6 @@ export function useCandidateBlockingSubscription({
           message += ` - ${details.join(", ")}`;
         }
 
-        console.log("📬 About to add notification:", {
-          title,
-          message,
-          candidateId: event.candidateId,
-          candidateName: event.candidateName,
-          type: event.isBlocked ? "candidate_blocked" : "candidate_unblocked",
-        });
-
         addNotification({
           type: event.isBlocked ? "candidate_blocked" : "candidate_unblocked",
           title,
@@ -125,19 +87,6 @@ export function useCandidateBlockingSubscription({
           candidateName: event.candidateName,
           unselectedCount: unselectedCount,
           unrankedCount: unrankedCount,
-        });
-
-        console.log("📬 Added notification for lecturer:", {
-          title,
-          message,
-          candidateName: event.candidateName,
-        });
-      } else {
-        console.log("🚫 Not adding notification because:", {
-          isLecturer: user?.userType === "lecturer",
-          hasAffectedLecturerIds: !!event.affectedLecturerIds,
-          userIdIncluded: event.affectedLecturerIds?.includes(user?.id || -1),
-          shouldReceiveNotification,
         });
       }
 
@@ -161,8 +110,6 @@ export function useCandidateBlockingSubscription({
       process.env.NEXT_PUBLIC_ADMIN_WS_ENDPOINT ||
       "ws://localhost:4002/graphql";
 
-    console.log("🔗 Creating WebSocket connection to:", wsUrl);
-
     const ws = new WebSocket(wsUrl, "graphql-transport-ws");
     wsRef.current = ws;
 
@@ -173,8 +120,6 @@ export function useCandidateBlockingSubscription({
         return;
       }
 
-      console.log("✅ WebSocket connection opened");
-
       // Send connection init message
       const initMessage = {
         type: "connection_init",
@@ -182,7 +127,6 @@ export function useCandidateBlockingSubscription({
       };
       try {
         ws.send(JSON.stringify(initMessage));
-        console.log("📤 Sent connection init message");
       } catch {
         // Silently handle connection init errors
       }
@@ -196,11 +140,9 @@ export function useCandidateBlockingSubscription({
 
       try {
         const message = JSON.parse(event.data);
-        console.log("📨 WebSocket message received:", message.type, message);
 
         switch (message.type) {
           case "connection_ack":
-            console.log("🤝 Connection acknowledged, sending subscription");
             // Send subscription message using graphql-transport-ws protocol
             const subscriptionMessage = {
               id: "candidate-blocking-subscription",
@@ -232,7 +174,6 @@ export function useCandidateBlockingSubscription({
             };
             try {
               ws.send(JSON.stringify(subscriptionMessage));
-              console.log("📤 Sent subscription message");
               // Clear any previous errors and mark as connected
               setSubscriptionState((prev) => ({
                 ...prev,
@@ -246,10 +187,6 @@ export function useCandidateBlockingSubscription({
             break;
 
           case "next":
-            console.log(
-              "📡 Subscription data received:",
-              message.payload?.data
-            );
             if (message.payload?.data?.candidateBlockingUpdates) {
               processSubscriptionData(
                 message.payload.data.candidateBlockingUpdates
@@ -270,7 +207,6 @@ export function useCandidateBlockingSubscription({
             break;
 
           case "complete":
-            console.log("✅ Subscription completed");
             if (!isCleanedUpRef.current) {
               setSubscriptionState((prev) => ({
                 ...prev,
@@ -281,7 +217,6 @@ export function useCandidateBlockingSubscription({
             break;
 
           default:
-            console.log("❓ Unknown message type:", message.type);
             break;
         }
       } catch (error) {
@@ -344,7 +279,6 @@ export function useCandidateBlockingSubscription({
 
   // Initialize direct WebSocket connection with delay to prevent React Strict Mode issues
   useEffect(() => {
-    console.log("🚀 Initializing WebSocket subscription");
     // Reset cleanup flag
     isCleanedUpRef.current = false;
 
@@ -361,7 +295,6 @@ export function useCandidateBlockingSubscription({
 
     // Cleanup function
     return () => {
-      console.log("🧹 Cleaning up WebSocket subscription");
       // Mark as cleaned up to prevent handlers from running
       isCleanedUpRef.current = true;
 

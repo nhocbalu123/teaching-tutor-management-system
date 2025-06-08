@@ -32,15 +32,7 @@ const ApplicantItem = React.memo<{
   // Reduce animation complexity for large lists
   const shouldAnimate = index < 20; // Only animate first 20 items
 
-  // Debug log để check rank value
-  if (application.rank !== undefined) {
-    console.log(`🔍 Crown debug for ${application.fullName}:`, {
-      rank: application.rank,
-      rankType: typeof application.rank,
-      shouldShowCrown:
-        application.rank !== undefined && application.rank !== null,
-    });
-  }
+  // Check if application should show ranking crown
 
   const itemContent = (
     <div
