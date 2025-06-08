@@ -7,8 +7,10 @@ import { CourseAssignment } from "../types/CourseAssignment";
 import { Application } from "../types/Application";
 import { SelectedCandidate } from "../types/SelectedCandidate";
 import bcrypt from "bcryptjs";
+import path from "path";
 
-config();
+// Load environment variables from root .env file
+config({ path: path.resolve(__dirname, "../../../.env") });
 
 export const AppDataSource = new DataSource({
     type: "mysql",

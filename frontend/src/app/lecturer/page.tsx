@@ -20,6 +20,9 @@ import ApplicationFilters from "@/modules/lecturer/components/application-filter
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { redirect } from "next/navigation";
 import styles from "./LecturerPage.module.css";
+import { AdminApolloProvider } from "@/components/AdminApolloProvider";
+import { useCandidateBlockingSubscription } from "@/hooks/useCandidateBlockingSubscription";
+import { CandidateBlockedEvent } from "@/lib/graphql-subscriptions";
 
 type TabType = "applications" | "rankings" | "stats";
 
@@ -30,6 +33,7 @@ const convertToLegacyApplication = (
   role?: { roleName: string };
   course?: { courseCode: string; courseName: string; semester: string };
   rankedForCourse?: string;
+  isBlocked?: boolean;
 } => {
   const availabilityValue =
     (appResponse.availability as { type: string })?.type || "Part Time";
@@ -74,6 +78,8 @@ const convertToLegacyApplication = (
         ? [appResponse.course.courseCode]
         : undefined,
     rankedForCourse: appResponse.rankedForCourse,
+    // Add blocking status
+    isBlocked: appResponse.candidate?.isBlocked || false,
   };
 };
 
@@ -108,10 +114,89 @@ const convertToLegacyStatistics = (stats: unknown) => {
   };
 };
 
-const LecturerDashboardPage: React.FC = () => {
+const LecturerDashboardInner: React.FC = () => {
   // Authentication
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { lecturerName } = useLecturerAuth();
+
+  // UI state
+  const [activeTab, setActiveTab] = useState<TabType>("applications");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
+
+  // Show toast function
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" | "info" = "success") => {
+      console.log("🍞 showToast called:", { message, type });
+
+      // Clear any existing toast first
+      setToastMessage(null);
+
+      // Set new toast after a small delay to ensure the previous one is cleared
+      setTimeout(() => {
+        setToastMessage(message);
+        setToastType(type);
+      }, 10);
+    },
+    []
+  );
+
+  // Test function to manually trigger toast
+  const testToast = useCallback(() => {
+    console.log("🧪 Testing toast functionality");
+    showToast("Test notification: Candidate blocked", "info");
+    showToast("Test notification: Candidate unblocked", "success");
+  }, [showToast]);
+
+  // Test backend connectivity first
+  const testBackendConnectivity = useCallback(async () => {
+    console.log("🧪 Testing backend connectivity...");
+    const httpUrl =
+      process.env.NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT ||
+      "http://localhost:4002/graphql";
+    const healthUrl = "http://localhost:4002/health";
+
+    // Test 1: Health endpoint
+    try {
+      console.log("🏥 Testing health endpoint:", healthUrl);
+      const healthResponse = await fetch(healthUrl);
+      if (healthResponse.ok) {
+        const healthData = await healthResponse.json();
+        console.log("✅ Health endpoint response:", healthData);
+        showToast("Health check: Connected", "success");
+      } else {
+        console.log("❌ Health endpoint failed:", healthResponse.status);
+        showToast(`Health check failed: ${healthResponse.status}`, "error");
+      }
+    } catch (error) {
+      console.error("❌ Health endpoint error:", error);
+      showToast("Health check: Network error", "error");
+    }
+
+    // Test 2: GraphQL endpoint
+    try {
+      console.log("🔗 Testing GraphQL endpoint:", httpUrl);
+      const response = await fetch(httpUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: "query { __typename }" }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ GraphQL endpoint response:", data);
+        showToast("GraphQL test: Connected", "success");
+      } else {
+        console.log("❌ GraphQL endpoint failed:", response.status);
+        showToast(`GraphQL test failed: ${response.status}`, "error");
+      }
+    } catch (error) {
+      console.error("❌ GraphQL endpoint error:", error);
+      showToast("GraphQL test: Network error", "error");
+    }
+  }, [showToast]);
 
   // Application management with enhanced filtering
   const {
@@ -143,6 +228,130 @@ const LecturerDashboardPage: React.FC = () => {
     handleSelectApplication: rawHandleSelectApplication,
   } = useApplicationManagement();
 
+  // Memoize the callback function to prevent excessive re-initializations
+  const onCandidateBlocked = useCallback(
+    (event: CandidateBlockedEvent) => {
+      console.log("🔔 Candidate blocking event received:", event);
+      console.log("🔄 Refreshing applications after blocking event...");
+      // Refresh applications to get updated data
+      loadApplications()
+        .then(() => {
+          console.log("✅ Applications refreshed after blocking event");
+        })
+        .catch((error) => {
+          console.error("❌ Failed to refresh applications:", error);
+        });
+    },
+    [loadApplications]
+  );
+
+  // Candidate blocking subscription with memoized callbacks
+  const subscriptionResult = useCandidateBlockingSubscription({
+    showToast,
+    onCandidateBlocked,
+  });
+
+  const {
+    isConnected: subscriptionConnected,
+    loading: subscriptionLoading,
+    error: subscriptionError,
+    dataReceived,
+  } = subscriptionResult;
+
+  // Track if connection toast has been shown
+  const [connectionToastShown, setConnectionToastShown] = useState(false);
+
+  // Test subscription connection via Apollo Client (defined after subscription variables)
+  const testSubscriptionConnection = useCallback(() => {
+    console.log("🧪 Testing Apollo Client subscription connection");
+
+    if (subscriptionConnected) {
+      showToast("✅ Subscription is already connected!", "success");
+      console.log("✅ Subscription status: Connected and ready");
+    } else if (subscriptionLoading) {
+      showToast("🔄 Subscription is connecting...", "info");
+      console.log("🔄 Subscription status: Loading/Connecting");
+    } else if (subscriptionError) {
+      showToast(`❌ Subscription error: ${subscriptionError.message}`, "error");
+      console.log("❌ Subscription status: Error -", subscriptionError.message);
+    } else {
+      showToast("❓ Subscription status unknown", "info");
+      console.log("❓ Subscription status: Unknown state");
+    }
+
+    console.log("🔍 Full subscription state:", {
+      connected: subscriptionConnected,
+      loading: subscriptionLoading,
+      error: subscriptionError?.message,
+      dataReceived,
+    });
+  }, [
+    subscriptionConnected,
+    subscriptionLoading,
+    subscriptionError,
+    dataReceived,
+    showToast,
+  ]);
+
+  // Test subscription event trigger
+  const testSubscriptionEvent = useCallback(async () => {
+    console.log("🧪 Triggering test subscription event...");
+    showToast("🧪 Triggering test subscription event...", "info");
+
+    try {
+      const response = await fetch("http://localhost:4002/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: `mutation { testSubscription }`,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("🧪 Test subscription response:", result);
+
+      if (result.data?.testSubscription) {
+        showToast("✅ Test event triggered successfully!", "success");
+        console.log("✅ Test subscription event triggered successfully");
+      } else {
+        showToast("❌ Failed to trigger test event", "error");
+        console.error("❌ Test subscription failed:", result.errors);
+      }
+    } catch (error) {
+      console.error("❌ Error triggering test subscription:", error);
+      showToast("❌ Error triggering test event", "error");
+    }
+  }, [showToast]);
+
+  // Log subscription connection status for debugging
+  useEffect(() => {
+    console.log("🔗 Subscription status:", {
+      connected: subscriptionConnected,
+      loading: subscriptionLoading,
+      error: subscriptionError?.message,
+      dataReceived,
+    });
+  }, [
+    subscriptionConnected,
+    subscriptionLoading,
+    subscriptionError,
+    dataReceived,
+  ]);
+
+  // Add debug info for subscription - only show connection toast once
+  useEffect(() => {
+    if (subscriptionConnected && !connectionToastShown) {
+      console.log("✅ Real-time notifications are active");
+      showToast("Real-time notifications connected", "info");
+      setConnectionToastShown(true);
+    } else if (!subscriptionConnected) {
+      console.log("🔌 Real-time notifications disconnected");
+      setConnectionToastShown(false);
+    }
+  }, [subscriptionConnected, showToast, connectionToastShown]);
+
   // Convert to legacy format for existing components
   const applications = rawApplications.map(convertToLegacyApplication);
   const statistics = convertToLegacyStatistics(rawStatistics);
@@ -168,18 +377,12 @@ const LecturerDashboardPage: React.FC = () => {
     }
   }, [selectedApplication, rawSelectedApplication]);
 
-  // UI state
-  const [activeTab, setActiveTab] = useState<TabType>("applications");
+  // Additional UI state
   const [courses, setCourses] = useState<Array<{ code: string; name: string }>>(
     []
   );
   const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const [skillsFilterArray, setSkillsFilterArray] = useState<string[]>([]);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: "",
-    type: "success" as "success" | "error" | "info",
-  });
 
   // Authentication check
   useEffect(() => {
@@ -195,17 +398,6 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
   }, [user, isAuthenticated, authLoading]);
-
-  // Toast function
-  const showToast = useCallback(
-    (message: string, type: "success" | "error" | "info" = "success") => {
-      setToast({ visible: true, message, type });
-      setTimeout(() => {
-        setToast((prev) => ({ ...prev, visible: false }));
-      }, 3000);
-    },
-    []
-  );
 
   // Load available courses and extract skills
   const loadCourses = useCallback(async () => {
@@ -264,7 +456,7 @@ const LecturerDashboardPage: React.FC = () => {
 
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
-    showToast("Refreshing data...", "info");
+    showToast("Refreshing data...", "success");
     try {
       await Promise.all([loadCourses(), loadApplications()]);
       showToast("Data refreshed successfully", "success");
@@ -386,7 +578,7 @@ const LecturerDashboardPage: React.FC = () => {
 
       if (response.success) {
         setComment("");
-        showToast("Comment deleted", "info");
+        showToast("Comment deleted", "success");
         await loadApplications(); // Reload to get updated data
       } else {
         showToast(response.message || "Failed to delete comment", "error");
@@ -701,6 +893,95 @@ const LecturerDashboardPage: React.FC = () => {
             onRefresh={handleManualRefresh}
           />
 
+          {/* Debug button for testing toasts */}
+          <div
+            style={{
+              margin: "1rem 0",
+              padding: "1rem",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "0.5rem",
+            }}
+          >
+            <button
+              onClick={testToast}
+              style={{
+                padding: "0.5rem 1rem",
+                backgroundColor: "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "0.25rem",
+                cursor: "pointer",
+                marginRight: "1rem",
+              }}
+            >
+              🧪 Test Toast Notifications
+            </button>
+            <button
+              onClick={testBackendConnectivity}
+              style={{
+                padding: "0.5rem 1rem",
+                backgroundColor: "#16a34a",
+                color: "white",
+                border: "none",
+                borderRadius: "0.25rem",
+                cursor: "pointer",
+                marginRight: "1rem",
+              }}
+            >
+              🔗 Test Backend Connectivity
+            </button>
+            <button
+              onClick={testSubscriptionConnection}
+              style={{
+                padding: "0.5rem 1rem",
+                backgroundColor: "#059669",
+                color: "white",
+                border: "none",
+                borderRadius: "0.25rem",
+                cursor: "pointer",
+                marginRight: "1rem",
+              }}
+            >
+              📡 Test Subscription Status
+            </button>
+            <button
+              onClick={testSubscriptionEvent}
+              style={{
+                padding: "0.5rem 1rem",
+                backgroundColor: "#dc2626",
+                color: "white",
+                border: "none",
+                borderRadius: "0.25rem",
+                cursor: "pointer",
+                marginRight: "1rem",
+              }}
+            >
+              🔥 Trigger Test Event
+            </button>
+            <span style={{ fontSize: "0.875rem", color: "#666" }}>
+              Real-time Notifications:{" "}
+              {subscriptionLoading
+                ? "🎧 Listening for events..."
+                : subscriptionConnected
+                  ? "✅ Active"
+                  : subscriptionError
+                    ? "❌ Error"
+                    : "❌ Inactive"}
+              {subscriptionError && (
+                <span style={{ color: "red", fontSize: "0.75rem" }}>
+                  {" "}
+                  ({subscriptionError.message})
+                </span>
+              )}
+              <br />
+              <small style={{ fontSize: "0.75rem", opacity: 0.8 }}>
+                Events Received:{" "}
+                {dataReceived ? "✅ Yes" : "⏳ Waiting for admin events"} |
+                WebSocket Status: Connected ✅
+              </small>
+            </span>
+          </div>
+
           {/* Enhanced Application Filters */}
           <ApplicationFilters
             searchQuery={searchQuery}
@@ -807,18 +1088,29 @@ const LecturerDashboardPage: React.FC = () => {
         </div>
 
         {/* Toast Notifications */}
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          visible={toast.visible}
-          onClose={() => setToast({ ...toast, visible: false })}
-          variant="toast"
-          position="bottom-left"
-          autoClose={true}
-          autoCloseDelay={3000}
-        />
+        {toastMessage && (
+          <Toast
+            message={toastMessage}
+            type={toastType}
+            visible={!!toastMessage}
+            onClose={() => setToastMessage(null)}
+            variant="toast"
+            position="bottom-left"
+            autoClose={true}
+            autoCloseDelay={3000}
+          />
+        )}
       </div>
     </LoadingWrapper>
+  );
+};
+
+// Main wrapper component with Apollo provider
+const LecturerDashboardPage: React.FC = () => {
+  return (
+    <AdminApolloProvider>
+      <LecturerDashboardInner />
+    </AdminApolloProvider>
   );
 };
 

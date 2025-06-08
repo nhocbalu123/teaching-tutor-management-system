@@ -148,7 +148,9 @@ export class AuthController {
                     email: savedUser.email,
                     userType: savedUser.userType,
                 },
-                process.env.JWT_SECRET || "fallback_secret_key",
+                process.env.BACKEND_JWT_SECRET ||
+                    process.env.JWT_SECRET ||
+                    "fallback_secret_key",
                 { expiresIn: "7d" }
             );
 
@@ -244,7 +246,9 @@ export class AuthController {
                     email: user.email,
                     userType: user.userType,
                 },
-                process.env.JWT_SECRET || "fallback_secret_key",
+                process.env.BACKEND_JWT_SECRET ||
+                    process.env.JWT_SECRET ||
+                    "fallback_secret_key",
                 { expiresIn: "7d" }
             );
 

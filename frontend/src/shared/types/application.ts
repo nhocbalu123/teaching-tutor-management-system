@@ -17,6 +17,7 @@ export interface Application {
   selectedForCourses?: string[]; // Which specific courses if selected for multiple in one app
   comment?: string; // Lecturer's comment
   rank?: number; // Lecturer's ranking
+  isBlocked?: boolean; // Whether the candidate is blocked
   // Add other common application fields
 }
 

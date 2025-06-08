@@ -209,11 +209,12 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               <p className={styles.applicantEmail}>{application.email}</p>
               <div className={styles.applicantBadges}>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {(application as any).role && (
+                {((application as any)?.role?.roleName === "tutor" ||
+                  application.previousRoles?.includes("tutor")) && (
                   <span className={styles.roleBadge}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className={styles.roleIconSmall}
+                      className={styles.roleBadgeIcon}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -225,26 +226,65 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {(application as any).role?.roleName === "tutor"
+                    {(
+                      application as TutorApplication & {
+                        role?: { roleName: string };
+                      }
+                    )?.role?.roleName === "tutor"
                       ? "Tutor"
-                      : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                        (application as any).role?.roleName === "lab_assistant"
+                      : (
+                            application as TutorApplication & {
+                              role?: { roleName: string };
+                            }
+                          )?.role?.roleName === "lab_assistant"
                         ? "Lab Assistant"
-                        : "Application"}
+                        : "Tutor Applicant"}
                   </span>
                 )}
-                <span
-                  className={`${styles.availabilityBadge} ${application.availability === "Full Time" ? styles.fullTime : styles.partTime}`}
-                >
+
+                <span className={styles.availabilityBadge}>
                   {application.availability}
                 </span>
-                <span className={styles.dateBadge}>
-                  Applied:{" "}
-                  {new Date(application.dateApplied).toLocaleDateString()}
+
+                <span className={styles.statusBadge}>
+                  {(application.status as string) === "pending"
+                    ? "Pending Review"
+                    : (application.status as string) === "selected"
+                      ? "Selected"
+                      : (application.status as string) === "rejected"
+                        ? "Rejected"
+                        : application.status}
                 </span>
               </div>
             </div>
+
+            {/* Blocked candidate warning */}
+            {application.isBlocked && (
+              <div className={styles.blockedWarning}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.warningIcon}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+                <div>
+                  <strong>Candidate Unavailable</strong>
+                  <p>
+                    This candidate has been blocked by an administrator and
+                    cannot be selected.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className={styles.buttonGroup}>
               {application.selected ? (
                 <>
@@ -293,8 +333,11 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   onClick={handleSelectButtonClick}
                   className={`${styles.actionButton} ${styles.selectButton}`}
                   title="Select applicant for all applied courses"
+                  disabled={application.isBlocked}
                 >
-                  Select Applicant
+                  {application.isBlocked
+                    ? "Candidate Unavailable"
+                    : "Select Applicant"}
                 </button>
               )}
             </div>

@@ -77,7 +77,9 @@ export class AuthResolver {
                     email: user.email,
                     userType: user.userType,
                 },
-                process.env.JWT_SECRET || "admin-secret-key",
+                process.env.ADMIN_JWT_SECRET ||
+                    process.env.JWT_SECRET ||
+                    "admin-secret-key",
                 { expiresIn: "24h" }
             );
 

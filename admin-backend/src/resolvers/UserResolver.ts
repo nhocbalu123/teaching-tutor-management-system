@@ -10,6 +10,8 @@ import {
 } from "type-graphql";
 import { User, UserType } from "../types/User";
 import { AppDataSource } from "../config/database";
+import { pubsub, SUBSCRIPTION_TOPICS } from "../config/pubsub";
+import { CandidateBlockedEvent } from "./SubscriptionResolver";
 
 @ObjectType()
 class UserStats {
@@ -134,6 +136,35 @@ export class UserResolver {
             user.isBlocked = true;
             await userRepository.save(user);
 
+            // Publish subscription event if user is a candidate
+            if (user.userType === UserType.CANDIDATE) {
+                const event: CandidateBlockedEvent = {
+                    candidateId: user.id,
+                    candidateName: user.fullName,
+                    candidateEmail: user.email,
+                    isBlocked: true,
+                    timestamp: new Date().toISOString(),
+                    candidate: user,
+                };
+
+                console.log("📡 Publishing CANDIDATE_BLOCKED event:", event);
+                console.log(
+                    "🔧 Publishing to topic:",
+                    SUBSCRIPTION_TOPICS.CANDIDATE_BLOCKED
+                );
+                console.log("📦 Publishing payload:", {
+                    candidateBlockingUpdates: event,
+                });
+
+                await pubsub.publish(SUBSCRIPTION_TOPICS.CANDIDATE_BLOCKED, {
+                    candidateBlockingUpdates: event,
+                });
+                console.log(
+                    "✅ CANDIDATE_BLOCKED event published successfully"
+                );
+                console.log("🕐 Publish timestamp:", new Date().toISOString());
+            }
+
             return {
                 success: true,
                 message: "User blocked successfully",
@@ -163,6 +194,35 @@ export class UserResolver {
 
             user.isBlocked = false;
             await userRepository.save(user);
+
+            // Publish subscription event if user is a candidate
+            if (user.userType === UserType.CANDIDATE) {
+                const event: CandidateBlockedEvent = {
+                    candidateId: user.id,
+                    candidateName: user.fullName,
+                    candidateEmail: user.email,
+                    isBlocked: false,
+                    timestamp: new Date().toISOString(),
+                    candidate: user,
+                };
+
+                console.log("📡 Publishing CANDIDATE_UNBLOCKED event:", event);
+                console.log(
+                    "🔧 Publishing to topic:",
+                    SUBSCRIPTION_TOPICS.CANDIDATE_UNBLOCKED
+                );
+                console.log("📦 Publishing payload:", {
+                    candidateBlockingUpdates: event,
+                });
+
+                await pubsub.publish(SUBSCRIPTION_TOPICS.CANDIDATE_UNBLOCKED, {
+                    candidateBlockingUpdates: event,
+                });
+                console.log(
+                    "✅ CANDIDATE_UNBLOCKED event published successfully"
+                );
+                console.log("🕐 Publish timestamp:", new Date().toISOString());
+            }
 
             return {
                 success: true,
