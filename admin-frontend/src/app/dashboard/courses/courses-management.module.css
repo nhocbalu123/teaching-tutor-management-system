@@ -94,9 +94,26 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
+.searchContainer {
+    position: relative;
+    width: 100%;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--color-text-secondary);
+    transition: color 0.2s ease;
+    z-index: 1;
+}
+
 .searchInput {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
     border: 1px solid var(--color-border);
     border-radius: 8px;
     font-size: 0.875rem;
@@ -108,6 +125,11 @@
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.searchInput:focus + .searchIcon,
+.searchContainer:focus-within .searchIcon {
+    color: var(--color-primary);
 }
 
 /* Courses Grid */
@@ -568,7 +590,7 @@
 .modalActions {
     display: flex !important;
     justify-content: flex-end !important;
-    padding: 1rem 1.5rem !important;
+    padding: 1rem 0rem 1rem 1.5rem !important;
     border-top: 1px solid #e5e7eb !important;
     gap: 0.75rem !important;
     background-color: #f9fafb !important;
@@ -832,6 +854,14 @@
 :global(.dark) .formSelect:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+:global(.dark) .searchIcon {
+    color: var(--color-text-secondary);
+}
+
+:global(.dark) .searchContainer:focus-within .searchIcon {
+    color: var(--color-primary);
 }
 
 :global(.dark) .formLabel {

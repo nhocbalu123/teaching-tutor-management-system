@@ -22,6 +22,7 @@ import {
     UserMinusIcon,
     ExclamationTriangleIcon,
     XMarkIcon,
+    MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./courses-management.module.css";
 
@@ -346,13 +347,16 @@ export default function CoursesManagement() {
 
                 {/* Search */}
                 <div className={styles.searchSection}>
-                    <input
-                        type="text"
-                        placeholder="Search courses..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className={styles.searchInput}
-                    />
+                    <div className={styles.searchContainer}>
+                        <MagnifyingGlassIcon className={styles.searchIcon} />
+                        <input
+                            type="text"
+                            placeholder="Search courses..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                    </div>
                 </div>
 
                 {/* Error Display */}
@@ -1034,7 +1038,6 @@ export default function CoursesManagement() {
                 visible={toast.visible}
                 type={toast.type}
                 onClose={hideToast}
-                title={toast.title}
                 position="bottom-left"
             />
         </div>
