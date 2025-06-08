@@ -1,4 +1,5 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Toast.module.css";
 
 interface ToastProps {
@@ -143,63 +144,98 @@ const Toast: React.FC<ToastProps> = ({
     ${className}
   `.trim();
 
-    if (!visible) return null;
+    // Animation variants based on position and variant
+    const getAnimationVariants = () => {
+        if (variant === "inline") {
+            return {
+                initial: { opacity: 0, height: 0, marginBottom: 0 },
+                animate: { opacity: 1, height: "auto", marginBottom: "1rem" },
+                exit: { opacity: 0, height: 0, marginBottom: 0 },
+            };
+        }
+
+        // Toast variant animations based on position
+        const isLeft = position.includes("left");
+        const isRight = position.includes("right");
+        const isTop = position.includes("top");
+        const isBottom = position.includes("bottom");
+
+        return {
+            initial: { 
+                opacity: 0, 
+                x: isLeft ? -100 : isRight ? 100 : 0,
+                y: isTop ? -100 : isBottom ? 100 : 0 
+            },
+            animate: { opacity: 1, x: 0, y: 0 },
+            exit: { 
+                opacity: 0, 
+                x: isLeft ? -100 : isRight ? 100 : 0,
+                y: isTop ? -100 : isBottom ? 100 : 0 
+            },
+        };
+    };
+
+    const animationVariants = getAnimationVariants();
 
     return (
-        <div
-            className={containerClass}
-            style={{
-                opacity: visible ? 1 : 0,
-                transition: "opacity 0.3s ease",
-            }}
-        >
-            {/* Floating icon */}
-            <div className={styles.toastFloatingIcon}>{icons[type]}</div>
-
-            {/* Main content wrapper */}
-            <div className={styles.toastInner}>
-                {/* Left side with decorative circles */}
-                <div className={styles.toastDecorative}>
-                    <div className={styles.circle1}></div>
-                    <div className={styles.circle2}></div>
-                    <div className={styles.circle3}></div>
-                </div>
-
-                {/* Content */}
-                <div className={styles.toastContentArea}>
-                    <div className={styles.toastHeader}>
-                        <h2 className={styles.toastTitle}>
-                            {title || getDefaultTitle()}
-                        </h2>
+        <AnimatePresence>
+            {visible && (
+                <motion.div
+                    className={containerClass}
+                    initial={animationVariants.initial}
+                    animate={animationVariants.animate}
+                    exit={animationVariants.exit}
+                    transition={{ duration: 0.3 }}
+                >
+                    {/* Floating icon at the top */}
+                    <div className={styles.toastFloatingIcon}>
+                        {icons[type]}
                     </div>
-                    <p className={styles.toastMessage}>{message}</p>
-                </div>
-
-                {/* Close button */}
-                {showCloseButton && (
-                    <button
-                        onClick={onClose}
-                        className={styles.toastClose}
-                        type="button"
-                        aria-label="Close"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                )}
-            </div>
-        </div>
+                    
+                    {/* Main content wrapper */}
+                    <div className={styles.toastInner}>
+                        {/* Left side with decorative circles */}
+                        <div className={styles.toastDecorative}>
+                            <div className={styles.circle1}></div>
+                            <div className={styles.circle2}></div>
+                            <div className={styles.circle3}></div>
+                        </div>
+                        
+                        {/* Content */}
+                        <div className={styles.toastContentArea}>
+                            <div className={styles.toastHeader}>
+                                <h2 className={styles.toastTitle}>{title || getDefaultTitle()}</h2>
+                            </div>
+                            <p className={styles.toastMessage}>{message}</p>
+                        </div>
+                        
+                        {/* Close button at top right corner */}
+                        {showCloseButton && (
+                            <button
+                                onClick={onClose}
+                                className={styles.toastClose}
+                                type="button"
+                                aria-label="Close"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 

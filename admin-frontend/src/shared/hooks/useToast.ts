@@ -1,74 +1,180 @@
 import { useState, useCallback } from "react";
 
-interface ToastState {
-    visible: boolean;
+export interface ToastState {
     message: string;
     type: "success" | "error" | "info" | "warning";
-    title?: string;
+    visible: boolean;
+    id?: string;
 }
 
-interface ToastOptions {
-    type?: "success" | "error" | "info" | "warning";
-    title?: string;
-    autoClose?: boolean;
-    autoCloseDelay?: number;
+export interface UseToastReturn {
+    toast: ToastState;
+    showToast: (
+        message: string,
+        type?: "success" | "error" | "info" | "warning"
+    ) => void;
+    showSuccess: (message: string) => void;
+    showError: (message: string) => void;
+    showInfo: (message: string) => void;
+    showWarning: (message: string) => void;
+    hideToast: () => void;
+    isVisible: boolean;
 }
 
-export const useToast = () => {
+export const useToast = (
+    initialState: Partial<ToastState> = {}
+): UseToastReturn => {
     const [toast, setToast] = useState<ToastState>({
-        visible: false,
         message: "",
-        type: "success",
+        type: "info",
+        visible: false,
+        ...initialState,
     });
 
-    const showToast = useCallback((message: string, options?: ToastOptions) => {
-        setToast({
-            visible: true,
-            message,
-            type: options?.type || "success",
-            title: options?.title,
-        });
-    }, []);
-
-    const hideToast = useCallback(() => {
-        setToast((prev) => ({ ...prev, visible: false }));
-    }, []);
-
-    const showError = useCallback(
-        (message: string, title?: string) => {
-            showToast(message, { type: "error", title });
+    const showToast = useCallback(
+        (
+            message: string,
+            type: "success" | "error" | "info" | "warning" = "info"
+        ) => {
+            setToast({
+                message,
+                type,
+                visible: true,
+                id: Date.now().toString(),
+            });
         },
-        [showToast]
+        []
     );
 
     const showSuccess = useCallback(
-        (message: string, title?: string) => {
-            showToast(message, { type: "success", title });
+        (message: string) => {
+            showToast(message, "success");
         },
         [showToast]
     );
 
-    const showWarning = useCallback(
-        (message: string, title?: string) => {
-            showToast(message, { type: "warning", title });
+    const showError = useCallback(
+        (message: string) => {
+            showToast(message, "error");
         },
         [showToast]
     );
 
     const showInfo = useCallback(
-        (message: string, title?: string) => {
-            showToast(message, { type: "info", title });
+        (message: string) => {
+            showToast(message, "info");
+        },
+        [showToast]
+    );
+
+    const showWarning = useCallback(
+        (message: string) => {
+            showToast(message, "warning");
+        },
+        [showToast]
+    );
+
+    const hideToast = useCallback(() => {
+        setToast((prev) => ({ ...prev, visible: false }));
+    }, []);
+
+    return {
+        toast,
+        showToast,
+        showSuccess,
+        showError,
+        showInfo,
+        showWarning,
+        hideToast,
+        isVisible: toast.visible,
+    };
+};
+
+// For multiple toasts (queue)
+export interface UseToastQueueReturn extends UseToastReturn {
+    toasts: ToastState[];
+    removeToast: (id: string) => void;
+    clearAllToasts: () => void;
+}
+
+export const useToastQueue = (): UseToastQueueReturn => {
+    const [toasts, setToasts] = useState<ToastState[]>([]);
+
+    const singleToast = useToast();
+
+    const showToast = useCallback(
+        (
+            message: string,
+            type: "success" | "error" | "info" | "warning" = "info"
+        ) => {
+            const id = Date.now().toString();
+            const newToast: ToastState = {
+                message,
+                type,
+                visible: true,
+                id,
+            };
+
+            setToasts((prev) => [...prev, newToast]);
+
+            // Also update single toast for compatibility
+            singleToast.showToast(message, type);
+        },
+        [singleToast]
+    );
+
+    const removeToast = useCallback((id: string) => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, []);
+
+    const clearAllToasts = useCallback(() => {
+        setToasts([]);
+        singleToast.hideToast();
+    }, [singleToast]);
+
+    const showSuccess = useCallback(
+        (message: string) => {
+            showToast(message, "success");
+        },
+        [showToast]
+    );
+
+    const showError = useCallback(
+        (message: string) => {
+            showToast(message, "error");
+        },
+        [showToast]
+    );
+
+    const showInfo = useCallback(
+        (message: string) => {
+            showToast(message, "info");
+        },
+        [showToast]
+    );
+
+    const showWarning = useCallback(
+        (message: string) => {
+            showToast(message, "warning");
         },
         [showToast]
     );
 
     return {
-        toast,
+        toasts,
+        toast: singleToast.toast,
         showToast,
-        hideToast,
-        showError,
         showSuccess,
-        showWarning,
+        showError,
         showInfo,
+        showWarning,
+        hideToast: singleToast.hideToast,
+        removeToast,
+        clearAllToasts,
+        isVisible: singleToast.isVisible,
     };
 };
+
+// Legacy aliases for backward compatibility
+export const useNotification = useToast;
+export type NotificationState = ToastState;
