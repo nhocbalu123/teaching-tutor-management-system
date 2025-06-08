@@ -655,7 +655,7 @@ export default function CoursesManagement() {
                                             })
                                         }
                                         className={styles.formInput}
-                                        placeholder="e.g., 2024 Semester 1"
+                                        placeholder="e.g., Semester 2 2025"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
@@ -809,7 +809,7 @@ export default function CoursesManagement() {
                                             })
                                         }
                                         className={styles.formInput}
-                                        placeholder="e.g., 2024 Semester 1"
+                                        placeholder="e.g., Semester 2 2025"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
