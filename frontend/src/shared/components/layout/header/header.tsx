@@ -12,7 +12,7 @@ import styles from "./header.module.css";
 const Header: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,8 +32,10 @@ const Header: React.FC = () => {
   }, []);
 
   const handleSignOut = () => {
-    logout();
-    router.push("/");
+    if (!isLoggingOut) {
+      logout();
+    }
+    // Remove router.push - let AuthContext handle navigation
   };
 
   useEffect(() => {
@@ -151,6 +153,7 @@ const Header: React.FC = () => {
                   onSignOut={handleSignOut}
                   onToggleDarkMode={toggleDarkMode}
                   isDarkMode={isDarkMode}
+                  isLoggingOut={isLoggingOut}
                 />
               </div>
             ) : (

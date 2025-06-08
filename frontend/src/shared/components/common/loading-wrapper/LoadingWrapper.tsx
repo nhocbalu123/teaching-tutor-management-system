@@ -6,7 +6,7 @@ interface LoadingWrapperProps {
   children: React.ReactNode;
   loadingMessage?: string;
   minHeight?: string;
-  position?: "center" | "top" | "flex-start";
+  position?: "center" | "top" | "flex-start" | "top-center";
 }
 
 const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
@@ -17,9 +17,19 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
   position = "center",
 }) => {
   if (isLoading) {
+    let justifyContent = position;
+    let paddingTop = undefined;
+    
+    // Special handling for top-center position
+    if (position === "top-center") {
+      justifyContent = "flex-start";
+      paddingTop = "8rem"; // Add top padding to push content down
+    }
+
     const containerStyle = {
       minHeight,
-      justifyContent: position,
+      justifyContent,
+      paddingTop,
     };
 
     return (

@@ -11,6 +11,7 @@ import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { redirect } from "next/navigation";
 import TutorHeroSection from "@/modules/tutor/components/hero-section/TutorHeroSection";
 import SearchFilters from "@/modules/tutor/components/search-filters/SearchFilters";
+
 import styles from "./TutorPage.module.css";
 
 const TutorDashboardPage: React.FC = () => {
@@ -130,31 +131,40 @@ const TutorDashboardPage: React.FC = () => {
     return myApplications.some(app => app.courseId === courseId);
   };
 
-  // Filter courses based on search query and active filter
-  const filteredCourses = courses.filter((course) => {
-    const matchesSearch = !searchQuery || 
-      course.courseCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.courseName.toLowerCase().includes(searchQuery.toLowerCase());
 
-    let matchesFilter = true;
-    
-    switch (activeFilter) {
-      case "available":
-        // Show courses where user hasn't applied for ANY positions
-        matchesFilter = !hasAppliedToCourse(course.id);
-        break;
-      case "applied":
-        // Show courses where user has applied for ANY positions
-        matchesFilter = hasAppliedToCourse(course.id);
-        break;
-      case "all":
-      default:
-        matchesFilter = true;
-        break;
-    }
 
-    return matchesSearch && matchesFilter;
-  });
+  // Filter courses based on search query and active filter with memoization
+  const filteredCourses = React.useMemo(() => {
+    return courses.filter((course) => {
+      const searchTerm = searchQuery.toLowerCase();
+      
+      // Search only in courseCode, courseName, semester, and description
+      const matchesSearch = !searchQuery || 
+        course.courseCode.toLowerCase().includes(searchTerm) ||
+        course.courseName.toLowerCase().includes(searchTerm) ||
+        course.semester.toLowerCase().includes(searchTerm) ||
+        (course.description && course.description.toLowerCase().includes(searchTerm));
+
+      let matchesFilter = true;
+      
+      switch (activeFilter) {
+        case "available":
+          // Show courses where user hasn't applied for ANY positions
+          matchesFilter = !hasAppliedToCourse(course.id);
+          break;
+        case "applied":
+          // Show courses where user has applied for ANY positions
+          matchesFilter = hasAppliedToCourse(course.id);
+          break;
+        case "all":
+        default:
+          matchesFilter = true;
+          break;
+      }
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [courses, searchQuery, activeFilter, myApplications]);
 
   const openApplyModal = (course: Course, role: Role) => {
     console.log("Apply button clicked for:", course.courseCode, role.roleName);
@@ -228,6 +238,8 @@ const TutorDashboardPage: React.FC = () => {
       <LoadingWrapper
         isLoading={true}
         loadingMessage="Loading tutor dashboard..."
+        minHeight="100vh"
+        position="top-center"
       >
         <div />
       </LoadingWrapper>

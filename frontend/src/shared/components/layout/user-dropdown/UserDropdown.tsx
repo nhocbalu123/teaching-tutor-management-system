@@ -16,6 +16,7 @@ export interface UserDropdownProps {
   onSignOut: () => void;
   onToggleDarkMode: () => void;
   isDarkMode: boolean;
+  isLoggingOut?: boolean;
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({
@@ -23,6 +24,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   onSignOut,
   onToggleDarkMode,
   isDarkMode,
+  isLoggingOut = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -224,22 +226,40 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
               </div>
 
               {/* Sign Out Button */}
-              <button className={styles.signOutButton} onClick={onSignOut}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={styles.actionIcon}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                Sign Out
+              <button 
+                className={styles.signOutButton} 
+                onClick={onSignOut}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? (
+                  <>
+                    <svg className={styles.actionIcon} viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="32" strokeDashoffset="32">
+                        <animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/>
+                        <animate attributeName="strokeDasharray" dur="1s" values="0 32;16 16;0 32;0 32" repeatCount="indefinite"/>
+                      </circle>
+                    </svg>
+                    Signing Out...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={styles.actionIcon}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Sign Out
+                  </>
+                )}
               </button>
             </div>
           </div>

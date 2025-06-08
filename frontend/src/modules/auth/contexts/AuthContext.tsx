@@ -9,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isLoggingOut: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -31,6 +32,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -71,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
+    setIsLoggingOut(true);
     try {
       // Call backend logout endpoint
       await AuthService.logout();
@@ -81,7 +84,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       AuthService.removeToken();
       AuthService.removeUser();
       setUser(null);
-      router.push("/signin");
+      setIsLoggingOut(false);
+      // Use replace instead of push to avoid history stack issues
+      router.replace("/signin");
     }
   };
 
@@ -94,6 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated: !!user,
     isLoading,
+    isLoggingOut,
     login,
     logout,
     updateUser,

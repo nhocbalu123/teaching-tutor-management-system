@@ -3,7 +3,7 @@
 /* Hero Section */
 .tutorHeroSection {
   position: relative;
-  padding: 4rem 0 3rem;
+  padding: 8rem 0 5rem;
   background: linear-gradient(
     135deg,
     var(--color-bg-secondary) 0%,
