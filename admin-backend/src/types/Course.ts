@@ -83,6 +83,19 @@ export class Course {
     @OneToMany(() => Application, (application) => application.course)
     applications: Application[];
 
+    // Position tracking fields (computed at runtime)
+    @Field(() => Int, { nullable: true })
+    selectedTutors?: number;
+
+    @Field(() => Int, { nullable: true })
+    selectedLabAssistants?: number;
+
+    @Field(() => Int, { nullable: true })
+    availableTutors?: number;
+
+    @Field(() => Int, { nullable: true })
+    availableLabAssistants?: number;
+
     // Virtual properties
     @Field()
     get displayName(): string {

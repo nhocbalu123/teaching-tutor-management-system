@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ApplicationService, Course, Role, ApplicationData, ApplicationResponse } from "@/shared/services/applicationService";
+import {
+  ApplicationService,
+  Course,
+  Role,
+  ApplicationData,
+  ApplicationResponse,
+} from "@/shared/services/applicationService";
 import CourseCard from "@/modules/tutor/components/course-card/course-card";
 import ApplyModal from "@/modules/tutor/components/apply-modal/apply-modal";
 import Toast from "@/shared/components/common/toast/Toast";
@@ -20,7 +26,9 @@ const TutorDashboardPage: React.FC = () => {
   // Data state
   const [courses, setCourses] = useState<Course[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [myApplications, setMyApplications] = useState<ApplicationResponse[]>([]);
+  const [myApplications, setMyApplications] = useState<ApplicationResponse[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal state
@@ -31,7 +39,9 @@ const TutorDashboardPage: React.FC = () => {
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<"all" | "applied" | "available">("all");
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "applied" | "available" | "unavailable"
+  >("all");
 
   // Toast notifications
   const {
@@ -75,13 +85,17 @@ const TutorDashboardPage: React.FC = () => {
           setCourses(coursesResponse.data.courses);
           setRoles(coursesResponse.data.roles);
         } else {
-          showError(coursesResponse.message || "Failed to load courses and roles");
+          showError(
+            coursesResponse.message || "Failed to load courses and roles"
+          );
         }
 
         if (applicationsResponse.success && applicationsResponse.data) {
           setMyApplications(applicationsResponse.data);
         } else {
-          showError(applicationsResponse.message || "Failed to load your applications");
+          showError(
+            applicationsResponse.message || "Failed to load your applications"
+          );
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -94,20 +108,86 @@ const TutorDashboardPage: React.FC = () => {
     loadData();
   }, [user, showError]);
 
+  // Function to refresh course data (useful after application status changes)
+  const refreshCourseData = async () => {
+    try {
+      const coursesResponse = await ApplicationService.getCoursesAndRoles();
+      if (coursesResponse.success && coursesResponse.data) {
+        setCourses(coursesResponse.data.courses);
+        console.log("🔄 Course data refreshed after application status change");
+      }
+    } catch (error) {
+      console.error("Error refreshing course data:", error);
+      // Don't show error to user as this is background refresh
+    }
+  };
+
+  // Periodic refresh to detect application status changes
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    // Refresh course and application data every 30 seconds to detect status changes
+    const refreshInterval = setInterval(async () => {
+      try {
+        const [coursesResponse, applicationsResponse] = await Promise.all([
+          ApplicationService.getCoursesAndRoles(),
+          ApplicationService.getMyCandidateApplications(),
+        ]);
+
+        if (coursesResponse.success && coursesResponse.data) {
+          setCourses(coursesResponse.data.courses);
+        }
+
+        if (applicationsResponse.success && applicationsResponse.data) {
+          const newApplications = applicationsResponse.data;
+
+          // Check if any application status changed from pending to selected
+          const statusChanges = newApplications.filter((newApp) => {
+            const oldApp = myApplications.find((app) => app.id === newApp.id);
+            return (
+              oldApp &&
+              oldApp.status === "pending" &&
+              newApp.status === "selected"
+            );
+          });
+
+          if (statusChanges.length > 0) {
+            console.log(
+              "🎉 Application status changed to selected:",
+              statusChanges.length
+            );
+            // Show a success message for newly selected applications
+            statusChanges.forEach((app) => {
+              showSuccess(
+                `Congratulations! You've been selected for ${app.course?.courseCode}!`
+              );
+            });
+          }
+
+          setMyApplications(newApplications);
+        }
+      } catch (error) {
+        console.error("Error during periodic refresh:", error);
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [user, isLoading, myApplications, showSuccess]);
+
   // Calculate comprehensive statistics
   const getComprehensiveStats = () => {
     const totalRoleCourseCombinations = courses.length * roles.length;
     const appliedCombinations = myApplications.length;
-    
+
     // Calculate available opportunities (role-course combinations the user can apply for)
     let availableOpportunities = 0;
-    
-    courses.forEach(course => {
-      roles.forEach(role => {
+
+    courses.forEach((course) => {
+      roles.forEach((role) => {
         const hasApplied = myApplications.some(
-          app => app.courseId === course.id && app.roleId === role.id
+          (app) => app.courseId === course.id && app.roleId === role.id
         );
-        
+
         if (!hasApplied) {
           availableOpportunities += 1; // Count each role-course combination as one opportunity
         }
@@ -118,43 +198,186 @@ const TutorDashboardPage: React.FC = () => {
       totalCourses: courses.length,
       totalApplications: myApplications.length,
       availableOpportunities, // Number of role-course combinations user can still apply for
-      completionRate: totalRoleCourseCombinations > 0 
-        ? Math.round((appliedCombinations / totalRoleCourseCombinations) * 100)
-        : 0
+      completionRate:
+        totalRoleCourseCombinations > 0
+          ? Math.round(
+              (appliedCombinations / totalRoleCourseCombinations) * 100
+            )
+          : 0,
     };
   };
 
   const stats = getComprehensiveStats();
 
   // Check if user has applied to any role in a course
-  const hasAppliedToCourse = React.useCallback((courseId: number) => {
-    return myApplications.some(app => app.courseId === courseId);
-  }, [myApplications]);
+  const hasAppliedToCourse = (courseId: number) => {
+    return myApplications.some((app) => app.courseId === courseId);
+  };
+
+  // Smart search utility functions
+  const fuzzyMatch = (text: string, query: string): number => {
+    // Simple fuzzy matching - returns score between 0 and 1
+    const textLower = text.toLowerCase();
+    const queryLower = query.toLowerCase();
+
+    // Exact match gets highest score
+    if (textLower.includes(queryLower)) return 1.0;
+
+    // Character-level fuzzy matching for typos
+    let score = 0;
+    let queryIndex = 0;
+
+    for (
+      let i = 0;
+      i < textLower.length && queryIndex < queryLower.length;
+      i++
+    ) {
+      if (textLower[i] === queryLower[queryIndex]) {
+        score++;
+        queryIndex++;
+      }
+    }
+
+    return queryIndex === queryLower.length
+      ? (score / queryLower.length) * 0.8
+      : 0;
+  };
+
+  const normalizeSearchTerm = (term: string): string[] => {
+    // Handle common variations and synonyms
+    const synonyms: { [key: string]: string[] } = {
+      tutor: ["tutor", "tutorial", "tutoring", "teach", "instructor"],
+      lab: ["lab", "laboratory", "practical", "workshop"],
+      assistant: ["assistant", "aide", "helper", "support"],
+      programming: ["programming", "coding", "development", "software"],
+      data: ["data", "database", "information"],
+      web: ["web", "website", "internet", "online"],
+      systems: ["systems", "system", "infrastructure"],
+      advanced: ["advanced", "senior", "higher", "level"],
+    };
+
+    const normalized = term.toLowerCase().trim();
+
+    // Check if term matches any synonym group
+    for (const [key, values] of Object.entries(synonyms)) {
+      if (values.some((synonym) => fuzzyMatch(synonym, normalized) > 0.7)) {
+        return values;
+      }
+    }
+
+    return [normalized];
+  };
 
 
+  const calculateSearchScore = (
+    course: Course,
+    searchTerms: string[]
+  ): number => {
+    let totalScore = 0;
+    const weights = {
+      courseCode: 0.9,
+      courseName: 1.0,
+      description: 0.7,
+      semester: 0.5,
+      positions: 1.2, // Higher weight for position-related matches
+    };
 
-  // Filter courses based on search query and active filter with memoization
+    searchTerms.forEach((term) => {
+      const normalizedTerms = normalizeSearchTerm(term);
+
+      normalizedTerms.forEach((normalizedTerm) => {
+        // Position-specific scoring
+        if (
+          ["tutor", "tutorial", "tutoring", "teach", "instructor"].includes(
+            normalizedTerm
+          )
+        ) {
+          const hasAvailableTutors =
+            course.availableTutors !== undefined
+              ? course.availableTutors > 0
+              : course.maxTutors > 0;
+          if (hasAvailableTutors) totalScore += weights.positions;
+        }
+
+        if (
+          [
+            "lab",
+            "laboratory",
+            "assistant",
+            "aide",
+            "helper",
+            "practical",
+          ].includes(normalizedTerm)
+        ) {
+          const hasAvailableLabAssistants =
+            course.availableLabAssistants !== undefined
+              ? course.availableLabAssistants > 0
+              : course.maxLabAssistants > 0;
+          if (hasAvailableLabAssistants) totalScore += weights.positions;
+        }
+
+        // General content scoring
+        totalScore +=
+          fuzzyMatch(course.courseCode, normalizedTerm) * weights.courseCode;
+        totalScore +=
+          fuzzyMatch(course.courseName, normalizedTerm) * weights.courseName;
+        totalScore +=
+          fuzzyMatch(course.semester, normalizedTerm) * weights.semester;
+
+        if (course.description) {
+          totalScore +=
+            fuzzyMatch(course.description, normalizedTerm) *
+            weights.description;
+        }
+      });
+    });
+
+    return totalScore;
+  };
+
+  // Enhanced filter courses with smart search
   const filteredCourses = React.useMemo(() => {
-    return courses.filter((course) => {
-      const searchTerm = searchQuery.toLowerCase();
-      
-      // Search only in courseCode, courseName, semester, and description
-      const matchesSearch = !searchQuery || 
-        course.courseCode.toLowerCase().includes(searchTerm) ||
-        course.courseName.toLowerCase().includes(searchTerm) ||
-        course.semester.toLowerCase().includes(searchTerm) ||
-        (course.description && course.description.toLowerCase().includes(searchTerm));
+    let coursesWithScores = courses.map((course) => {
+      const hasAvailablePositions =
+        (course.availableTutors !== undefined
+          ? course.availableTutors > 0
+          : course.maxTutors > 0) ||
+        (course.availableLabAssistants !== undefined
+          ? course.availableLabAssistants > 0
+          : course.maxLabAssistants > 0);
+
+      let searchScore = 0;
+      let matchesSearch = true;
+
+      if (searchQuery.trim()) {
+        // Split search query into terms and clean them
+        const searchTerms = searchQuery
+          .trim()
+          .split(/\s+/)
+          .filter((term) => term.length > 0);
+
+        searchScore = calculateSearchScore(course, searchTerms);
+
+        // Only show courses with some relevance and available positions
+        matchesSearch = searchScore > 0.3 && hasAvailablePositions;
+      } else {
+        // No search query - show all courses with available positions
+        matchesSearch = hasAvailablePositions;
+        searchScore = hasAvailablePositions ? 1 : 0;
+      }
 
       let matchesFilter = true;
-      
+
       switch (activeFilter) {
         case "available":
-          // Show courses where user hasn't applied for ANY positions
           matchesFilter = !hasAppliedToCourse(course.id);
           break;
         case "applied":
-          // Show courses where user has applied for ANY positions
           matchesFilter = hasAppliedToCourse(course.id);
+          break;
+        case "unavailable":
+          matchesFilter =
+            !hasAvailablePositions && !hasAppliedToCourse(course.id);
           break;
         case "all":
         default:
@@ -162,9 +385,20 @@ const TutorDashboardPage: React.FC = () => {
           break;
       }
 
-      return matchesSearch && matchesFilter;
+      return {
+        course,
+        score: searchScore,
+        matches: matchesSearch && matchesFilter,
+      };
     });
-  }, [courses, searchQuery, activeFilter, hasAppliedToCourse]);
+
+    // Filter and sort by relevance score
+    return coursesWithScores
+      .filter((item) => item.matches)
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.course);
+  }, [courses, searchQuery, activeFilter, myApplications, hasAppliedToCourse]);
+
 
   const openApplyModal = (course: Course, role: Role) => {
     console.log("Apply button clicked for:", course.courseCode, role.roleName);
@@ -180,7 +414,9 @@ const TutorDashboardPage: React.FC = () => {
     );
 
     if (existingApplication) {
-      showError(`You have already applied for ${role.roleName} position in ${course.courseCode}.`);
+      showError(
+        `You have already applied for ${role.roleName} position in ${course.courseCode}.`
+      );
       return;
     }
 
@@ -205,7 +441,8 @@ const TutorDashboardPage: React.FC = () => {
       setIsSubmitting(true);
 
       // Submit application to backend
-      const response = await ApplicationService.createApplication(applicationData);
+      const response =
+        await ApplicationService.createApplication(applicationData);
 
       if (response.success && response.data) {
         // Add new application to local state
@@ -213,16 +450,20 @@ const TutorDashboardPage: React.FC = () => {
 
         // Close modal and show success message
         setIsModalOpen(false);
-        showSuccess(
-          `Application submitted for ${selectedCourse.courseCode}!`
-        );
+        showSuccess(`Application submitted for ${selectedCourse.courseCode}!`);
+
+        // Refresh course data to get updated position availability
+        await refreshCourseData();
 
         // Clear the success message after 3 seconds
         setTimeout(() => {
           hideSuccess();
         }, 3000);
       } else {
-        showError(response.message || "Failed to submit your application. Please try again.");
+        showError(
+          response.message ||
+            "Failed to submit your application. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -298,17 +539,28 @@ const TutorDashboardPage: React.FC = () => {
               </p>
               {activeFilter === "available" && myApplications.length > 0 && (
                 <p className="text-gray-500 text-sm mt-2">
-                  You have applied to all available courses. Check the &quot;Applied&quot; filter to see your applications.
+                  You have applied to all available courses. Check the
+                  &quot;Applied&quot; filter to see your applications.
                 </p>
               )}
               {activeFilter === "applied" && myApplications.length === 0 && (
                 <p className="text-gray-500 text-sm mt-2">
-                  You haven&apos;t applied to any courses yet. Check the &quot;Available&quot; filter to see opportunities.
+                  You haven&apos;t applied to any courses yet. Check the
+                  &quot;Available&quot; filter to see opportunities.
+                </p>
+              )}
+              {activeFilter === "unavailable" && (
+                <p className="text-gray-500 text-sm mt-2">
+                  All courses currently have available positions or you have
+                  already applied to them. Check the &quot;Available&quot;
+                  filter to see open opportunities.
                 </p>
               )}
             </div>
           ) : (
-            <div className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
+            <div
+              className={`${styles.courseGrid} grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}
+            >
               {filteredCourses.map((course) => (
                 <CourseCard
                   key={course.id}

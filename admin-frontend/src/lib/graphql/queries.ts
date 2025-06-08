@@ -153,6 +153,10 @@ export const GET_ALL_COURSES = gql`
             description
             maxTutors
             maxLabAssistants
+            selectedTutors
+            selectedLabAssistants
+            availableTutors
+            availableLabAssistants
             createdAt
             displayName
             courseAssignments {

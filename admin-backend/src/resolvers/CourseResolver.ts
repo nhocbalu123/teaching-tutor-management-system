@@ -64,7 +64,10 @@ export class CourseResolver {
     @Query(() => [Course])
     async getAllCourses(): Promise<Course[]> {
         const courseRepository = AppDataSource.getRepository(Course);
-        return await courseRepository.find({
+        const applicationRepository =
+            AppDataSource.getRepository("Application");
+
+        const courses = await courseRepository.find({
             relations: [
                 "courseAssignments",
                 "courseAssignments.lecturer",
@@ -73,6 +76,53 @@ export class CourseResolver {
             ],
             order: { createdAt: "DESC" },
         });
+
+        // Calculate available positions for each course
+        const coursesWithAvailablePositions = await Promise.all(
+            courses.map(async (course) => {
+                // Count selected applications for tutors
+                const selectedTutors = await applicationRepository.count({
+                    where: {
+                        courseId: course.id,
+                        status: ApplicationStatus.SELECTED,
+                        role: { roleName: "tutor" },
+                    },
+                    relations: ["role"],
+                });
+
+                // Count selected applications for lab assistants
+                const selectedLabAssistants = await applicationRepository.count(
+                    {
+                        where: {
+                            courseId: course.id,
+                            status: ApplicationStatus.SELECTED,
+                            role: { roleName: "lab_assistant" },
+                        },
+                        relations: ["role"],
+                    }
+                );
+
+                // Calculate available positions
+                const availableTutors = Math.max(
+                    0,
+                    course.maxTutors - selectedTutors
+                );
+                const availableLabAssistants = Math.max(
+                    0,
+                    course.maxLabAssistants - selectedLabAssistants
+                );
+
+                // Add the available positions as computed properties
+                (course as any).selectedTutors = selectedTutors;
+                (course as any).selectedLabAssistants = selectedLabAssistants;
+                (course as any).availableTutors = availableTutors;
+                (course as any).availableLabAssistants = availableLabAssistants;
+
+                return course;
+            })
+        );
+
+        return coursesWithAvailablePositions;
     }
 
     @Query(() => Course, { nullable: true })

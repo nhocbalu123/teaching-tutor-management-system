@@ -206,14 +206,22 @@ export const useApplicationManagement = () => {
         if (response.success) {
           // Reload applications to get updated data
           await loadApplications();
-          return true;
+          return { success: true };
         } else {
           console.error("Failed to save application:", response.message);
-          return false;
+          return { success: false, message: response.message };
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Error saving application:", error);
-        return false;
+        const errorMessage =
+          error && typeof error === "object" && "response" in error
+            ? (error as { response?: { data?: { message?: string } } }).response
+                ?.data?.message
+            : "Failed to save application";
+        return {
+          success: false,
+          message: errorMessage || "Failed to save application",
+        };
       }
     },
     [loadApplications]

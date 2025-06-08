@@ -37,6 +37,11 @@ export interface Course {
   description?: string;
   maxTutors: number;
   maxLabAssistants: number;
+  // Position tracking fields (optional for backward compatibility)
+  availableTutors?: number;
+  availableLabAssistants?: number;
+  selectedTutors?: number;
+  selectedLabAssistants?: number;
 }
 
 export interface Role {

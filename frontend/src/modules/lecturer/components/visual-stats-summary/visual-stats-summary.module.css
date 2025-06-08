@@ -289,3 +289,13 @@
 .statCard.leastSelected:hover .statApplicantAvatar {
   animation: pulseBlue 1.5s infinite;
 }
+
+.positionIcon {
+  background-color: rgba(156, 163, 175, 0.1);
+  color: #6b7280;
+}
+
+.dark .positionIcon {
+  background-color: rgba(156, 163, 175, 0.15);
+  color: #9ca3af;
+}

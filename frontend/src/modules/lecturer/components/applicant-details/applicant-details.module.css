@@ -1172,3 +1172,33 @@
   background-color: #374151;
   border-color: #4b5563;
 }
+
+/* Position Information Styles */
+.positionInfo {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.positionBadge {
+  display: inline-block;
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.dark .positionBadge {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark .positionInfo {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
