@@ -145,30 +145,14 @@ export class UserResolver {
             let affectedLecturerIds: number[] = [];
 
             if (user.userType === UserType.CANDIDATE) {
-                console.log(
-                    `🔄 Finding affected lecturers and automatically unselecting applications for blocked candidate ${user.id}`
-                );
-
                 // First find affected lecturers before unselecting applications
                 affectedLecturerIds =
                     await ApplicationService.getAffectedLecturerIds(user.id);
-                console.log(
-                    `📋 Found ${affectedLecturerIds.length} affected lecturers:`,
-                    affectedLecturerIds
-                );
 
                 applicationResult =
                     await ApplicationService.unselectAndUnrankCandidateApplications(
                         user.id
                     );
-
-                if (applicationResult.success) {
-                    console.log(`✅ ${applicationResult.message}`);
-                } else {
-                    console.error(
-                        `❌ Failed to unselect/unrank applications: ${applicationResult.message}`
-                    );
-                }
             }
 
             // Publish subscription event if user is a candidate
@@ -187,22 +171,9 @@ export class UserResolver {
                     affectedLecturerIds: affectedLecturerIds,
                 };
 
-                console.log("📡 Publishing CANDIDATE_BLOCKED event:", event);
-                console.log(
-                    "🔧 Publishing to topic:",
-                    SUBSCRIPTION_TOPICS.CANDIDATE_BLOCKED
-                );
-                console.log("📦 Publishing payload:", {
-                    candidateBlockingUpdates: event,
-                });
-
                 await pubsub.publish(SUBSCRIPTION_TOPICS.CANDIDATE_BLOCKED, {
                     candidateBlockingUpdates: event,
                 });
-                console.log(
-                    "✅ CANDIDATE_BLOCKED event published successfully"
-                );
-                console.log("🕐 Publish timestamp:", new Date().toISOString());
             }
 
             // Publish user account event for the blocked user
@@ -216,14 +187,9 @@ export class UserResolver {
                 user: user,
             };
 
-            console.log(
-                "📡 Publishing USER_ACCOUNT_BLOCKED event:",
-                userAccountEvent
-            );
             await pubsub.publish(SUBSCRIPTION_TOPICS.USER_ACCOUNT_BLOCKED, {
                 userAccountUpdates: userAccountEvent,
             });
-            console.log("✅ USER_ACCOUNT_BLOCKED event published successfully");
 
             return {
                 success: true,
@@ -231,7 +197,6 @@ export class UserResolver {
                 user,
             };
         } catch (error) {
-            console.error("Block user error:", error);
             return {
                 success: false,
                 message: "Failed to block user",
@@ -260,10 +225,6 @@ export class UserResolver {
                 // Find affected lecturers who have this candidate's applications
                 const affectedLecturerIds =
                     await ApplicationService.getAffectedLecturerIds(user.id);
-                console.log(
-                    `📋 Found ${affectedLecturerIds.length} affected lecturers for unblock:`,
-                    affectedLecturerIds
-                );
 
                 const event: CandidateBlockedEvent = {
                     candidateId: user.id,
@@ -275,22 +236,9 @@ export class UserResolver {
                     affectedLecturerIds: affectedLecturerIds,
                 };
 
-                console.log("📡 Publishing CANDIDATE_UNBLOCKED event:", event);
-                console.log(
-                    "🔧 Publishing to topic:",
-                    SUBSCRIPTION_TOPICS.CANDIDATE_UNBLOCKED
-                );
-                console.log("📦 Publishing payload:", {
-                    candidateBlockingUpdates: event,
-                });
-
                 await pubsub.publish(SUBSCRIPTION_TOPICS.CANDIDATE_UNBLOCKED, {
                     candidateBlockingUpdates: event,
                 });
-                console.log(
-                    "✅ CANDIDATE_UNBLOCKED event published successfully"
-                );
-                console.log("🕐 Publish timestamp:", new Date().toISOString());
             }
 
             return {
@@ -299,7 +247,6 @@ export class UserResolver {
                 user,
             };
         } catch (error) {
-            console.error("Unblock user error:", error);
             return {
                 success: false,
                 message: "Failed to unblock user",
@@ -349,14 +296,9 @@ export class UserResolver {
                 user: user,
             };
 
-            console.log(
-                "📡 Publishing USER_ACCOUNT_DELETED event:",
-                userAccountEvent
-            );
             await pubsub.publish(SUBSCRIPTION_TOPICS.USER_ACCOUNT_DELETED, {
                 userAccountUpdates: userAccountEvent,
             });
-            console.log("✅ USER_ACCOUNT_DELETED event published successfully");
 
             await userRepository.remove(user);
 
@@ -365,7 +307,6 @@ export class UserResolver {
                 message: "User deleted successfully",
             };
         } catch (error) {
-            console.error("Delete user error:", error);
             return {
                 success: false,
                 message: "Failed to delete user",

@@ -68,22 +68,10 @@ async function startServer() {
             path: "/graphql",
         });
 
-        // Add WebSocket connection debugging
+        // WebSocket connection handling
         wsServer.on("connection", (ws, req) => {
-            console.log("🔗 New WebSocket connection established");
-            console.log("📍 Connection from:", req.socket.remoteAddress);
-            console.log("🛣️ Request URL:", req.url);
-
-            ws.on("close", (code, reason) => {
-                console.log(
-                    "🔒 WebSocket connection closed:",
-                    code,
-                    reason.toString()
-                );
-            });
-
             ws.on("error", (error) => {
-                console.error("❌ WebSocket error:", error);
+                // Silent error handling for production
             });
         });
 
@@ -92,23 +80,13 @@ async function startServer() {
             {
                 schema,
                 onConnect: (ctx) => {
-                    console.log("🔌 GraphQL WS client connecting...");
-                    console.log(
-                        "📦 Connection context keys:",
-                        Object.keys(ctx)
-                    );
                     return true;
                 },
                 onDisconnect: (ctx, code, reason) => {
-                    console.log(
-                        "🔌 GraphQL WS client disconnected:",
-                        code,
-                        reason
-                    );
+                    // Silent disconnect handling
                 },
                 onSubscribe: (ctx, id, payload) => {
-                    console.log("📡 New subscription ID:", id);
-                    console.log("📡 Subscription query:", payload.query);
+                    // Silent subscription handling
                 },
             },
             wsServer
@@ -175,26 +153,9 @@ async function startServer() {
         // Start server
         const PORT = process.env.ADMIN_BACKEND_PORT || process.env.PORT || 4002;
         httpServer.listen(PORT, () => {
-            console.log(
-                `🚀 Admin GraphQL Server ready at http://localhost:${PORT}/graphql`
-            );
-            console.log(
-                `📊 GraphQL Playground available at http://localhost:${PORT}/graphql`
-            );
-            console.log(
-                `🏥 Health check available at http://localhost:${PORT}/health`
-            );
-            console.log(
-                `🔗 WebSocket subscriptions ready at ws://localhost:${PORT}/graphql`
-            );
-
-            // Add debugging for subscription system
-            console.log(
-                "📡 Subscription system initialized and ready for connections"
-            );
+            // Server started successfully
         });
     } catch (error) {
-        console.error("❌ Failed to start admin server:", error);
         process.exit(1);
     }
 }

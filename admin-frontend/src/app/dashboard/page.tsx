@@ -11,45 +11,37 @@ import {
 } from "@heroicons/react/24/outline";
 import styles from "./admin-dashboard.module.css";
 
-
 export default function Dashboard() {
     const { data: userStats, loading: userStatsLoading } =
         useQuery(GET_USER_STATS);
     const { data: coursesData, loading: coursesLoading } =
         useQuery(GET_ALL_COURSES);
 
-
     const stats = [
         {
-            name: "Total Applications",
+            name: "Total Users",
             value: userStats?.getUserStats?.totalUsers || 0,
             icon: UsersIcon,
             color: "total",
             trend: "+12%",
         },
         {
-            name: "Selected",
+            name: "Candidates",
             value: userStats?.getUserStats?.totalCandidates || 0,
             icon: UserGroupIcon,
             color: "selected",
             trend: "+8%",
         },
         {
-            name: "Pending",
+            name: "Lecturers",
             value: userStats?.getUserStats?.totalLecturers || 0,
             icon: AcademicCapIcon,
             color: "pending",
             trend: "+5%",
         },
         {
-            name: "Selection Rate",
-            value: userStats?.getUserStats?.blockedUsers
-                ? `${Math.round(
-                      (userStats.getUserStats.totalCandidates /
-                          userStats.getUserStats.totalUsers) *
-                          100 || 0
-                  )}%`
-                : "0%",
+            name: "Blocked Users",
+            value: userStats?.getUserStats?.blockedUsers || 0,
             icon: ExclamationTriangleIcon,
             color: "rate",
             trend: "-2%",
@@ -274,11 +266,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-
-
             </div>
         </div>
     );

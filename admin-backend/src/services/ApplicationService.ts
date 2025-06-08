@@ -17,18 +17,12 @@ export class ApplicationService {
             const courseAssignmentRepository =
                 AppDataSource.getRepository(CourseAssignment);
 
-            console.log(`🔍 Finding applications for candidate ${candidateId}`);
-
             // Get all applications for this candidate
             const candidateApplications = await applicationRepository.find({
                 where: { candidateId: candidateId },
                 relations: ["course"],
                 select: ["id", "courseId"],
             });
-
-            console.log(
-                `📋 Found ${candidateApplications.length} applications for candidate ${candidateId}`
-            );
 
             if (candidateApplications.length === 0) {
                 return [];
@@ -38,7 +32,6 @@ export class ApplicationService {
             const courseIds = [
                 ...new Set(candidateApplications.map((app) => app.courseId)),
             ];
-            console.log(`📚 Candidate has applications in courses:`, courseIds);
 
             // Find lecturers assigned to these courses
             const courseAssignments = await courseAssignmentRepository.find({
@@ -64,10 +57,6 @@ export class ApplicationService {
                         assignments.map((assignment) => assignment.lecturerId)
                     ),
                 ];
-                console.log(
-                    `👨‍🏫 Found ${affectedLecturerIds.length} affected lecturers:`,
-                    affectedLecturerIds
-                );
                 return affectedLecturerIds;
             }
 
@@ -76,13 +65,8 @@ export class ApplicationService {
                     courseAssignments.map((assignment) => assignment.lecturerId)
                 ),
             ];
-            console.log(
-                `👨‍🏫 Found ${affectedLecturerIds.length} affected lecturers:`,
-                affectedLecturerIds
-            );
             return affectedLecturerIds;
         } catch (error) {
-            console.error("❌ Error finding affected lecturer IDs:", error);
             return [];
         }
     }
@@ -112,19 +96,11 @@ export class ApplicationService {
                 relations: ["course", "role", "candidate"],
             });
 
-            console.log(
-                `📋 Found ${selectedApplications.length} selected applications for candidate ${candidateId}`
-            );
-
             let unselectedCount = 0;
             let unrankedCount = 0;
 
             // Process each selected application
             for (const application of selectedApplications) {
-                console.log(
-                    `🔄 Processing application ${application.id} for candidate ${candidateId}`
-                );
-
                 // Check if the application was ranked
                 const wasRanked =
                     application.rank !== null &&
@@ -132,10 +108,6 @@ export class ApplicationService {
                     application.rank > 0;
 
                 if (wasRanked) {
-                    console.log(
-                        `🗑️ Removing ranking for application ${application.id} (rank: ${application.rank})`
-                    );
-
                     // Clear ranking information
                     application.rank = null;
                     application.rankedBy = null;
@@ -150,21 +122,10 @@ export class ApplicationService {
 
                 // Save the updated application
                 await applicationRepository.save(application);
-
-                console.log(
-                    `✅ Application ${application.id} unselected and unranked`
-                );
             }
 
             // After unranking applications, we need to reorder remaining rankings
             await this.reorderRankingsAfterRemoval();
-
-            console.log(
-                `✅ Successfully processed ${selectedApplications.length} applications for candidate ${candidateId}`
-            );
-            console.log(
-                `📊 Unselected: ${unselectedCount}, Unranked: ${unrankedCount}`
-            );
 
             return {
                 success: true,
@@ -173,10 +134,6 @@ export class ApplicationService {
                 unrankedCount,
             };
         } catch (error) {
-            console.error(
-                "❌ Error unselecting and unranking candidate applications:",
-                error
-            );
             return {
                 success: false,
                 message: "Failed to unselect and unrank candidate applications",
@@ -213,10 +170,6 @@ export class ApplicationService {
                     app.rank !== null && app.rank !== undefined && app.rank > 0
             );
 
-            console.log(
-                `🔄 Reordering ${applicationsWithRanks.length} ranked applications`
-            );
-
             // Group by course
             const applicationsByCourse = applicationsWithRanks.reduce(
                 (acc, app) => {
@@ -234,10 +187,6 @@ export class ApplicationService {
             for (const [courseCode, courseApplications] of Object.entries(
                 applicationsByCourse
             )) {
-                console.log(
-                    `🔄 Reordering ${courseApplications.length} applications for course ${courseCode}`
-                );
-
                 // Sort by current rank to maintain relative order
                 courseApplications.sort(
                     (a, b) => (a.rank || 0) - (b.rank || 0)
@@ -247,18 +196,13 @@ export class ApplicationService {
                 for (let i = 0; i < courseApplications.length; i++) {
                     const newRank = i + 1;
                     if (courseApplications[i].rank !== newRank) {
-                        console.log(
-                            `📝 Updating application ${courseApplications[i].id} rank from ${courseApplications[i].rank} to ${newRank}`
-                        );
                         courseApplications[i].rank = newRank;
                         await applicationRepository.save(courseApplications[i]);
                     }
                 }
             }
-
-            console.log("✅ Ranking reordering completed");
         } catch (error) {
-            console.error("❌ Error reordering rankings:", error);
+            // Silent error handling for production
         }
     }
 }

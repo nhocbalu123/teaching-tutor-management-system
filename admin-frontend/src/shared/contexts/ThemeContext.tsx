@@ -6,6 +6,7 @@ import StorageManager from "@/shared/utils/storageManager";
 interface ThemeContextType {
     isDarkMode: boolean;
     toggleDarkMode: () => void;
+    isHydrated: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -14,22 +15,28 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
             try {
-                const darkModePreference = StorageManager.getItem("darkMode") === "true";
+                const darkModePreference =
+                    StorageManager.getItem("darkMode") === "true";
                 setIsDarkMode(darkModePreference);
                 if (darkModePreference) {
                     document.documentElement.setAttribute("data-theme", "dark");
                     document.documentElement.classList.add("dark");
                 } else {
-                    document.documentElement.setAttribute("data-theme", "light");
+                    document.documentElement.setAttribute(
+                        "data-theme",
+                        "light"
+                    );
                     document.documentElement.classList.remove("dark");
                 }
             } catch (e) {
-                console.error("Error loading dark mode preference:", e);
                 setIsDarkMode(false);
+            } finally {
+                setIsHydrated(true);
             }
         }
     }, []);
@@ -48,12 +55,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
                 StorageManager.setItem("darkMode", "false");
             }
         } catch (e) {
-            console.error("Error toggling dark mode:", e);
+            // Silent error handling for production
         }
     };
 
     return (
-        <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
+        <ThemeContext.Provider
+            value={{ isDarkMode, toggleDarkMode, isHydrated }}
+        >
             {children}
         </ThemeContext.Provider>
     );

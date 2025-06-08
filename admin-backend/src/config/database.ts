@@ -40,12 +40,10 @@ export const AppDataSource = new DataSource({
 export const initializeDatabase = async () => {
     try {
         await AppDataSource.initialize();
-        console.log("✅ Admin Database connection initialized successfully");
 
         // Seed admin user
         await seedAdminUser();
     } catch (error) {
-        console.error("❌ Error during admin database initialization:", error);
         throw error;
     }
 };
@@ -73,11 +71,10 @@ const seedAdminUser = async () => {
             });
 
             await userRepository.save(adminUser);
-            console.log("✅ Admin user created with credentials: admin/admin");
         } else {
-            console.log("✅ Admin user already exists");
+            // Admin user already exists
         }
     } catch (error) {
-        console.error("❌ Error seeding admin user:", error);
+        // Silent error handling for production
     }
 };

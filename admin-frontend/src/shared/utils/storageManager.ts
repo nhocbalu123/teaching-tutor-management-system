@@ -18,7 +18,6 @@ class StorageManager {
             localStorage.removeItem(test);
             return true;
         } catch {
-            console.warn("localStorage not available, using fallback storage");
             return false;
         }
     }
@@ -33,7 +32,6 @@ class StorageManager {
                 this.trackUsage("write", key, false);
             }
         } catch (e) {
-            console.error(`Storage error writing key '${key}':`, e);
             this.fallbackStorage.set(key, value);
             this.trackUsage("write", key, false);
         }
@@ -51,7 +49,6 @@ class StorageManager {
                 return result;
             }
         } catch (e) {
-            console.error(`Storage error reading key '${key}':`, e);
             const result = this.fallbackStorage.get(key) || null;
             this.trackUsage("read", key, false);
             return result;
@@ -68,7 +65,6 @@ class StorageManager {
                 this.trackUsage("delete", key, false);
             }
         } catch (e) {
-            console.error(`Storage error removing key '${key}':`, e);
             this.fallbackStorage.delete(key);
             this.trackUsage("delete", key, false);
         }
@@ -94,13 +90,11 @@ class StorageManager {
 
             // Check version compatibility
             if (versionedData.version !== this.CURRENT_VERSION) {
-                console.warn(`Data version mismatch for ${key}, migrating...`);
                 return this.migrateData(key, versionedData);
             }
 
             return versionedData.data;
         } catch (e) {
-            console.error(`Error reading versioned data for ${key}:`, e);
             return null;
         }
     }
@@ -115,7 +109,6 @@ class StorageManager {
             this.setVersionedItem(key, migratedData);
             return migratedData;
         } catch (e) {
-            console.error(`Migration failed for ${key}:`, e);
             this.removeItem(key);
             return null;
         }
@@ -144,11 +137,10 @@ class StorageManager {
 
             const usage = total / (5 * 1024 * 1024); // Assume 5MB limit
             if (usage > 0.8) {
-                // 80% full
-                console.warn("localStorage is nearly full, consider cleanup");
+                // 80% full - silent monitoring
             }
         } catch (e) {
-            console.error("Error checking storage health:", e);
+            // Silent error handling for production
         }
     }
 }

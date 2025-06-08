@@ -20,10 +20,14 @@ export default function AdminLogin() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    
+
     // Login success modal state
     const [showLoginSuccess, setShowLoginSuccess] = useState(false);
-    const [loggedInUser, setLoggedInUser] = useState<{firstName: string; lastName: string; email: string} | null>(null);
+    const [loggedInUser, setLoggedInUser] = useState<{
+        firstName: string;
+        lastName: string;
+        email: string;
+    } | null>(null);
 
     const router = useRouter();
     const [adminLogin] = useMutation(ADMIN_LOGIN);
@@ -50,7 +54,7 @@ export default function AdminLogin() {
                 setLoggedInUser({
                     firstName: data.adminLogin.user.firstName || "Admin",
                     lastName: data.adminLogin.user.lastName || "",
-                    email: data.adminLogin.user.email || email
+                    email: data.adminLogin.user.email || email,
                 });
                 setShowLoginSuccess(true);
             } else {
@@ -58,7 +62,6 @@ export default function AdminLogin() {
             }
         } catch (err) {
             setError("An error occurred during login");
-            console.error("Login error:", err);
         } finally {
             setLoading(false);
         }
@@ -160,7 +163,7 @@ export default function AdminLogin() {
                     </div>
                 </form>
             </div>
-            
+
             {/* Login Success Modal */}
             {showLoginSuccess && loggedInUser && (
                 <LoginSuccessModal

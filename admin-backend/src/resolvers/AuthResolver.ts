@@ -96,7 +96,6 @@ export class AuthResolver {
                 user,
             };
         } catch (error) {
-            console.error("Admin login error:", error);
             return {
                 success: false,
                 message: "An error occurred during login",
@@ -112,7 +111,6 @@ export class AuthResolver {
             }
             return true;
         } catch (error) {
-            console.error("Admin logout error:", error);
             return false;
         }
     }

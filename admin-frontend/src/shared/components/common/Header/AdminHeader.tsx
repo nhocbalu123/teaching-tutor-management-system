@@ -35,7 +35,7 @@ interface AdminHeaderProps {
 const AdminHeader: React.FC<AdminHeaderProps> = ({ user, onLogout }) => {
     const router = useRouter();
     const pathname = usePathname();
-    const { isDarkMode, toggleDarkMode } = useTheme();
+    const { isDarkMode, toggleDarkMode, isHydrated } = useTheme();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -260,11 +260,15 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ user, onLogout }) => {
                                                     className={`${
                                                         styles.themeToggle
                                                     } ${
-                                                        isDarkMode
+                                                        isHydrated && isDarkMode
                                                             ? styles.active
                                                             : ""
                                                     }`}
-                                                    onClick={toggleDarkMode}
+                                                    onClick={
+                                                        isHydrated
+                                                            ? toggleDarkMode
+                                                            : undefined
+                                                    }
                                                     aria-label="Toggle dark mode"
                                                 >
                                                     <div

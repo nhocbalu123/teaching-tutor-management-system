@@ -71,24 +71,10 @@ const wsClient = createClient({
     },
     on: {
         error: (error: unknown) => {
-            if (process.env.NODE_ENV === "development") {
-                console.warn(
-                    "WebSocket connection issue (admin-backend may not be running):",
-                    error
-                );
-            }
+            // Silent error handling for production
         },
         closed: (event) => {
-            if (process.env.NODE_ENV === "development") {
-                const closeEvent = event as { code?: number; reason?: string };
-                if (closeEvent?.code !== 1000) {
-                    console.warn(
-                        "WebSocket connection closed unexpectedly:",
-                        closeEvent?.code,
-                        closeEvent?.reason
-                    );
-                }
-            }
+            // Silent connection handling for production
         },
     },
 });

@@ -98,7 +98,6 @@ export default function UsersManagement() {
     const handleBlockToggle = async (user: User) => {
         // Prevent admin from blocking themselves
         if (currentUser && user.id === currentUser.id) {
-            console.warn("Attempted self-block prevented");
             return;
         }
 
@@ -108,31 +107,24 @@ export default function UsersManagement() {
                     variables: { id: parseInt(user.id.toString()) },
                 });
                 if (!result.data?.unblockUser.success) {
-                    console.error(
-                        "Failed to unblock user:",
-                        result.data?.unblockUser.message
-                    );
+                    // Silent error handling for production
                 }
             } else {
                 const result = await blockUser({
                     variables: { id: parseInt(user.id.toString()) },
                 });
                 if (!result.data?.blockUser.success) {
-                    console.error(
-                        "Failed to block user:",
-                        result.data?.blockUser.message
-                    );
+                    // Silent error handling for production
                 }
             }
         } catch (error) {
-            console.error("Error toggling user block status:", error);
+            // Silent error handling for production
         }
     };
 
     const handleDeleteClick = (user: User) => {
         // Prevent admin from deleting themselves
         if (currentUser && user.id === currentUser.id) {
-            console.warn("Attempted self-delete prevented");
             return;
         }
 
@@ -148,7 +140,7 @@ export default function UsersManagement() {
                 variables: { id: parseInt(userToDelete.id.toString()) },
             });
         } catch (error) {
-            console.error("Error deleting user:", error);
+            // Silent error handling for production
         }
     };
 
@@ -264,12 +256,16 @@ export default function UsersManagement() {
                                 ))}
                             </div>
                             <div className={styles.searchContainer}>
-                                <MagnifyingGlassIcon className={styles.searchIcon} />
+                                <MagnifyingGlassIcon
+                                    className={styles.searchIcon}
+                                />
                                 <input
                                     type="text"
                                     placeholder="Search users..."
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
                                     className={styles.searchInput}
                                 />
                             </div>

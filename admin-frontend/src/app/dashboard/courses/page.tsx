@@ -111,11 +111,6 @@ export default function CoursesManagement() {
                     const { action, message } =
                         subscriptionData.data.courseUpdates;
 
-                    console.log("📡 Received course update:", {
-                        action,
-                        message,
-                    });
-
                     // Refresh course data to get latest state
                     refetchCourses();
 
@@ -142,7 +137,6 @@ export default function CoursesManagement() {
                 }
             },
             onError: (error) => {
-                console.error("Course subscription error:", error);
                 // Don't show error toast for subscription failures to avoid spam
             },
         }
@@ -155,11 +149,6 @@ export default function CoursesManagement() {
             loading: lecturersLoading,
         },
     ] = useLazyQuery(GET_UNASSIGNED_LECTURERS);
-
-    // Log errors for debugging
-    console.log("Courses Error:", coursesError);
-    console.log("Courses Data:", coursesData);
-    console.log("Courses Loading:", coursesLoading);
 
     const [createCourse] = useMutation(CREATE_COURSE, {
         onCompleted: () => {
@@ -236,7 +225,6 @@ export default function CoursesManagement() {
             }
         },
         onError: (error) => {
-            console.error("Error removing lecturer:", error);
             showError(error.message || "Failed to remove lecturer");
         },
     });
@@ -279,7 +267,7 @@ export default function CoursesManagement() {
                 },
             });
         } catch (error) {
-            console.error("Error creating course:", error);
+            // Silent error handling for production
         }
     };
 
@@ -299,7 +287,7 @@ export default function CoursesManagement() {
                 },
             });
         } catch (error) {
-            console.error("Error updating course:", error);
+            // Silent error handling for production
         }
     };
 
@@ -311,7 +299,7 @@ export default function CoursesManagement() {
                 variables: { id: parseInt(selectedCourse.id.toString()) },
             });
         } catch (error) {
-            console.error("Error deleting course:", error);
+            // Silent error handling for production
         }
     };
 
@@ -326,27 +314,20 @@ export default function CoursesManagement() {
                 },
             });
         } catch (error) {
-            console.error("Error assigning lecturer:", error);
+            // Silent error handling for production
         }
     };
 
     const handleRemoveLecturer = async (lecturerId: number, course: Course) => {
-        console.log("Removing lecturer:", {
-            lecturerId,
-            courseId: course.id,
-            courseName: course.courseName,
-        });
-
         try {
-            const result = await removeLecturer({
+            await removeLecturer({
                 variables: {
                     lecturerId: parseInt(lecturerId.toString()),
                     courseId: parseInt(course.id.toString()),
                 },
             });
-            console.log("Remove lecturer result:", result);
         } catch (error) {
-            console.error("Error removing lecturer:", error);
+            // Silent error handling for production
         }
     };
 

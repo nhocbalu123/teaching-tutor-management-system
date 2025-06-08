@@ -209,7 +209,6 @@ export class CourseResolver {
                 message: `Course created: ${course.courseCode} - ${course.courseName}`,
             };
 
-            console.log("📡 Publishing COURSE_CREATED event:", courseEvent);
             await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_CREATED, {
                 courseUpdates: courseEvent,
             });
@@ -220,7 +219,6 @@ export class CourseResolver {
                 course,
             };
         } catch (error) {
-            console.error("Create course error:", error);
             return {
                 success: false,
                 message: "Failed to create course",
@@ -267,7 +265,6 @@ export class CourseResolver {
                 message: `Course updated: ${course.courseCode} - ${course.courseName}`,
             };
 
-            console.log("📡 Publishing COURSE_UPDATED event:", courseEvent);
             await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_UPDATED, {
                 courseUpdates: courseEvent,
             });
@@ -278,7 +275,6 @@ export class CourseResolver {
                 course,
             };
         } catch (error) {
-            console.error("Update course error:", error);
             return {
                 success: false,
                 message: "Failed to update course",
@@ -339,7 +335,6 @@ export class CourseResolver {
                 message: `Course deleted: ${courseInfo.courseCode} - ${courseInfo.courseName}`,
             };
 
-            console.log("📡 Publishing COURSE_DELETED event:", courseEvent);
             await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_DELETED, {
                 courseUpdates: courseEvent,
             });
@@ -350,8 +345,6 @@ export class CourseResolver {
                     "Course deleted successfully. All related assignments and applications have been removed.",
             };
         } catch (error) {
-            console.error("Delete course error:", error);
-
             // Check if it's a foreign key constraint error
             if (error.message.includes("foreign key constraint")) {
                 return {
@@ -433,7 +426,6 @@ export class CourseResolver {
                 assignment: savedAssignment!,
             };
         } catch (error) {
-            console.error("Assign lecturer error:", error);
             return {
                 success: false,
                 message: "Failed to assign lecturer to course",
@@ -469,7 +461,6 @@ export class CourseResolver {
                 message: "Lecturer removed from course successfully",
             };
         } catch (error) {
-            console.error("Remove lecturer error:", error);
             return {
                 success: false,
                 message: "Failed to remove lecturer from course",
