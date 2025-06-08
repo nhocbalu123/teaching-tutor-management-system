@@ -17,6 +17,13 @@
 
 .headerContent {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.titleSection {
+  display: flex;
   flex-direction: column;
 }
 
@@ -37,6 +44,37 @@
 .dashboardSubtitle {
   font-size: 1.1rem;
   color: var(--color-text-secondary);
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.refreshButton:hover {
+  background: var(--color-secondary);
+  transform: translateY(-1px);
+}
+
+.refreshIcon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.refreshButton:hover .refreshIcon {
+  transform: rotate(45deg);
 }
 
 /* Quick Stats Grid */
@@ -119,6 +157,44 @@
   color: var(--color-text-primary);
   line-height: 1.2;
   margin-bottom: 0.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .refreshButton {
+    align-self: flex-start;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .quickStats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .statIcon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .statIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
 }
 
 /* Dark mode adjustments */

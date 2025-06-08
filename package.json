@@ -3,28 +3,44 @@
     "version": "1.0.0",
     "description": "Fullstack project with frontend and backend",
     "scripts": {
-        "install": "npm run install:frontend && npm run install:backend",
+        "install": "npm run install:frontend && npm run install:backend && npm run install:admin-frontend && npm run install:admin-backend",
         "install:frontend": "cd frontend && npm install",
         "install:backend": "cd backend && npm install",
-        "dev": "echo \"Choose your OS: npm run dev:windows (Windows) or npm run dev:unix (Mac/Linux) or open 2 terminals and run: npm run dev:frontend & npm run dev:backend\"",
+        "install:admin-frontend": "cd admin-frontend && npm install",
+        "install:admin-backend": "cd admin-backend && npm install",
+        "dev": "echo \"Choose your OS: npm run dev:windows (Windows) or npm run dev:unix (Mac/Linux) or open terminals and run: npm run dev:frontend & npm run dev:backend\"",
         "dev:windows": "start \"Frontend\" cmd /c \"npm run dev:frontend\" && start \"Backend\" cmd /c \"npm run dev:backend\"",
         "dev:unix": "npm run dev:frontend & npm run dev:backend",
         "dev:frontend": "cd frontend && npm run dev",
         "dev:backend": "cd backend && npm run dev",
-        "build": "npm run build:frontend && npm run build:backend",
+        "dev:admin": "echo \"Choose your OS: npm run dev:admin:windows (Windows) or npm run dev:admin:unix (Mac/Linux)\"",
+        "dev:admin:windows": "start \"Admin Frontend\" cmd /c \"npm run dev:admin-frontend\" && start \"Admin Backend\" cmd /c \"npm run dev:admin-backend\"",
+        "dev:admin:unix": "npm run dev:admin-frontend & npm run dev:admin-backend",
+        "dev:admin-frontend": "cd admin-frontend && npm run dev",
+        "dev:admin-backend": "cd admin-backend && npm run dev",
+        "build": "npm run build:frontend && npm run build:backend && npm run build:admin-frontend && npm run build:admin-backend",
         "build:frontend": "cd frontend && npm run build",
         "build:backend": "cd backend && npm run build",
-        "start": "echo \"Choose your OS: npm run start:windows (Windows) or npm run start:unix (Mac/Linux) or open 2 terminals and run: npm run start:frontend & npm run start:backend\"",
+        "build:admin-frontend": "cd admin-frontend && npm run build",
+        "build:admin-backend": "cd admin-backend && npm run build",
+        "start": "echo \"Choose your OS: npm run start:windows (Windows) or npm run start:unix (Mac/Linux) or open terminals and run: npm run start:frontend & npm run start:backend\"",
         "start:windows": "start \"Frontend\" cmd /c \"npm run start:frontend\" && start \"Backend\" cmd /c \"npm run start:backend\"",
         "start:unix": "npm run start:frontend & npm run start:backend",
         "start:frontend": "cd frontend && npm start",
         "start:backend": "cd backend && npm start",
+        "start:admin": "echo \"Choose your OS: npm run start:admin:windows (Windows) or npm run start:admin:unix (Mac/Linux)\"",
+        "start:admin:windows": "start \"Admin Frontend\" cmd /c \"npm run start:admin-frontend\" && start \"Admin Backend\" cmd /c \"npm run start:admin-backend\"",
+        "start:admin:unix": "npm run start:admin-frontend & npm run start:admin-backend",
+        "start:admin-frontend": "cd admin-frontend && npm start",
+        "start:admin-backend": "cd admin-backend && npm start",
         "test": "npm run test:frontend && npm run test:backend",
         "test:frontend": "cd frontend && npm test",
         "test:backend": "cd backend && npm test",
-        "clean": "npm run clean:frontend && npm run clean:backend",
+        "clean": "npm run clean:frontend && npm run clean:backend && npm run clean:admin-frontend && npm run clean:admin-backend",
         "clean:frontend": "cd frontend && rm -rf node_modules",
-        "clean:backend": "cd backend && rm -rf node_modules"
+        "clean:backend": "cd backend && rm -rf node_modules",
+        "clean:admin-frontend": "cd admin-frontend && rm -rf node_modules",
+        "clean:admin-backend": "cd admin-backend && rm -rf node_modules"
     },
     "keywords": [
         "fullstack",
@@ -32,5 +48,10 @@
         "backend"
     ],
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "graphql-ws": "^6.0.5",
+        "node-fetch": "^3.3.2",
+        "ws": "^8.18.2"
+    }
 }

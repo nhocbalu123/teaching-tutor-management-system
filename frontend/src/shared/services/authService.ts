@@ -3,7 +3,9 @@ import { AuthResponse, SignupData, SigninData, User } from "../types/user";
 import StorageManager from "../utils/storageManager";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_ENDPOINT ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:5000/api";
 
 const authAPI = axios.create({
   baseURL: `${API_BASE_URL}/auth`,
@@ -95,7 +97,9 @@ export class AuthService {
         StorageManager.setItem("tokenExpiry", payload.exp.toString());
         console.log("Token saved with expiry:", new Date(payload.exp * 1000));
       } else {
-        console.warn("Invalid token structure, saving without expiry validation");
+        console.warn(
+          "Invalid token structure, saving without expiry validation"
+        );
         StorageManager.setItem("token", token);
       }
     } catch (error) {
@@ -192,13 +196,13 @@ export class AuthService {
   // Parse JWT payload without verification (for expiry check)
   private static parseJWT(token: string): { exp?: number } | null {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
         atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
       );
       return JSON.parse(jsonPayload);
     } catch (error) {

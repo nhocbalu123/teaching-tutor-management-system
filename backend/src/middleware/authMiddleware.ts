@@ -41,17 +41,21 @@ export const authenticateToken = async (
     try {
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET || "fallback_secret_key"
+            process.env.BACKEND_JWT_SECRET ||
+                process.env.JWT_SECRET ||
+                "fallback_secret_key"
         ) as JwtPayload;
 
         // Verify user still exists in database and is not blocked
         const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOne({
-            where: { id: decoded.userId }
+            where: { id: decoded.userId },
         });
 
         if (!user) {
-            console.log(`Token verification failed: User ${decoded.userId} not found in database`);
+            console.log(
+                `Token verification failed: User ${decoded.userId} not found in database`
+            );
             res.status(401).json({
                 success: false,
                 message: "User account not found",
@@ -60,10 +64,13 @@ export const authenticateToken = async (
         }
 
         if (user.isBlocked) {
-            console.log(`Token verification failed: User ${decoded.userId} is blocked`);
+            console.log(
+                `Token verification failed: User ${decoded.userId} is blocked`
+            );
             res.status(403).json({
                 success: false,
-                message: "Account has been blocked. Please contact administrator.",
+                message:
+                    "Account has been blocked. Please contact administrator.",
             });
             return;
         }

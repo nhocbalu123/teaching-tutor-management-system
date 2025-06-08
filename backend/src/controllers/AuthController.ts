@@ -5,7 +5,11 @@ import { AppDataSource } from "../config/database";
 import { User, UserType } from "../entities/User";
 import { Course } from "../entities/Course";
 import { CourseAssignment } from "../entities/CourseAssignment";
-import { validateSignupData, validateSigninData, getUserTypeFromEmail } from "../utils/validation";
+import {
+    validateSignupData,
+    validateSigninData,
+    getUserTypeFromEmail,
+} from "../utils/validation";
 
 interface AssignedCourse {
     id: number;
@@ -17,21 +21,26 @@ interface AssignedCourse {
 
 export class AuthController {
     private userRepository = AppDataSource.getRepository(User);
-    private courseAssignmentRepository = AppDataSource.getRepository(CourseAssignment);
+    private courseAssignmentRepository =
+        AppDataSource.getRepository(CourseAssignment);
 
     async signup(req: Request, res: Response): Promise<void> {
         try {
-            const { email, password, firstName, lastName, userType } =
-                req.body;
+            const { email, password, firstName, lastName, userType } = req.body;
 
             console.log("🔄 Signup attempt for email:", email);
-            console.log("🔍 Request body received:", JSON.stringify(req.body, null, 2));
+            console.log(
+                "🔍 Request body received:",
+                JSON.stringify(req.body, null, 2)
+            );
             console.log("🔍 UserType provided:", userType);
 
             // Automatically determine userType from email domain if not provided
             let finalUserType = userType;
             if (!finalUserType) {
-                console.log("🔍 No userType provided, determining from email...");
+                console.log(
+                    "🔍 No userType provided, determining from email..."
+                );
                 finalUserType = getUserTypeFromEmail(email);
                 if (!finalUserType) {
                     console.log("❌ Invalid email domain for:", email);
@@ -39,37 +48,51 @@ export class AuthController {
                         success: false,
                         message: "Invalid email domain",
                         errors: {
-                            email: "Email must end with @candidate.edu.au (for candidates) or @lecturer.edu.au (for lecturers)"
-                        }
+                            email: "Email must end with @candidate.edu.au (for candidates) or @lecturer.edu.au (for lecturers)",
+                        },
                     });
                     return;
                 }
-                console.log("📧 Auto-determined userType from email:", finalUserType);
+                console.log(
+                    "📧 Auto-determined userType from email:",
+                    finalUserType
+                );
                 // Set the userType in the request body for validation
                 req.body.userType = finalUserType;
             } else {
-                console.log("🔍 UserType provided, validating against email...");
+                console.log(
+                    "🔍 UserType provided, validating against email..."
+                );
                 // If userType is provided, verify it matches the email domain
                 const userTypeFromEmail = getUserTypeFromEmail(email);
                 if (userTypeFromEmail && userTypeFromEmail !== finalUserType) {
-                    const expectedDomain = userTypeFromEmail === UserType.CANDIDATE ? "@candidate.edu.au" : "@lecturer.edu.au";
+                    const expectedDomain =
+                        userTypeFromEmail === UserType.CANDIDATE
+                            ? "@candidate.edu.au"
+                            : "@lecturer.edu.au";
                     console.log("❌ UserType mismatch for:", email);
                     res.status(400).json({
                         success: false,
                         message: "User type does not match email domain",
                         errors: {
-                            email: `Email domain does not match selected user type. Use ${expectedDomain} for ${userTypeFromEmail}s`
-                        }
+                            email: `Email domain does not match selected user type. Use ${expectedDomain} for ${userTypeFromEmail}s`,
+                        },
                     });
                     return;
                 }
             }
 
-            console.log("🔍 Data to validate:", JSON.stringify(req.body, null, 2));
+            console.log(
+                "🔍 Data to validate:",
+                JSON.stringify(req.body, null, 2)
+            );
 
             // Validate input data with userType now set
             const validation = validateSignupData(req.body);
-            console.log("🔍 Validation result:", JSON.stringify(validation, null, 2));
+            console.log(
+                "🔍 Validation result:",
+                JSON.stringify(validation, null, 2)
+            );
 
             if (!validation.isValid) {
                 console.log("❌ Signup validation failed:", validation.errors);
@@ -111,7 +134,12 @@ export class AuthController {
 
             // Save user to database
             const savedUser = await this.userRepository.save(newUser);
-            console.log("✅ User created successfully:", savedUser.id, "Type:", savedUser.userType);
+            console.log(
+                "✅ User created successfully:",
+                savedUser.id,
+                "Type:",
+                savedUser.userType
+            );
 
             // Generate JWT token
             const token = jwt.sign(
@@ -120,7 +148,9 @@ export class AuthController {
                     email: savedUser.email,
                     userType: savedUser.userType,
                 },
-                process.env.JWT_SECRET || "fallback_secret_key",
+                process.env.BACKEND_JWT_SECRET ||
+                    process.env.JWT_SECRET ||
+                    "fallback_secret_key",
                 { expiresIn: "7d" }
             );
 
@@ -216,7 +246,9 @@ export class AuthController {
                     email: user.email,
                     userType: user.userType,
                 },
-                process.env.JWT_SECRET || "fallback_secret_key",
+                process.env.BACKEND_JWT_SECRET ||
+                    process.env.JWT_SECRET ||
+                    "fallback_secret_key",
                 { expiresIn: "7d" }
             );
 
@@ -291,74 +323,61 @@ export class AuthController {
             // If user is a lecturer, include their assigned courses
             let assignedCourses: AssignedCourse[] = [];
             if (user.userType === UserType.LECTURER) {
-                console.log("🔍 Fetching assigned courses for lecturer:", userId);
-                console.log("🔍 User type is:", user.userType, "UserType.LECTURER:", UserType.LECTURER);
+                console.log(
+                    "🔍 Fetching assigned courses for lecturer:",
+                    userId
+                );
+                console.log(
+                    "🔍 User type is:",
+                    user.userType,
+                    "UserType.LECTURER:",
+                    UserType.LECTURER
+                );
 
                 try {
-                    const courseAssignments = await this.courseAssignmentRepository.find({
-                        where: { lecturerId: userId },
-                        relations: ["course"],
-                        order: { course: { courseCode: "ASC" } }
-                    });
+                    const courseAssignments =
+                        await this.courseAssignmentRepository.find({
+                            where: { lecturerId: userId },
+                            relations: ["course"],
+                            order: { course: { courseCode: "ASC" } },
+                        });
 
-                    console.log("🔍 Found course assignments:", courseAssignments.length);
-                    console.log("🔍 Course assignments data:", courseAssignments);
+                    console.log(
+                        "🔍 Found course assignments:",
+                        courseAssignments.length
+                    );
+                    console.log(
+                        "🔍 Course assignments data:",
+                        courseAssignments
+                    );
 
-                    if (courseAssignments.length > 0) {
-                        assignedCourses = courseAssignments.map(assignment => ({
-                            id: assignment.course.id,
-                            courseCode: assignment.course.courseCode,
-                            courseName: assignment.course.courseName,
-                            semester: assignment.course.semester,
-                            assignedAt: assignment.assignedAt
-                        }));
-                    } else {
-                        // If no assignments found, create mock data for demonstration
-                        console.log("⚠️ No course assignments found, creating mock data for lecturer");
-                        assignedCourses = [
-                            {
-                                id: 1,
-                                courseCode: "COSC2758",
-                                courseName: "Full Stack Development",
-                                semester: "Semester 1 2025",
-                                assignedAt: new Date("2024-01-15")
-                            },
-                            {
-                                id: 2,
-                                courseCode: "COSC2671",
-                                courseName: "Introduction to Web Programming",
-                                semester: "Semester 1 2025",
-                                assignedAt: new Date("2024-01-15")
-                            }
-                        ];
-                    }
+                    assignedCourses = courseAssignments.map((assignment) => ({
+                        id: assignment.course.id,
+                        courseCode: assignment.course.courseCode,
+                        courseName: assignment.course.courseName,
+                        semester: assignment.course.semester,
+                        assignedAt: assignment.assignedAt,
+                    }));
 
-                    console.log(`✅ Mapped ${assignedCourses.length} assigned courses for lecturer`);
+                    console.log(
+                        `✅ Mapped ${assignedCourses.length} assigned courses for lecturer`
+                    );
                     console.log("✅ Assigned courses:", assignedCourses);
                 } catch (courseError) {
-                    console.error("❌ Error fetching course assignments:", courseError);
-                    // Fallback to mock data if there's an error
-                    assignedCourses = [
-                        {
-                            id: 1,
-                            courseCode: "COSC2758",
-                            courseName: "Full Stack Development",
-                            semester: "Semester 1 2025",
-                            assignedAt: new Date("2024-01-15")
-                        },
-                        {
-                            id: 2,
-                            courseCode: "COSC2671",
-                            courseName: "Introduction to Web Programming",
-                            semester: "Semester 1 2025",
-                            assignedAt: new Date("2024-01-15")
-                        }
-                    ];
+                    console.error(
+                        "❌ Error fetching course assignments:",
+                        courseError
+                    );
+                    // Keep assignedCourses as empty array if there's an error
+                    assignedCourses = [];
                 }
             }
 
             console.log("✅ Profile retrieved for:", user.email);
-            console.log("📊 Final assigned courses count:", assignedCourses.length);
+            console.log(
+                "📊 Final assigned courses count:",
+                assignedCourses.length
+            );
 
             res.status(200).json({
                 success: true,

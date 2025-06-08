@@ -2,7 +2,6 @@
 node_modules/
 
 # Environment variables
-.env
 .env.local
 .env.development.local
 .env.test.local
@@ -42,3 +41,4 @@ uploads/
 
 # Assignment file
 assignment.txt
+GRAPHQL_SUBSCRIPTIONS_IMPLEMENTATION.md

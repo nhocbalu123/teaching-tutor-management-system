@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import type { Application as TutorApplication } from "@/shared/types/application"; // Updated
-import { availableCourses } from "@/shared/data/courses";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./applicant-details.module.css";
 import {
@@ -53,12 +52,6 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   useEffect(() => {
     const originalComment = application?.comment || "";
     const hasChanges = comment !== originalComment;
-    console.log("📝 Unsaved changes check:", {
-      originalComment,
-      comment,
-      hasChanges,
-      applicationId: application?.id,
-    });
     setHasUnsavedChanges(hasChanges);
   }, [comment, application?.comment, application?.id]);
 
@@ -151,17 +144,7 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   };
 
   const handleAddToRankingClick = () => {
-    console.log("🎯 handleAddToRankingClick called:", {
-      applicationId: application?.id,
-      selected: application?.selected,
-      rank: application?.rank,
-      rankType: typeof application?.rank,
-      comment: application?.comment,
-      hasComment: !!application?.comment,
-    });
-
     if (!application.selected) {
-      console.log("❌ Not selected");
       showToast(
         "Please select the applicant before adding to ranking",
         "error"
@@ -169,20 +152,21 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
       return;
     }
     // Fix: Check if truly ranked (rank > 0), handle null/undefined explicitly
-    if (application.rank !== null && application.rank !== undefined && application.rank > 0) {
-      console.log("❌ Already ranked:", application.rank);
+    if (
+      application.rank !== null &&
+      application.rank !== undefined &&
+      application.rank > 0
+    ) {
       showToast("Applicant is already added to ranking", "info");
       return;
     }
     if (!application.comment) {
-      console.log("❌ No comment");
       showToast(
         "Please add and save a comment before adding to ranking.",
         "error"
       );
       return;
     }
-    console.log("✅ Calling onAddToRanking");
     onAddToRanking();
   };
 
@@ -206,11 +190,12 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
               <p className={styles.applicantEmail}>{application.email}</p>
               <div className={styles.applicantBadges}>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {(application as any).role && (
+                {((application as any)?.role?.roleName === "tutor" ||
+                  application.previousRoles?.includes("tutor")) && (
                   <span className={styles.roleBadge}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className={styles.roleIconSmall}
+                      className={styles.roleBadgeIcon}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -222,24 +207,65 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {((application as any).role?.roleName === "tutor") ? "Tutor" : 
-                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                     ((application as any).role?.roleName === "lab_assistant") ? "Lab Assistant" : 
-                     "Application"}
+                    {(
+                      application as TutorApplication & {
+                        role?: { roleName: string };
+                      }
+                    )?.role?.roleName === "tutor"
+                      ? "Tutor"
+                      : (
+                            application as TutorApplication & {
+                              role?: { roleName: string };
+                            }
+                          )?.role?.roleName === "lab_assistant"
+                        ? "Lab Assistant"
+                        : "Tutor Applicant"}
                   </span>
                 )}
-                <span
-                  className={`${styles.availabilityBadge} ${application.availability === "Full Time" ? styles.fullTime : styles.partTime}`}
-                >
+
+                <span className={styles.availabilityBadge}>
                   {application.availability}
                 </span>
-                <span className={styles.dateBadge}>
-                  Applied:{" "}
-                  {new Date(application.dateApplied).toLocaleDateString()}
+
+                <span className={styles.statusBadge}>
+                  {(application.status as string) === "pending"
+                    ? "Pending Review"
+                    : (application.status as string) === "selected"
+                      ? "Selected"
+                      : (application.status as string) === "rejected"
+                        ? "Rejected"
+                        : application.status}
                 </span>
               </div>
             </div>
+
+            {/* Blocked candidate warning */}
+            {application.isBlocked && (
+              <div className={styles.blockedWarning}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.warningIcon}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+                <div>
+                  <strong>Candidate Unavailable</strong>
+                  <p>
+                    This candidate has been blocked by an administrator and
+                    cannot be selected.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className={styles.buttonGroup}>
               {application.selected ? (
                 <>
@@ -249,7 +275,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   >
                     Unselect
                   </button>
-                  {application.rank !== null && application.rank !== undefined && application.rank > 0 ? (
+                  {application.rank !== null &&
+                  application.rank !== undefined &&
+                  application.rank > 0 ? (
                     <button
                       disabled
                       className={`${styles.actionButton} ${styles.alreadyRankedButton}`}
@@ -286,14 +314,15 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
                   onClick={handleSelectButtonClick}
                   className={`${styles.actionButton} ${styles.selectButton}`}
                   title="Select applicant for all applied courses"
+                  disabled={application.isBlocked}
                 >
-                  Select Applicant
+                  {application.isBlocked
+                    ? "Candidate Unavailable"
+                    : "Select Applicant"}
                 </button>
               )}
             </div>
           </div>
-
-
 
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>
@@ -315,14 +344,20 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
             </h4>
             <div className={styles.coursesContainer}>
               {application.courses.map((courseCode) => {
-                const courseInfo = availableCourses.find(
-                  (course) => course.code === courseCode
-                );
+                // Use embedded course information from the extended application object
+                const extendedApp = application as TutorApplication & {
+                  course?: {
+                    courseCode: string;
+                    courseName: string;
+                    semester: string;
+                  };
+                };
+
                 return (
                   <div key={courseCode} className={styles.courseCard}>
                     <div className={styles.courseCode}>{courseCode}</div>
                     <div className={styles.courseName}>
-                      {courseInfo ? courseInfo.name : "Course not found"}
+                      {extendedApp.course?.courseName || "Course not found"}
                     </div>
                     {application.selectedForCourses?.includes(courseCode) && (
                       <svg

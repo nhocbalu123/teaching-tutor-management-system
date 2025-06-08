@@ -1,0 +1,448 @@
+import { gql } from "@apollo/client";
+
+// Auth Queries
+export const ADMIN_LOGIN = gql`
+    mutation AdminLogin($email: String!, $password: String!) {
+        adminLogin(email: $email, password: $password) {
+            success
+            token
+            message
+            user {
+                id
+                email
+                firstName
+                lastName
+                userType
+                fullName
+            }
+        }
+    }
+`;
+
+export const ADMIN_LOGOUT = gql`
+    mutation AdminLogout {
+        adminLogout
+    }
+`;
+
+// User Queries
+export const GET_ALL_USERS = gql`
+    query GetAllUsers {
+        getAllUsers {
+            id
+            email
+            firstName
+            lastName
+            userType
+            isBlocked
+            createdAt
+            fullName
+        }
+    }
+`;
+
+export const GET_USERS_BY_TYPE = gql`
+    query GetUsersByType($userType: UserType!) {
+        getUsersByType(userType: $userType) {
+            id
+            email
+            firstName
+            lastName
+            userType
+            isBlocked
+            createdAt
+            fullName
+        }
+    }
+`;
+
+export const GET_USER_STATS = gql`
+    query GetUserStats {
+        getUserStats {
+            totalUsers
+            totalCandidates
+            totalLecturers
+            totalAdmins
+            blockedUsers
+        }
+    }
+`;
+
+export const GET_USER_BY_ID = gql`
+    query GetUserById($id: Int!) {
+        getUserById(id: $id) {
+            id
+            email
+            firstName
+            lastName
+            userType
+            isBlocked
+            createdAt
+            fullName
+            courseAssignments {
+                id
+                course {
+                    id
+                    courseCode
+                    courseName
+                }
+                assignedAt
+            }
+            applications {
+                id
+                status
+                course {
+                    id
+                    courseCode
+                    courseName
+                }
+                role {
+                    id
+                    roleName
+                }
+                appliedAt
+            }
+        }
+    }
+`;
+
+// User Mutations
+export const BLOCK_USER = gql`
+    mutation BlockUser($id: Int!) {
+        blockUser(id: $id) {
+            success
+            message
+            user {
+                id
+                isBlocked
+            }
+        }
+    }
+`;
+
+export const UNBLOCK_USER = gql`
+    mutation UnblockUser($id: Int!) {
+        unblockUser(id: $id) {
+            success
+            message
+            user {
+                id
+                isBlocked
+            }
+        }
+    }
+`;
+
+export const DELETE_USER = gql`
+    mutation DeleteUser($id: Int!) {
+        deleteUser(id: $id) {
+            success
+            message
+        }
+    }
+`;
+
+// Course Queries
+export const GET_ALL_COURSES = gql`
+    query GetAllCourses {
+        getAllCourses {
+            id
+            courseCode
+            courseName
+            semester
+            description
+            maxTutors
+            maxLabAssistants
+            createdAt
+            displayName
+            courseAssignments {
+                id
+                lecturer {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+                assignedAt
+            }
+            applications {
+                id
+                status
+                candidate {
+                    id
+                    firstName
+                    lastName
+                }
+            }
+        }
+    }
+`;
+
+export const GET_COURSE_BY_ID = gql`
+    query GetCourseById($id: Int!) {
+        getCourseById(id: $id) {
+            id
+            courseCode
+            courseName
+            semester
+            description
+            maxTutors
+            maxLabAssistants
+            createdAt
+            displayName
+            courseAssignments {
+                id
+                lecturer {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+                assignedAt
+            }
+            applications {
+                id
+                status
+                candidate {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+                role {
+                    id
+                    roleName
+                }
+                appliedAt
+            }
+        }
+    }
+`;
+
+export const GET_ALL_COURSE_ASSIGNMENTS = gql`
+    query GetAllCourseAssignments {
+        getAllCourseAssignments {
+            id
+            lecturer {
+                id
+                firstName
+                lastName
+                email
+            }
+            course {
+                id
+                courseCode
+                courseName
+                semester
+            }
+            assignedAt
+        }
+    }
+`;
+
+export const GET_UNASSIGNED_LECTURERS = gql`
+    query GetUnassignedLecturers($courseId: Int) {
+        getUnassignedLecturers(courseId: $courseId) {
+            id
+            firstName
+            lastName
+            email
+        }
+    }
+`;
+
+// Course Mutations
+export const CREATE_COURSE = gql`
+    mutation CreateCourse($input: CourseInput!) {
+        createCourse(input: $input) {
+            success
+            message
+            course {
+                id
+                courseCode
+                courseName
+                semester
+                description
+                maxTutors
+                maxLabAssistants
+            }
+        }
+    }
+`;
+
+export const UPDATE_COURSE = gql`
+    mutation UpdateCourse($id: Int!, $input: CourseInput!) {
+        updateCourse(id: $id, input: $input) {
+            success
+            message
+            course {
+                id
+                courseCode
+                courseName
+                semester
+                description
+                maxTutors
+                maxLabAssistants
+            }
+        }
+    }
+`;
+
+export const DELETE_COURSE = gql`
+    mutation DeleteCourse($id: Int!) {
+        deleteCourse(id: $id) {
+            success
+            message
+        }
+    }
+`;
+
+// Report Queries
+export const GET_CANDIDATES_CHOSEN_PER_COURSE = gql`
+    query GetCandidatesChosenPerCourse {
+        getCandidatesChosenPerCourse {
+            course {
+                id
+                courseCode
+                courseName
+                semester
+            }
+            selectedCandidates {
+                candidate {
+                    id
+                    firstName
+                    lastName
+                    email
+                    fullName
+                }
+                course {
+                    id
+                    courseCode
+                    courseName
+                }
+                selectedAt
+                selectedBy {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                application {
+                    id
+                    status
+                    role {
+                        id
+                        roleName
+                    }
+                }
+            }
+            totalSelected
+        }
+    }
+`;
+
+export const GET_CANDIDATES_WITH_MULTIPLE_SELECTIONS = gql`
+    query GetCandidatesWithMultipleSelections {
+        getCandidatesWithMultipleSelections {
+            candidate {
+                id
+                firstName
+                lastName
+                email
+                fullName
+            }
+            selections {
+                candidate {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                course {
+                    id
+                    courseCode
+                    courseName
+                    semester
+                }
+                selectedAt
+                selectedBy {
+                    id
+                    firstName
+                    lastName
+                    fullName
+                }
+                application {
+                    id
+                    role {
+                        id
+                        roleName
+                    }
+                }
+            }
+            totalSelections
+        }
+    }
+`;
+
+export const GET_UNSELECTED_CANDIDATES = gql`
+    query GetUnselectedCandidates {
+        getUnselectedCandidates {
+            candidate {
+                id
+                firstName
+                lastName
+                email
+                fullName
+            }
+            applications {
+                id
+                status
+                appliedAt
+                course {
+                    id
+                    courseCode
+                    courseName
+                    semester
+                }
+                role {
+                    id
+                    roleName
+                }
+            }
+            totalApplications
+        }
+    }
+`;
+
+export const ASSIGN_LECTURER_TO_COURSE = gql`
+    mutation AssignLecturerToCourse($lecturerId: Int!, $courseId: Int!) {
+        assignLecturerToCourse(lecturerId: $lecturerId, courseId: $courseId) {
+            success
+            message
+            assignment {
+                id
+                lecturer {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+                course {
+                    id
+                    courseCode
+                    courseName
+                }
+                assignedAt
+            }
+        }
+    }
+`;
+
+export const REMOVE_LECTURER_FROM_COURSE = gql`
+    mutation RemoveLecturerFromCourse($lecturerId: Int!, $courseId: Int!) {
+        removeLecturerFromCourse(lecturerId: $lecturerId, courseId: $courseId) {
+            success
+            message
+        }
+    }
+`;

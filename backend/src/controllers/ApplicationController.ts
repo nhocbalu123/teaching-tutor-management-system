@@ -14,13 +14,25 @@ export class ApplicationController {
     private courseRepository = AppDataSource.getRepository(Course);
     private roleRepository = AppDataSource.getRepository(Role);
     private userRepository = AppDataSource.getRepository(User);
-    private courseAssignmentRepository = AppDataSource.getRepository(CourseAssignment);
-    private selectedCandidateRepository = AppDataSource.getRepository(SelectedCandidate);
+    private courseAssignmentRepository =
+        AppDataSource.getRepository(CourseAssignment);
+    private selectedCandidateRepository =
+        AppDataSource.getRepository(SelectedCandidate);
 
     // PA Part C: Create new application
-    async createApplication(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async createApplication(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
-            const { courseId, roleId, availability, skills, experience, motivation } = req.body;
+            const {
+                courseId,
+                roleId,
+                availability,
+                skills,
+                experience,
+                motivation,
+            } = req.body;
             const candidateId = req.user?.userId;
 
             console.log("🔄 Creating application for candidate:", candidateId);
@@ -50,8 +62,12 @@ export class ApplicationController {
             }
 
             // Verify course and role exist
-            const course = await this.courseRepository.findOne({ where: { id: courseId } });
-            const role = await this.roleRepository.findOne({ where: { id: roleId } });
+            const course = await this.courseRepository.findOne({
+                where: { id: courseId },
+            });
+            const role = await this.roleRepository.findOne({
+                where: { id: roleId },
+            });
 
             if (!course || !role) {
                 res.status(404).json({
@@ -62,13 +78,14 @@ export class ApplicationController {
             }
 
             // Check for duplicate application
-            const existingApplication = await this.applicationRepository.findOne({
-                where: {
-                    candidateId,
-                    courseId,
-                    roleId,
-                },
-            });
+            const existingApplication =
+                await this.applicationRepository.findOne({
+                    where: {
+                        candidateId,
+                        courseId,
+                        roleId,
+                    },
+                });
 
             if (existingApplication) {
                 res.status(409).json({
@@ -90,9 +107,14 @@ export class ApplicationController {
                 status: ApplicationStatus.PENDING,
             });
 
-            const savedApplication = await this.applicationRepository.save(newApplication);
+            const savedApplication = await this.applicationRepository.save(
+                newApplication
+            );
 
-            console.log("✅ Application created successfully:", savedApplication.id);
+            console.log(
+                "✅ Application created successfully:",
+                savedApplication.id
+            );
 
             res.status(201).json({
                 success: true,
@@ -109,7 +131,10 @@ export class ApplicationController {
     }
 
     // PA Part C: Get candidate's applications
-    async getMyCandidateApplications(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async getMyCandidateApplications(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const candidateId = req.user?.userId;
 
@@ -133,7 +158,10 @@ export class ApplicationController {
     }
 
     // PA Part C: Get available courses and roles for candidates
-    async getCoursesAndRoles(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async getCoursesAndRoles(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const courses = await this.courseRepository.find({
                 order: { courseCode: "ASC" },
@@ -157,7 +185,10 @@ export class ApplicationController {
     }
 
     // CR Part: Get applications with advanced filtering for lecturers
-    async getApplicationsForLecturer(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async getApplicationsForLecturer(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const lecturerId = req.user?.userId;
             const {
@@ -185,12 +216,15 @@ export class ApplicationController {
             }
 
             // Get lecturer's assigned courses
-            const courseAssignments = await this.courseAssignmentRepository.find({
-                where: { lecturerId },
-                relations: ["course"],
-            });
+            const courseAssignments =
+                await this.courseAssignmentRepository.find({
+                    where: { lecturerId },
+                    relations: ["course"],
+                });
 
-            const assignedCourseIds = courseAssignments.map((ca) => ca.courseId);
+            const assignedCourseIds = courseAssignments.map(
+                (ca) => ca.courseId
+            );
 
             if (assignedCourseIds.length === 0) {
                 res.status(200).json({
@@ -220,25 +254,37 @@ export class ApplicationController {
             }
 
             if (roleType && roleType !== "all") {
-                queryBuilder.andWhere("role.roleName = :roleType", { roleType });
-            }
-
-            if (availability && availability !== "all") {
-                queryBuilder.andWhere("JSON_UNQUOTE(JSON_EXTRACT(application.availability, '$.type')) = :availability", { availability });
-            }
-
-            if (skills) {
-                queryBuilder.andWhere("LOWER(application.skills) LIKE LOWER(:skills)", {
-                    skills: `%${skills}%`,
+                queryBuilder.andWhere("role.roleName = :roleType", {
+                    roleType,
                 });
             }
 
+            if (availability && availability !== "all") {
+                queryBuilder.andWhere(
+                    "JSON_UNQUOTE(JSON_EXTRACT(application.availability, '$.type')) = :availability",
+                    { availability }
+                );
+            }
+
+            if (skills) {
+                queryBuilder.andWhere(
+                    "LOWER(application.skills) LIKE LOWER(:skills)",
+                    {
+                        skills: `%${skills}%`,
+                    }
+                );
+            }
+
             if (courseCode && courseCode !== "all") {
-                queryBuilder.andWhere("course.courseCode = :courseCode", { courseCode });
+                queryBuilder.andWhere("course.courseCode = :courseCode", {
+                    courseCode,
+                });
             }
 
             if (status && status !== "all") {
-                queryBuilder.andWhere("application.status = :status", { status });
+                queryBuilder.andWhere("application.status = :status", {
+                    status,
+                });
             }
 
             // Order by application date (newest first)
@@ -246,7 +292,9 @@ export class ApplicationController {
 
             const applications = await queryBuilder.getMany();
 
-            console.log(`✅ Found ${applications.length} applications for lecturer`);
+            console.log(
+                `✅ Found ${applications.length} applications for lecturer`
+            );
 
             res.status(200).json({
                 success: true,
@@ -262,7 +310,10 @@ export class ApplicationController {
     }
 
     // DI Part: Get application statistics for visualization
-    async getApplicationStatistics(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async getApplicationStatistics(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const lecturerId = req.user?.userId;
 
@@ -280,12 +331,15 @@ export class ApplicationController {
             }
 
             // Get lecturer's assigned courses
-            const courseAssignments = await this.courseAssignmentRepository.find({
-                where: { lecturerId },
-                relations: ["course"],
-            });
+            const courseAssignments =
+                await this.courseAssignmentRepository.find({
+                    where: { lecturerId },
+                    relations: ["course"],
+                });
 
-            const assignedCourseIds = courseAssignments.map((ca) => ca.courseId);
+            const assignedCourseIds = courseAssignments.map(
+                (ca) => ca.courseId
+            );
 
             if (assignedCourseIds.length === 0) {
                 res.status(200).json({
@@ -294,7 +348,11 @@ export class ApplicationController {
                         totalApplications: 0,
                         applicationsByRole: { tutor: 0, lab_assistant: 0 },
                         applicationsByCourse: [],
-                        applicationsByStatus: { pending: 0, selected: 0, rejected: 0 },
+                        applicationsByStatus: {
+                            pending: 0,
+                            selected: 0,
+                            rejected: 0,
+                        },
                         skillFrequency: [],
                         availabilityDistribution: { partTime: 0, fullTime: 0 },
                     },
@@ -304,7 +362,7 @@ export class ApplicationController {
 
             // Get all applications for assigned courses
             const applications = await this.applicationRepository.find({
-                where: assignedCourseIds.map(courseId => ({ courseId })),
+                where: assignedCourseIds.map((courseId) => ({ courseId })),
                 relations: ["course", "role", "candidate"],
             });
 
@@ -312,17 +370,28 @@ export class ApplicationController {
             const stats = {
                 totalApplications: applications.length,
                 applicationsByRole: {
-                    tutor: applications.filter(app => app.role.roleName === "tutor").length,
-                    lab_assistant: applications.filter(app => app.role.roleName === "lab_assistant").length,
+                    tutor: applications.filter(
+                        (app) => app.role.roleName === "tutor"
+                    ).length,
+                    lab_assistant: applications.filter(
+                        (app) => app.role.roleName === "lab_assistant"
+                    ).length,
                 },
                 applicationsByCourse: this.groupByCourse(applications),
                 applicationsByStatus: {
-                    pending: applications.filter(app => app.status === ApplicationStatus.PENDING).length,
-                    selected: applications.filter(app => app.status === ApplicationStatus.SELECTED).length,
-                    rejected: applications.filter(app => app.status === ApplicationStatus.REJECTED).length,
+                    pending: applications.filter(
+                        (app) => app.status === ApplicationStatus.PENDING
+                    ).length,
+                    selected: applications.filter(
+                        (app) => app.status === ApplicationStatus.SELECTED
+                    ).length,
+                    rejected: applications.filter(
+                        (app) => app.status === ApplicationStatus.REJECTED
+                    ).length,
                 },
                 skillFrequency: this.calculateSkillFrequency(applications),
-                availabilityDistribution: this.calculateAvailabilityDistribution(applications),
+                availabilityDistribution:
+                    this.calculateAvailabilityDistribution(applications),
             };
 
             res.status(200).json({
@@ -339,7 +408,10 @@ export class ApplicationController {
     }
 
     // CR Part: Update application status
-    async updateApplicationStatus(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async updateApplicationStatus(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const { id } = req.params;
             const { status } = req.body;
@@ -359,12 +431,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -376,13 +449,16 @@ export class ApplicationController {
 
             // Update application status
             application.status = status;
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             // If selected, create SelectedCandidate record
             if (status === ApplicationStatus.SELECTED) {
-                const existingSelection = await this.selectedCandidateRepository.findOne({
-                    where: { applicationId: application.id },
-                });
+                const existingSelection =
+                    await this.selectedCandidateRepository.findOne({
+                        where: { applicationId: application.id },
+                    });
 
                 if (!existingSelection) {
                     const selection = this.selectedCandidateRepository.create({
@@ -408,17 +484,24 @@ export class ApplicationController {
     }
 
     // Helper methods for statistics calculation
-    private groupByCourse(applications: Application[]): Array<{ course: string; count: number }> {
+    private groupByCourse(
+        applications: Application[]
+    ): Array<{ course: string; count: number }> {
         const courseGroups = applications.reduce((acc, app) => {
             const courseKey = app.course.courseCode;
             acc[courseKey] = (acc[courseKey] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
 
-        return Object.entries(courseGroups).map(([course, count]) => ({ course, count }));
+        return Object.entries(courseGroups).map(([course, count]) => ({
+            course,
+            count,
+        }));
     }
 
-    private calculateSkillFrequency(applications: Application[]): Array<{ skill: string; frequency: number }> {
+    private calculateSkillFrequency(
+        applications: Application[]
+    ): Array<{ skill: string; frequency: number }> {
         const skillCounts = {} as Record<string, number>;
 
         applications.forEach((app) => {
@@ -426,8 +509,8 @@ export class ApplicationController {
                 // Split skills by common delimiters and normalize
                 const skills = app.skills
                     .split(/[,;|\n]/)
-                    .map(skill => skill.trim().toLowerCase())
-                    .filter(skill => skill.length > 0);
+                    .map((skill) => skill.trim().toLowerCase())
+                    .filter((skill) => skill.length > 0);
 
                 skills.forEach((skill) => {
                     skillCounts[skill] = (skillCounts[skill] || 0) + 1;
@@ -441,16 +524,19 @@ export class ApplicationController {
             .slice(0, 20); // Top 20 skills
     }
 
-    private calculateAvailabilityDistribution(applications: Application[]): { partTime: number; fullTime: number } {
+    private calculateAvailabilityDistribution(applications: Application[]): {
+        partTime: number;
+        fullTime: number;
+    } {
         let partTime = 0;
         let fullTime = 0;
 
         applications.forEach((app) => {
-            if (app.availability && typeof app.availability === 'object') {
+            if (app.availability && typeof app.availability === "object") {
                 const availabilityType = (app.availability as any).type;
-                if (availabilityType === 'Part Time') {
+                if (availabilityType === "Part Time") {
                     partTime++;
-                } else if (availabilityType === 'Full Time') {
+                } else if (availabilityType === "Full Time") {
                     fullTime++;
                 }
             }
@@ -460,11 +546,17 @@ export class ApplicationController {
     }
 
     // PA Part D: Get assigned courses for lecturer
-    async getAssignedCoursesForLecturer(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async getAssignedCoursesForLecturer(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const lecturerId = req.user?.userId;
 
-            console.log("🔄 Fetching assigned courses for lecturer:", lecturerId);
+            console.log(
+                "🔄 Fetching assigned courses for lecturer:",
+                lecturerId
+            );
 
             // Verify user is a lecturer
             const lecturer = await this.userRepository.findOne({
@@ -480,15 +572,18 @@ export class ApplicationController {
             }
 
             // Get lecturer's assigned courses with course details
-            const courseAssignments = await this.courseAssignmentRepository.find({
-                where: { lecturerId },
-                relations: ["course"],
-                order: { course: { courseCode: "ASC" } },
-            });
+            const courseAssignments =
+                await this.courseAssignmentRepository.find({
+                    where: { lecturerId },
+                    relations: ["course"],
+                    order: { course: { courseCode: "ASC" } },
+                });
 
-            const assignedCourses = courseAssignments.map(ca => ca.course);
+            const assignedCourses = courseAssignments.map((ca) => ca.course);
 
-            console.log(`✅ Found ${assignedCourses.length} assigned courses for lecturer`);
+            console.log(
+                `✅ Found ${assignedCourses.length} assigned courses for lecturer`
+            );
 
             res.status(200).json({
                 success: true,
@@ -504,7 +599,10 @@ export class ApplicationController {
     }
 
     // Comment management methods
-    async updateApplicationComment(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async updateApplicationComment(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const { id } = req.params;
             const { comment } = req.body;
@@ -524,12 +622,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -544,7 +643,9 @@ export class ApplicationController {
             application.commentedBy = lecturerId;
             application.commentedAt = new Date();
 
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             res.status(200).json({
                 success: true,
@@ -560,7 +661,10 @@ export class ApplicationController {
         }
     }
 
-    async deleteApplicationComment(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async deleteApplicationComment(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const { id } = req.params;
             const lecturerId = req.user?.userId;
@@ -579,12 +683,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -599,7 +704,9 @@ export class ApplicationController {
             application.commentedBy = undefined;
             application.commentedAt = undefined;
 
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             res.status(200).json({
                 success: true,
@@ -616,7 +723,10 @@ export class ApplicationController {
     }
 
     // Ranking management methods
-    async addApplicationToRanking(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async addApplicationToRanking(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const { id } = req.params;
             const { rank, courseCode } = req.body;
@@ -636,12 +746,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -655,7 +766,8 @@ export class ApplicationController {
             if (application.status !== ApplicationStatus.SELECTED) {
                 res.status(400).json({
                     success: false,
-                    message: "Application must be selected before adding to ranking",
+                    message:
+                        "Application must be selected before adding to ranking",
                 });
                 return;
             }
@@ -666,7 +778,9 @@ export class ApplicationController {
             application.rankedAt = new Date();
             application.rankedForCourse = courseCode;
 
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             res.status(200).json({
                 success: true,
@@ -682,7 +796,10 @@ export class ApplicationController {
         }
     }
 
-    async updateApplicationRanking(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async updateApplicationRanking(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         try {
             const { id } = req.params;
             const { rank, courseCode } = req.body;
@@ -702,12 +819,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -723,7 +841,9 @@ export class ApplicationController {
             application.rankedAt = new Date();
             application.rankedForCourse = courseCode;
 
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             res.status(200).json({
                 success: true,
@@ -739,11 +859,14 @@ export class ApplicationController {
         }
     }
 
-    async removeApplicationFromRanking(req: AuthenticatedRequest, res: Response): Promise<void> {
+    async removeApplicationFromRanking(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
         console.log("🗑️ DELETE /ranking endpoint hit:", {
             applicationId: req.params.id,
             lecturerId: req.user?.userId,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
 
         try {
@@ -764,12 +887,13 @@ export class ApplicationController {
             }
 
             // Verify lecturer has access to this application's course
-            const courseAssignment = await this.courseAssignmentRepository.findOne({
-                where: {
-                    lecturerId,
-                    courseId: application.courseId,
-                },
-            });
+            const courseAssignment =
+                await this.courseAssignmentRepository.findOne({
+                    where: {
+                        lecturerId,
+                        courseId: application.courseId,
+                    },
+                });
 
             if (!courseAssignment) {
                 res.status(403).json({
@@ -784,7 +908,7 @@ export class ApplicationController {
                 applicationId: application.id,
                 currentRank: application.rank,
                 currentRankedBy: application.rankedBy,
-                currentRankedForCourse: application.rankedForCourse
+                currentRankedForCourse: application.rankedForCourse,
             });
 
             application.rank = null;
@@ -796,16 +920,18 @@ export class ApplicationController {
                 applicationId: application.id,
                 newRank: application.rank,
                 newRankedBy: application.rankedBy,
-                newRankedForCourse: application.rankedForCourse
+                newRankedForCourse: application.rankedForCourse,
             });
 
-            const updatedApplication = await this.applicationRepository.save(application);
+            const updatedApplication = await this.applicationRepository.save(
+                application
+            );
 
             console.log("🗑️ After saving to database:", {
                 applicationId: updatedApplication.id,
                 savedRank: updatedApplication.rank,
                 savedRankedBy: updatedApplication.rankedBy,
-                savedRankedForCourse: updatedApplication.rankedForCourse
+                savedRankedForCourse: updatedApplication.rankedForCourse,
             });
 
             res.status(200).json({
@@ -821,4 +947,51 @@ export class ApplicationController {
             });
         }
     }
-} 
+
+    // Test endpoint for debugging course validation
+    async testCourseValidation(
+        req: AuthenticatedRequest,
+        res: Response
+    ): Promise<void> {
+        try {
+            const { selectedCourses } = req.body;
+
+            console.log("🧪 Test course validation endpoint called:", {
+                selectedCourses,
+                selectedCoursesType: typeof selectedCourses,
+                isArray: Array.isArray(selectedCourses),
+                length: selectedCourses?.length,
+                body: req.body,
+            });
+
+            // Test the regex validation
+            const testResults = selectedCourses?.map((course: string) => ({
+                course,
+                courseType: typeof course,
+                trimmed: course?.trim(),
+                regexTest: course
+                    ? /^[A-Z]{4}\d{4}$/.test(course.trim())
+                    : false,
+                isValid:
+                    course &&
+                    typeof course === "string" &&
+                    /^[A-Z]{4}\d{4}$/.test(course.trim()),
+            }));
+
+            res.status(200).json({
+                success: true,
+                data: {
+                    input: selectedCourses,
+                    testResults,
+                    message: "Course validation test completed",
+                },
+            });
+        } catch (error) {
+            console.error("💥 Error in test course validation:", error);
+            res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    }
+}

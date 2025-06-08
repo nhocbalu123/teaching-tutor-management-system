@@ -22,40 +22,32 @@ export const ProfilePage: React.FC = () => {
 
       if (savedUser) {
         setUser(savedUser);
-        
-        // For lecturers, initialize assigned courses based on whether they are mock data or real users
-        if (savedUser.userType === UserType.LECTURER) {
-          // Mock data lecturers (from seeded database) have assigned courses
-          // Real user lecturers (newly created) have empty courses until admin assigns them
-          const isMockLecturer = [
-            "john.smith@lecturer.edu.au",
-            "sarah.johnson@lecturer.edu.au", 
-            "michael.williams@lecturer.edu.au",
-            "emily.brown@lecturer.edu.au",
-            "david.davis@lecturer.edu.au",
-            "lisa.wilson@lecturer.edu.au"
-          ].includes(savedUser.email);
 
-          if (isMockLecturer) {
-            // For mock lecturers, try to get courses from API
-            try {
-              const response = await AuthService.getProfile();
-              if (response.success && response.data?.assignedCourses && Array.isArray(response.data.assignedCourses)) {
-                console.log("✅ Setting assigned courses for mock lecturer:", response.data.assignedCourses);
-                setAssignedCourses(response.data.assignedCourses);
-              } else {
-                // Fallback: Mock lecturers get placeholder courses for demo
-                setAssignedCourses([]);
-                console.log("📝 Using empty courses for mock lecturer (admin needs to assign)");
-              }
-            } catch (apiError) {
-              console.error("Failed to fetch assigned courses for mock lecturer:", apiError);
+        // For lecturers, always try to fetch assigned courses from the API
+        if (savedUser.userType === UserType.LECTURER) {
+          try {
+            const response = await AuthService.getProfile();
+            if (
+              response.success &&
+              response.data?.assignedCourses &&
+              Array.isArray(response.data.assignedCourses)
+            ) {
+              console.log(
+                "✅ Setting assigned courses for lecturer:",
+                response.data.assignedCourses
+              );
+              setAssignedCourses(response.data.assignedCourses);
+            } else {
+              // No courses assigned yet
               setAssignedCourses([]);
+              console.log("📝 No courses assigned to this lecturer yet");
             }
-          } else {
-            // Real user lecturers always have empty courses (no admin system yet)
+          } catch (apiError) {
+            console.error(
+              "Failed to fetch assigned courses for lecturer:",
+              apiError
+            );
             setAssignedCourses([]);
-            console.log("👤 Real user lecturer - no courses assigned (admin approval required)");
           }
         }
 
@@ -159,7 +151,9 @@ export const ProfilePage: React.FC = () => {
         <div className={styles.errorWrapper}>
           <div className={styles.errorIcon}>❌</div>
           <h2 className={styles.errorTitle}>Error Loading Profile</h2>
-          <p className={styles.errorMessage}>{error || "Profile information could not be loaded."}</p>
+          <p className={styles.errorMessage}>
+            {error || "Profile information could not be loaded."}
+          </p>
         </div>
       </div>
     );
@@ -181,14 +175,15 @@ export const ProfilePage: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <div className={styles.userInfo}>
             <h1 className={styles.userName}>
               {user.firstName} {user.lastName}
             </h1>
             <div className={styles.userRole}>
               <span className={`${styles.roleBadge} ${styles[user.userType]}`}>
-                {getUserTypeIcon(user.userType)} {getUserTypeLabel(user.userType)}
+                {getUserTypeIcon(user.userType)}{" "}
+                {getUserTypeLabel(user.userType)}
               </span>
             </div>
             <p className={styles.userEmail}>{user.email}</p>
@@ -199,7 +194,9 @@ export const ProfilePage: React.FC = () => {
               <div className={styles.statIcon}>📅</div>
               <div className={styles.statContent}>
                 <span className={styles.statLabel}>Member Since</span>
-                <span className={styles.statValue}>{formatDate(user.createdAt)}</span>
+                <span className={styles.statValue}>
+                  {formatDate(user.createdAt)}
+                </span>
               </div>
             </div>
             <div className={styles.statCard}>
@@ -208,7 +205,9 @@ export const ProfilePage: React.FC = () => {
               </div>
               <div className={styles.statContent}>
                 <span className={styles.statLabel}>Status</span>
-                <span className={`${styles.statusBadge} ${user.isBlocked ? styles.blocked : styles.active}`}>
+                <span
+                  className={`${styles.statusBadge} ${user.isBlocked ? styles.blocked : styles.active}`}
+                >
                   {user.isBlocked ? "Blocked" : "Active"}
                 </span>
               </div>
@@ -218,7 +217,9 @@ export const ProfilePage: React.FC = () => {
                 <div className={styles.statIcon}>📚</div>
                 <div className={styles.statContent}>
                   <span className={styles.statLabel}>Assigned Courses</span>
-                  <span className={styles.statValue}>{assignedCourses.length}</span>
+                  <span className={styles.statValue}>
+                    {assignedCourses.length}
+                  </span>
                 </div>
               </div>
             )}
@@ -237,15 +238,21 @@ export const ProfilePage: React.FC = () => {
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Account Type</span>
-                  <span className={styles.infoValue}>{getUserTypeLabel(user.userType)}</span>
+                  <span className={styles.infoValue}>
+                    {getUserTypeLabel(user.userType)}
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Username</span>
-                  <span className={styles.infoValue}>{user.firstName} {user.lastName}</span>
+                  <span className={styles.infoValue}>
+                    {user.firstName} {user.lastName}
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Join Date</span>
-                  <span className={styles.infoValue}>{formatDate(user.createdAt)}</span>
+                  <span className={styles.infoValue}>
+                    {formatDate(user.createdAt)}
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Email</span>
@@ -258,9 +265,13 @@ export const ProfilePage: React.FC = () => {
           {/* Role-Specific Information */}
           <div className={styles.infoCard}>
             <div className={styles.cardHeader}>
-              <div className={styles.cardIcon}>{getUserTypeIcon(user.userType)}</div>
+              <div className={styles.cardIcon}>
+                {getUserTypeIcon(user.userType)}
+              </div>
               <h3 className={styles.cardTitle}>
-                {user.userType === UserType.LECTURER ? "Assigned Courses" : "Role Details"}
+                {user.userType === UserType.LECTURER
+                  ? "Assigned Courses"
+                  : "Role Details"}
               </h3>
             </div>
             <div className={styles.cardContent}>
@@ -269,20 +280,31 @@ export const ProfilePage: React.FC = () => {
                   {assignedCourses.length > 0 ? (
                     <>
                       <p className={styles.courseCount}>
-                        You are currently assigned to {assignedCourses.length} course{assignedCourses.length !== 1 ? 's' : ''}
+                        You are currently assigned to {assignedCourses.length}{" "}
+                        course{assignedCourses.length !== 1 ? "s" : ""}
                       </p>
                       <div className={styles.courseList}>
                         {assignedCourses.map((course) => (
                           <div key={course.id} className={styles.courseItem}>
                             <div className={styles.courseInfo}>
-                              <div className={styles.courseCode}>{course.courseCode}</div>
-                              <div className={styles.courseName}>{course.courseName}</div>
-                              <div className={styles.courseSemester}>{course.semester}</div>
+                              <div className={styles.courseCode}>
+                                {course.courseCode}
+                              </div>
+                              <div className={styles.courseName}>
+                                {course.courseName}
+                              </div>
+                              <div className={styles.courseSemester}>
+                                {course.semester}
+                              </div>
                             </div>
                             <div className={styles.courseDate}>
-                              <span className={styles.courseAssignedLabel}>Assigned</span>
+                              <span className={styles.courseAssignedLabel}>
+                                Assigned
+                              </span>
                               <span className={styles.courseAssignedDate}>
-                                {formatAssignedDate(course.assignedAt.toString())}
+                                {formatAssignedDate(
+                                  course.assignedAt.toString()
+                                )}
                               </span>
                             </div>
                           </div>
@@ -292,11 +314,14 @@ export const ProfilePage: React.FC = () => {
                   ) : (
                     <div className={styles.emptyCourses}>
                       <div className={styles.emptyCoursesIcon}>📚</div>
-                      <div className={styles.emptyCoursesTitle}>No Courses Assigned</div>
+                      <div className={styles.emptyCoursesTitle}>
+                        No Courses Assigned
+                      </div>
                       <div className={styles.emptyCoursesText}>
                         You haven&apos;t been assigned to any courses yet.
                         <br />
-                        Please contact the administrator to request course assignments.
+                        Please contact the administrator to request course
+                        assignments.
                       </div>
                     </div>
                   )}
@@ -304,7 +329,8 @@ export const ProfilePage: React.FC = () => {
               ) : (
                 <>
                   <p className={styles.roleDescription}>
-                    Explore and apply for tutor and lab assistant positions across various courses.
+                    Explore and apply for tutor and lab assistant positions
+                    across various courses.
                   </p>
                   <div className={styles.actionButton}>
                     <a href="/tutor" className={styles.primaryButton}>

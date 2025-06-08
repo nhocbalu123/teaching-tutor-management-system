@@ -7,11 +7,13 @@ import authRoutes from "./routes/user-auth-routes";
 import applicationRoutes from "./routes/application-routes";
 import databaseRoutes from "./routes/database-routes";
 import { getMelbourneTimestamp } from "./utils/dateUtils";
+import path from "path";
 
-config();
+// Load environment variables from root .env file
+config({ path: path.resolve(__dirname, "../../.env") });
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.BACKEND_PORT || process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -38,7 +40,8 @@ app.get("/db-test", async (req, res) => {
     try {
         const { DatabaseResetService } = await import("./utils/dbReset");
 
-        const isConnected = await DatabaseResetService.checkDatabaseConnection();
+        const isConnected =
+            await DatabaseResetService.checkDatabaseConnection();
         const isEmpty = await DatabaseResetService.isDatabaseEmpty();
 
         res.json({
@@ -46,7 +49,7 @@ app.get("/db-test", async (req, res) => {
             database: {
                 connected: isConnected,
                 isEmpty: isEmpty,
-                status: isEmpty ? "EMPTY - needs data" : "HAS DATA"
+                status: isEmpty ? "EMPTY - needs data" : "HAS DATA",
             },
             timestamp: getMelbourneTimestamp(),
             timezone: "Australia/Melbourne (AEST/AEDT)",
@@ -96,18 +99,28 @@ const startServer = async () => {
             console.log(`✅ Server is running on port ${PORT}`);
             console.log(`🏥 Health check: http://localhost:${PORT}/health`);
             console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
-            console.log(`📋 Application endpoints: http://localhost:${PORT}/api/applications`);
-            console.log(`🗄️ Database endpoints: http://localhost:${PORT}/api/database`);
-            console.log(`📊 Database status: http://localhost:${PORT}/api/database/status`);
+            console.log(
+                `📋 Application endpoints: http://localhost:${PORT}/api/applications`
+            );
+            console.log(
+                `🗄️ Database endpoints: http://localhost:${PORT}/api/database`
+            );
+            console.log(
+                `📊 Database status: http://localhost:${PORT}/api/database/status`
+            );
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);
         console.warn("⚠️ Starting server anyway for debugging purposes");
 
         app.listen(PORT, () => {
-            console.log(`⚠️ Server is running on port ${PORT} (DATABASE MAY NOT BE AVAILABLE)`);
+            console.log(
+                `⚠️ Server is running on port ${PORT} (DATABASE MAY NOT BE AVAILABLE)`
+            );
             console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-            console.log(`🔧 Manual database reset: POST http://localhost:${PORT}/api/database/reset`);
+            console.log(
+                `🔧 Manual database reset: POST http://localhost:${PORT}/api/database/reset`
+            );
         });
     }
 };
@@ -122,7 +135,6 @@ const initializeDatabaseSafely = async () => {
         await initializeDatabase();
         console.log("✅ Database initialization completed successfully");
         console.log("💾 User data will be preserved across server restarts");
-
     } catch (error) {
         console.error("❌ Database initialization failed:", error);
         console.warn("⚠️ Manual database intervention may be required");

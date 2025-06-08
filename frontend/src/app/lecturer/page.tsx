@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   ApplicationService,
   ApplicationResponse,
@@ -20,16 +20,20 @@ import ApplicationFilters from "@/modules/lecturer/components/application-filter
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { redirect } from "next/navigation";
 import styles from "./LecturerPage.module.css";
+import { AdminApolloProvider } from "@/components/AdminApolloProvider";
+import { useCandidateBlockingSubscription } from "@/hooks/useCandidateBlockingSubscription";
+import { CandidateBlockedEvent } from "@/lib/graphql-subscriptions";
 
 type TabType = "applications" | "rankings" | "stats";
 
 // Adapter function to convert ApplicationResponse to Application
 const convertToLegacyApplication = (
   appResponse: ApplicationResponse
-): Application & { 
-  role?: { roleName: string }; 
-  course?: { courseCode: string };
+): Application & {
+  role?: { roleName: string };
+  course?: { courseCode: string; courseName: string; semester: string };
   rankedForCourse?: string;
+  isBlocked?: boolean;
 } => {
   const availabilityValue =
     (appResponse.availability as { type: string })?.type || "Part Time";
@@ -56,13 +60,23 @@ const convertToLegacyApplication = (
       | "hired",
     selected: appResponse.status === "selected",
     comment: appResponse.comment || "",
-    rank: appResponse.rank, // Preserve rank from backend
-    // Extended properties
-    role: appResponse.role ? { roleName: appResponse.role.roleName } : undefined,
-    course: appResponse.course ? { courseCode: appResponse.course.courseCode } : undefined,
-    // Add fields needed for ranking
-    selectedForCourses: appResponse.status === "selected" ? [appResponse.course.courseCode] : undefined,
+    rank: appResponse.rank,
+    role: appResponse.role
+      ? { roleName: appResponse.role.roleName }
+      : undefined,
+    course: appResponse.course
+      ? {
+          courseCode: appResponse.course.courseCode,
+          courseName: appResponse.course.courseName,
+          semester: appResponse.course.semester,
+        }
+      : undefined,
+    selectedForCourses:
+      appResponse.status === "selected"
+        ? [appResponse.course.courseCode]
+        : undefined,
     rankedForCourse: appResponse.rankedForCourse,
+    isBlocked: appResponse.candidate?.isBlocked || false,
   };
 };
 
@@ -97,10 +111,29 @@ const convertToLegacyStatistics = (stats: unknown) => {
   };
 };
 
-const LecturerDashboardPage: React.FC = () => {
+const LecturerDashboardInner: React.FC = () => {
   // Authentication
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { lecturerName } = useLecturerAuth();
+
+  // UI state
+  const [activeTab, setActiveTab] = useState<TabType>("applications");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
+
+  // Show toast function
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" | "info" = "success") => {
+      setToastMessage(null);
+      setTimeout(() => {
+        setToastMessage(message);
+        setToastType(type);
+      }, 10);
+    },
+    []
+  );
 
   // Application management with enhanced filtering
   const {
@@ -108,10 +141,10 @@ const LecturerDashboardPage: React.FC = () => {
     statistics: rawStatistics,
     isInitialized,
     selectedApplication: rawSelectedApplication,
+    setSelectedApplication: setRawSelectedApplication,
     comment,
     setComment,
     rankedApplications: rawRankedApplications,
-    // CR Part: Enhanced filters
     selectedCourse,
     setSelectedCourse,
     selectedRankingCourse,
@@ -132,6 +165,89 @@ const LecturerDashboardPage: React.FC = () => {
     handleSelectApplication: rawHandleSelectApplication,
   } = useApplicationManagement();
 
+  // Memoize the callback function to prevent excessive re-initializations
+  const onCandidateBlocked = useCallback(
+    (event: CandidateBlockedEvent) => {
+      const shouldReceiveNotification =
+        user?.userType === "lecturer" &&
+        event.affectedLecturerIds &&
+        event.affectedLecturerIds.includes(user.id);
+
+      if (shouldReceiveNotification) {
+        if (event.isBlocked) {
+          const unselectedCount = event.unselectedApplicationsCount || 0;
+          const unrankedCount = event.unrankedApplicationsCount || 0;
+
+          let message = `${event.candidateName} blocked`;
+          if (unselectedCount > 0 || unrankedCount > 0) {
+            const details = [];
+            if (unselectedCount > 0)
+              details.push(
+                `${unselectedCount} application${unselectedCount === 1 ? "" : "s"} unselected`
+              );
+            if (unrankedCount > 0)
+              details.push(
+                `${unrankedCount} ranking${unrankedCount === 1 ? "" : "s"} removed`
+              );
+            message += ` - ${details.join(", ")}`;
+          }
+
+          showToast(message, "info");
+        } else {
+          showToast(`${event.candidateName} unblocked`, "success");
+        }
+      }
+
+      const isCurrentlySelectedAffected =
+        rawSelectedApplication &&
+        rawSelectedApplication.candidateId === event.candidateId;
+
+      if (isCurrentlySelectedAffected) {
+        setRawSelectedApplication(null);
+
+        if (event.isBlocked && shouldReceiveNotification) {
+          showToast(
+            `Currently selected candidate ${event.candidateName} has been blocked and unselected`,
+            "error"
+          );
+        }
+      }
+
+      loadApplications()
+        .then(() => {
+          if (isCurrentlySelectedAffected && !event.isBlocked) {
+            setTimeout(() => {
+              const updatedApplication = rawApplications.find(
+                (app) => app.candidateId === event.candidateId
+              );
+              if (updatedApplication) {
+                rawHandleSelectApplication(updatedApplication);
+              }
+            }, 100);
+          }
+        })
+        .catch((error) => {
+          console.error("❌ Failed to refresh applications:", error);
+        });
+    },
+    [
+      user,
+      loadApplications,
+      rawSelectedApplication,
+      setRawSelectedApplication,
+      rawHandleSelectApplication,
+      rawApplications,
+      showToast,
+    ]
+  );
+
+  // Candidate blocking subscription with memoized callbacks
+  // Initialize subscription for real-time updates
+  useCandidateBlockingSubscription({
+    showToast,
+    onCandidateBlocked,
+  });
+
   // Convert to legacy format for existing components
   const applications = rawApplications.map(convertToLegacyApplication);
   const statistics = convertToLegacyStatistics(rawStatistics);
@@ -146,29 +262,12 @@ const LecturerDashboardPage: React.FC = () => {
     convertToLegacyApplication
   );
 
-  // Debug log to track selectedApplication conversion
-  useEffect(() => {
-    if (selectedApplication) {
-      console.log("🔄 selectedApplication converted:", {
-        id: selectedApplication.id,
-        comment: selectedApplication.comment,
-        rawComment: rawSelectedApplication?.comment,
-      });
-    }
-  }, [selectedApplication, rawSelectedApplication]);
-
-  // UI state
-  const [activeTab, setActiveTab] = useState<TabType>("applications");
+  // Additional UI state
   const [courses, setCourses] = useState<Array<{ code: string; name: string }>>(
     []
   );
   const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const [skillsFilterArray, setSkillsFilterArray] = useState<string[]>([]);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: "",
-    type: "success" as "success" | "error" | "info",
-  });
 
   // Authentication check
   useEffect(() => {
@@ -186,58 +285,63 @@ const LecturerDashboardPage: React.FC = () => {
   }, [user, isAuthenticated, authLoading]);
 
   // Load available courses and extract skills
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        // First set mock courses to ensure UI works immediately
-        const mockCourseList = [
-          { code: "COSC2758", name: "Full Stack Development" },
-          { code: "COSC2671", name: "Introduction to Web Programming" },
-        ];
-        setCourses(mockCourseList);
-        console.log(
-          `✅ Set ${mockCourseList.length} mock assigned courses for lecturer`
-        );
-
-        // Try to get real data from API
-        const response =
-          await ApplicationService.getAssignedCoursesForLecturer();
-        if (response.success && response.data && response.data.length > 0) {
-          const courseList = response.data.map((course) => ({
-            code: course.courseCode,
-            name: course.courseName,
-          }));
-          setCourses(courseList);
-          console.log(
-            `✅ Updated with ${courseList.length} real assigned courses for lecturer`
+  const loadCourses = useCallback(async () => {
+    try {
+      const response = await ApplicationService.getAssignedCoursesForLecturer();
+      if (response.success && response.data && response.data.length > 0) {
+        const courseList = response.data.map((course) => ({
+          code: course.courseCode,
+          name: course.courseName,
+        }));
+        setCourses(courseList);
+      } else {
+        setCourses([]);
+        if (response.message && !response.success) {
+          showToast(
+            "No courses assigned yet. Contact administrator for course assignments.",
+            "info"
           );
-        } else {
-          console.log("📝 Using mock data - API returned no courses or failed");
-          // Keep mock data if API fails or returns empty
-          if (response.message && !response.success) {
-            showToast(
-              "Using demonstration data. Contact administrator for course assignments.",
-              "info"
-            );
-          }
         }
-      } catch (error) {
-        console.error(
-          "Error loading assigned courses, using mock data:",
-          error
-        );
-        // Mock data is already set above, so no need to do anything
-        showToast(
-          "Using demonstration courses. Please check your connection.",
-          "info"
-        );
       }
-    };
+    } catch (error) {
+      console.error("Error loading assigned courses:", error);
+      setCourses([]);
+      showToast(
+        "Error loading courses. Please check your connection.",
+        "error"
+      );
+    }
+  }, [showToast]);
 
+  useEffect(() => {
     if (isInitialized) {
       loadCourses();
     }
-  }, [isInitialized]);
+  }, [isInitialized, loadCourses]);
+
+  // Add a periodic refresh to detect course changes
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const refreshInterval = setInterval(() => {
+      loadCourses();
+      loadApplications();
+    }, 60000);
+
+    return () => clearInterval(refreshInterval);
+  }, [isInitialized, loadCourses, loadApplications]);
+
+  // Manual refresh function
+  const handleManualRefresh = useCallback(async () => {
+    showToast("Refreshing data...", "success");
+    try {
+      await Promise.all([loadCourses(), loadApplications()]);
+      showToast("Data refreshed successfully", "success");
+    } catch (error) {
+      console.error("Error during manual refresh:", error);
+      showToast("Error refreshing data", "error");
+    }
+  }, [loadCourses, loadApplications, showToast]);
 
   // Extract all unique skills from applications
   useEffect(() => {
@@ -299,24 +403,16 @@ const LecturerDashboardPage: React.FC = () => {
     setSortBy("none");
   };
 
-  // Toast function
-  const showToast = (
-    message: string,
-    type: "success" | "error" | "info" = "success"
-  ) => {
-    setToast({ visible: true, message, type });
-    setTimeout(() => {
-      setToast((prev) => ({ ...prev, visible: false }));
-    }, 3000);
-  };
-
   // Wrap the selection handler to convert back to ApplicationResponse
   const handleSelectApplication = (app: Application) => {
     const originalApp = rawApplications.find(
       (rawApp) => rawApp.id.toString() === app.id
     );
+
     if (originalApp) {
       rawHandleSelectApplication(originalApp);
+    } else {
+      console.error("❌ Could not find original app in rawApplications");
     }
   };
 
@@ -324,25 +420,15 @@ const LecturerDashboardPage: React.FC = () => {
   const handleSaveComment = async () => {
     if (!rawSelectedApplication) return;
 
-    console.log(
-      "💾 Saving comment:",
-      comment,
-      "for application:",
-      rawSelectedApplication.id
-    );
-
     try {
       const response = await ApplicationService.updateApplicationComment(
         rawSelectedApplication.id,
         comment
       );
 
-      console.log("💾 Save comment response:", response);
-
       if (response.success) {
         showToast("Comment saved successfully", "success");
-        await loadApplications(); // Reload to get updated data
-        console.log("💾 Applications reloaded after comment save");
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to save comment", "error");
       }
@@ -362,8 +448,8 @@ const LecturerDashboardPage: React.FC = () => {
 
       if (response.success) {
         setComment("");
-        showToast("Comment deleted", "info");
-        await loadApplications(); // Reload to get updated data
+        showToast("Comment deleted", "success");
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to delete comment", "error");
       }
@@ -373,11 +459,30 @@ const LecturerDashboardPage: React.FC = () => {
   };
 
   const handleSelectApplicantButton = async (selectedCourses: string[]) => {
-    if (!rawSelectedApplication) return;
+    let targetApplication: ApplicationResponse | null = rawSelectedApplication;
+
+    if (!targetApplication && selectedApplication) {
+      targetApplication =
+        rawApplications.find(
+          (rawApp) => rawApp.id.toString() === selectedApplication.id
+        ) || null;
+
+      if (targetApplication) {
+        rawHandleSelectApplication(targetApplication);
+      }
+    }
+
+    if (!targetApplication) {
+      showToast(
+        "No application found. Please try selecting the applicant from the list first.",
+        "error"
+      );
+      return;
+    }
 
     try {
       const response = await ApplicationService.updateApplicationStatus(
-        rawSelectedApplication.id,
+        targetApplication.id,
         "selected",
         comment,
         selectedCourses
@@ -385,11 +490,12 @@ const LecturerDashboardPage: React.FC = () => {
 
       if (response.success) {
         showToast("Applicant selected successfully", "success");
-        await loadApplications(); // Reload to get updated data
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to select applicant", "error");
       }
-    } catch {
+    } catch (error) {
+      console.error("❌ Error in handleSelectApplicantButton:", error);
       showToast("Error selecting applicant", "error");
     }
   };
@@ -398,23 +504,20 @@ const LecturerDashboardPage: React.FC = () => {
     if (!rawSelectedApplication) return;
 
     try {
-      // First, remove from ranking if ranked
       if (selectedApplication?.rank && selectedApplication.rank > 0) {
-        console.log("🗑️ Removing from ranking before unselecting:", {
-          applicationId: selectedApplication.id,
-          currentRank: selectedApplication.rank
-        });
-        
-        const removeRankingResponse = await ApplicationService.removeApplicationFromRanking(
-          parseInt(selectedApplication.id)
-        );
-        
+        const removeRankingResponse =
+          await ApplicationService.removeApplicationFromRanking(
+            parseInt(selectedApplication.id)
+          );
+
         if (!removeRankingResponse.success) {
-          console.warn("Failed to remove from ranking:", removeRankingResponse.message);
+          console.warn(
+            "Failed to remove from ranking:",
+            removeRankingResponse.message
+          );
         }
       }
 
-      // Then unselect the application
       const response = await ApplicationService.updateApplicationStatus(
         rawSelectedApplication.id,
         "pending"
@@ -422,7 +525,7 @@ const LecturerDashboardPage: React.FC = () => {
 
       if (response.success) {
         showToast("Applicant unselected and removed from ranking", "success");
-        await loadApplications(); // Reload to get updated data
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to unselect applicant", "error");
       }
@@ -435,7 +538,6 @@ const LecturerDashboardPage: React.FC = () => {
   const handleAddToRanking = async () => {
     if (!selectedApplication) return;
 
-    // Validation checks
     if (!selectedApplication.selected) {
       showToast(
         "Please select the applicant before adding to ranking",
@@ -444,7 +546,11 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
 
-    if (selectedApplication.rank !== undefined && selectedApplication.rank !== null && selectedApplication.rank > 0) {
+    if (
+      selectedApplication.rank !== undefined &&
+      selectedApplication.rank !== null &&
+      selectedApplication.rank > 0
+    ) {
       showToast("Applicant is already added to ranking", "info");
       return;
     }
@@ -463,7 +569,6 @@ const LecturerDashboardPage: React.FC = () => {
       return;
     }
 
-    // Auto-select the course since there's only one course
     let courseForRanking = selectedRankingCourse;
     if (!courseForRanking && selectedApplication.courses.length > 0) {
       courseForRanking = selectedApplication.courses[0];
@@ -475,20 +580,12 @@ const LecturerDashboardPage: React.FC = () => {
     }
 
     try {
-      // Calculate next rank (add to end of list)
       const currentRankedForCourse = rankedApplications.filter(
         (app) =>
           app.selectedForCourses?.includes(courseForRanking) ||
           app.courses.includes(courseForRanking)
       );
       const nextRank = currentRankedForCourse.length + 1;
-
-      console.log("🎯 Adding to ranking:", {
-        applicationId: selectedApplication.id,
-        nextRank,
-        courseForRanking,
-        currentRankedCount: currentRankedForCourse.length
-      });
 
       const response = await ApplicationService.addApplicationToRanking(
         parseInt(selectedApplication.id),
@@ -498,7 +595,7 @@ const LecturerDashboardPage: React.FC = () => {
 
       if (response.success) {
         showToast("Added to ranking successfully", "success");
-        await loadApplications(); // Reload to get updated data
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to add to ranking", "error");
       }
@@ -519,13 +616,12 @@ const LecturerDashboardPage: React.FC = () => {
     const currentIndex = filteredRanked.findIndex(
       (ranked) => ranked.id === app.id
     );
-    if (currentIndex <= 0) return; // Already at top or not found
+    if (currentIndex <= 0) return;
 
     const currentRank = currentIndex + 1;
     const newRank = currentRank - 1;
 
     try {
-      // Update the rank of the current application
       const response = await ApplicationService.updateApplicationRanking(
         parseInt(app.id),
         newRank,
@@ -533,7 +629,6 @@ const LecturerDashboardPage: React.FC = () => {
       );
 
       if (response.success) {
-        // Also update the application that was above (move it down)
         const appAbove = filteredRanked[currentIndex - 1];
         await ApplicationService.updateApplicationRanking(
           parseInt(appAbove.id),
@@ -542,7 +637,7 @@ const LecturerDashboardPage: React.FC = () => {
         );
 
         showToast("Ranking updated successfully", "success");
-        await loadApplications(); // Reload to get updated data
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to update ranking", "error");
       }
@@ -563,13 +658,12 @@ const LecturerDashboardPage: React.FC = () => {
     const currentIndex = filteredRanked.findIndex(
       (ranked) => ranked.id === app.id
     );
-    if (currentIndex >= filteredRanked.length - 1 || currentIndex < 0) return; // Already at bottom or not found
+    if (currentIndex >= filteredRanked.length - 1 || currentIndex < 0) return;
 
     const currentRank = currentIndex + 1;
     const newRank = currentRank + 1;
 
     try {
-      // Update the rank of the current application
       const response = await ApplicationService.updateApplicationRanking(
         parseInt(app.id),
         newRank,
@@ -577,7 +671,6 @@ const LecturerDashboardPage: React.FC = () => {
       );
 
       if (response.success) {
-        // Also update the application that was below (move it up)
         const appBelow = filteredRanked[currentIndex + 1];
         await ApplicationService.updateApplicationRanking(
           parseInt(appBelow.id),
@@ -586,7 +679,7 @@ const LecturerDashboardPage: React.FC = () => {
         );
 
         showToast("Ranking updated successfully", "success");
-        await loadApplications(); // Reload to get updated data
+        await loadApplications();
       } else {
         showToast(response.message || "Failed to update ranking", "error");
       }
@@ -597,27 +690,14 @@ const LecturerDashboardPage: React.FC = () => {
 
   const handleRemoveFromRanking = async (id: string) => {
     try {
-      console.log("🗑️ Removing from ranking:", { 
-        applicationId: id, 
-        beforeRemoval: { 
-          rankedCount: rankedApplications.length,
-          rankedApps: rankedApplications.map(app => ({ id: app.id, rank: app.rank }))
-        }
-      });
-      
       const response = await ApplicationService.removeApplicationFromRanking(
         parseInt(id)
       );
 
-      console.log("🗑️ Remove ranking response:", response);
-
       if (response.success) {
         showToast("Removed from ranking successfully", "success");
-        console.log("🔄 Reloading applications after remove...");
-        await loadApplications(); // Reload to get updated data
-        console.log("🔄 Applications reloaded, new ranked count:", rankedApplications.length);
+        await loadApplications();
       } else {
-        console.error("❌ Remove ranking failed:", response.message);
         showToast(response.message || "Failed to remove from ranking", "error");
       }
     } catch (error) {
@@ -627,7 +707,6 @@ const LecturerDashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Initialize ranking course selection when switching to rankings tab
     if (
       activeTab === "rankings" &&
       !selectedRankingCourse &&
@@ -660,6 +739,7 @@ const LecturerDashboardPage: React.FC = () => {
           <DashboardHeader
             lecturerName={lecturerName}
             statistics={statistics}
+            onRefresh={handleManualRefresh}
           />
 
           {/* Enhanced Application Filters */}
@@ -768,18 +848,29 @@ const LecturerDashboardPage: React.FC = () => {
         </div>
 
         {/* Toast Notifications */}
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          visible={toast.visible}
-          onClose={() => setToast({ ...toast, visible: false })}
-          variant="toast"
-          position="bottom-left"
-          autoClose={true}
-          autoCloseDelay={3000}
-        />
+        {toastMessage && (
+          <Toast
+            message={toastMessage}
+            type={toastType}
+            visible={!!toastMessage}
+            onClose={() => setToastMessage(null)}
+            variant="toast"
+            position="bottom-left"
+            autoClose={true}
+            autoCloseDelay={3000}
+          />
+        )}
       </div>
     </LoadingWrapper>
+  );
+};
+
+// Main wrapper component with Apollo provider
+const LecturerDashboardPage: React.FC = () => {
+  return (
+    <AdminApolloProvider>
+      <LecturerDashboardInner />
+    </AdminApolloProvider>
   );
 };
 

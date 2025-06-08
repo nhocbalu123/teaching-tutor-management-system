@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { useTheme } from "@/shared/contexts/ThemeContext";
 import UserDropdown from "../user-dropdown";
+import NotificationBell from "@/shared/components/common/notification-bell/NotificationBell";
 import styles from "./header.module.css";
 
 const Header: React.FC = () => {
@@ -139,16 +140,19 @@ const Header: React.FC = () => {
               </button>
             )}
             {isAuthenticated && user ? (
-              <UserDropdown
-                user={{
-                  fullName: `${user.firstName} ${user.lastName}`,
-                  email: user.email,
-                  role: getUserRole(),
-                }}
-                onSignOut={handleSignOut}
-                onToggleDarkMode={toggleDarkMode}
-                isDarkMode={isDarkMode}
-              />
+              <div className={styles.userSection}>
+                {user.userType === "lecturer" && <NotificationBell />}
+                <UserDropdown
+                  user={{
+                    fullName: `${user.firstName} ${user.lastName}`,
+                    email: user.email,
+                    role: getUserRole(),
+                  }}
+                  onSignOut={handleSignOut}
+                  onToggleDarkMode={toggleDarkMode}
+                  isDarkMode={isDarkMode}
+                />
+              </div>
             ) : (
               <div className={styles.authButtons}>
                 <Link
