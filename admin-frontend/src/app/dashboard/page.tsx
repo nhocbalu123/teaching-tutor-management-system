@@ -10,12 +10,17 @@ import {
     ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import styles from "./admin-dashboard.module.css";
+import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/common/Toast/Toast";
 
 export default function Dashboard() {
     const { data: userStats, loading: userStatsLoading } =
         useQuery(GET_USER_STATS);
     const { data: coursesData, loading: coursesLoading } =
         useQuery(GET_ALL_COURSES);
+    
+    // Toast functionality
+    const { toast, showSuccess, showError, showInfo, showWarning, hideToast } = useToast();
 
     const stats = [
         {
@@ -272,7 +277,84 @@ export default function Dashboard() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Toast Demo */}
+                    <div className={styles.contentCard}>
+                        <div className={styles.cardHeader}>
+                            <h3 className={styles.cardTitle}>Toast Notifications Demo</h3>
+                        </div>
+                        <div className={styles.cardContent}>
+                            <div className={styles.actionsList}>
+                                <button
+                                    onClick={() => showSuccess("Operation completed successfully!")}
+                                    className={`${styles.actionItem} ${styles.actionButton}`}
+                                    style={{background: 'rgb(240, 253, 244)', border: '1px solid rgb(34, 197, 94)'}}
+                                >
+                                    <div className={styles.actionContent}>
+                                        <h4 className={styles.actionTitle} style={{color: 'rgb(34, 197, 94)'}}>
+                                            Success Toast
+                                        </h4>
+                                        <p className={styles.actionDescription}>
+                                            Show a success notification
+                                        </p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => showError("Something went wrong!")}
+                                    className={`${styles.actionItem} ${styles.actionButton}`}
+                                    style={{background: 'rgb(254, 242, 242)', border: '1px solid rgb(239, 68, 68)'}}
+                                >
+                                    <div className={styles.actionContent}>
+                                        <h4 className={styles.actionTitle} style={{color: 'rgb(239, 68, 68)'}}>
+                                            Error Toast
+                                        </h4>
+                                        <p className={styles.actionDescription}>
+                                            Show an error notification
+                                        </p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => showInfo("Here's some useful information!")}
+                                    className={`${styles.actionItem} ${styles.actionButton}`}
+                                    style={{background: 'rgb(239, 246, 255)', border: '1px solid rgb(59, 130, 246)'}}
+                                >
+                                    <div className={styles.actionContent}>
+                                        <h4 className={styles.actionTitle} style={{color: 'rgb(59, 130, 246)'}}>
+                                            Info Toast
+                                        </h4>
+                                        <p className={styles.actionDescription}>
+                                            Show an info notification
+                                        </p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => showWarning("Please check your input!")}
+                                    className={`${styles.actionItem} ${styles.actionButton}`}
+                                    style={{background: 'rgb(255, 251, 235)', border: '1px solid rgb(245, 158, 11)'}}
+                                >
+                                    <div className={styles.actionContent}>
+                                        <h4 className={styles.actionTitle} style={{color: 'rgb(245, 158, 11)'}}>
+                                            Warning Toast
+                                        </h4>
+                                        <p className={styles.actionDescription}>
+                                            Show a warning notification
+                                        </p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Toast Notification */}
+                <Toast
+                    message={toast.message}
+                    visible={toast.visible}
+                    type={toast.type}
+                    onClose={hideToast}
+                    position="top-right"
+                    variant="toast"
+                />
             </div>
         </div>
     );

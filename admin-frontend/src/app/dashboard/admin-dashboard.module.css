@@ -447,6 +447,19 @@
     transform: translateX(2px);
 }
 
+
+.actionButton {
+    cursor: pointer;
+    border: none;
+    text-align: left;
+}
+
+.actionButton:hover {
+    background: var(--color-bg-hover);
+    transform: translateX(4px);
+}
+
+
 /* Dark Mode Adjustments */
 :global(.dark) .adminDashboard {
     background: linear-gradient(
