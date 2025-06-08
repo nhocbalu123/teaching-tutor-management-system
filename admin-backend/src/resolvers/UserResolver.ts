@@ -11,7 +11,10 @@ import {
 import { User, UserType } from "../types/User";
 import { AppDataSource } from "../config/database";
 import { pubsub, SUBSCRIPTION_TOPICS } from "../config/pubsub";
-import { CandidateBlockedEvent } from "./SubscriptionResolver";
+import {
+    CandidateBlockedEvent,
+    UserAccountEvent,
+} from "./SubscriptionResolver";
 import { ApplicationService } from "../services/ApplicationService";
 
 @ObjectType()
@@ -202,6 +205,26 @@ export class UserResolver {
                 console.log("🕐 Publish timestamp:", new Date().toISOString());
             }
 
+            // Publish user account event for the blocked user
+            const userAccountEvent: UserAccountEvent = {
+                userId: user.id,
+                userEmail: user.email,
+                userName: user.fullName,
+                userType: user.userType,
+                action: "blocked",
+                timestamp: new Date().toISOString(),
+                user: user,
+            };
+
+            console.log(
+                "📡 Publishing USER_ACCOUNT_BLOCKED event:",
+                userAccountEvent
+            );
+            await pubsub.publish(SUBSCRIPTION_TOPICS.USER_ACCOUNT_BLOCKED, {
+                userAccountUpdates: userAccountEvent,
+            });
+            console.log("✅ USER_ACCOUNT_BLOCKED event published successfully");
+
             return {
                 success: true,
                 message: "User blocked successfully",
@@ -314,6 +337,26 @@ export class UserResolver {
                     message: "Cannot delete admin users",
                 };
             }
+
+            // Publish user account event before deletion
+            const userAccountEvent: UserAccountEvent = {
+                userId: user.id,
+                userEmail: user.email,
+                userName: user.fullName,
+                userType: user.userType,
+                action: "deleted",
+                timestamp: new Date().toISOString(),
+                user: user,
+            };
+
+            console.log(
+                "📡 Publishing USER_ACCOUNT_DELETED event:",
+                userAccountEvent
+            );
+            await pubsub.publish(SUBSCRIPTION_TOPICS.USER_ACCOUNT_DELETED, {
+                userAccountUpdates: userAccountEvent,
+            });
+            console.log("✅ USER_ACCOUNT_DELETED event published successfully");
 
             await userRepository.remove(user);
 

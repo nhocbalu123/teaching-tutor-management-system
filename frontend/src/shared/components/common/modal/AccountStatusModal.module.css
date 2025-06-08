@@ -1,0 +1,335 @@
+/* Account Status Modal CSS - Matching Apply Modal Design */
+
+.accountStatusBackdrop {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 50 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  animation: fadeIn 0.3s ease-out !important;
+}
+
+:global(.dark) .accountStatusBackdrop {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.accountStatusModal {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  width: 100% !important;
+  max-width: 32rem !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+:global(.dark) .accountStatusModal {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border: 1px solid #374151 !important;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header */
+.accountStatusHeader {
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 1.5rem 1.5rem 1rem !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  position: relative !important;
+}
+
+:global(.dark) .accountStatusHeader {
+  border-bottom: 1px solid #374151 !important;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+}
+
+.accountStatusHeaderContent {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+}
+
+.headerTitleSection {
+  flex: 1 !important;
+}
+
+.accountStatusTitle {
+  color: #111827 !important;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.375rem 0 !important;
+  line-height: 1.3 !important;
+}
+
+:global(.dark) .accountStatusTitle {
+  color: #f3f4f6 !important;
+}
+
+.headerSubtitle {
+  color: #6b7280 !important;
+  font-size: 0.8rem !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+:global(.dark) .headerSubtitle {
+  color: #9ca3af !important;
+}
+
+/* Enhanced Close Button with X icon and hover effects */
+.accountStatusClose {
+  color: #6b7280 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 0.5rem !important;
+  border-radius: 0.5rem !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex-shrink: 0 !important;
+}
+
+:global(.dark) .accountStatusClose {
+  color: #9ca3af !important;
+  background: #374151 !important;
+  border-color: #4b5563 !important;
+}
+
+.accountStatusClose::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  transform: scale(0) !important;
+  border-radius: 0.5rem !important;
+  transition: transform 0.2s ease !important;
+}
+
+.accountStatusClose:hover::before {
+  transform: scale(1) !important;
+}
+
+.accountStatusClose:hover {
+  color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  border-color: #f87171 !important;
+  transform: scale(1.1) rotate(90deg) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+}
+
+:global(.dark) .accountStatusClose:hover {
+  color: #f87171 !important;
+  background-color: #450a0a !important;
+  border-color: #7f1d1d !important;
+}
+
+.accountStatusClose svg {
+  width: 18px !important;
+  height: 18px !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Content */
+.accountStatusContent {
+  padding: 1.5rem !important;
+}
+
+.statusInfoCard {
+  background: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: none !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.statusInfoCard:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.iconContainer {
+  margin-bottom: 1rem !important;
+}
+
+.icon {
+  font-size: 3rem !important;
+  display: block !important;
+  margin: 0 auto !important;
+  filter: none !important;
+}
+
+.messageSection {
+  text-align: center !important;
+}
+
+.userName {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  margin: 0 0 1rem 0 !important;
+  opacity: 0.95 !important;
+}
+
+.message {
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  opacity: 0.9 !important;
+}
+
+/* Actions */
+.accountStatusActions {
+  padding-top: 1rem !important;
+  border-top: 1px solid #e5e7eb !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+:global(.dark) .accountStatusActions {
+  border-top-color: #374151 !important;
+}
+
+.continueButton {
+  background: var(--accent-color, #f97316) !important;
+  color: white !important;
+  border: none !important;
+  padding: 1rem 2rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  min-width: 200px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.continueButton::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 100%
+  ) !important;
+  transform: translateX(-100%) !important;
+  transition: transform 0.3s ease !important;
+}
+
+.continueButton:hover::before {
+  transform: translateX(0) !important;
+}
+
+.continueButton:hover {
+  background: var(--accent-hover, #ea580c) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
+}
+
+.continueButton:active {
+  transform: translateY(0) !important;
+}
+
+.continueButton:focus {
+  outline: 2px solid var(--accent-color, #f97316) !important;
+  outline-offset: 2px !important;
+}
+
+/* Dark mode adjustments */
+:global(.dark) .statusInfoCard {
+  background: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:global(.dark) .statusInfoCard:hover {
+  box-shadow: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .accountStatusModal {
+    max-width: 90% !important;
+  }
+
+  .accountStatusHeader {
+    padding: 1.25rem 1.25rem 0.875rem !important;
+  }
+
+  .accountStatusContent {
+    padding: 1.25rem !important;
+  }
+
+  .accountStatusTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .icon {
+    font-size: 2.5rem !important;
+  }
+
+  .userName {
+    font-size: 1rem !important;
+  }
+
+  .message {
+    font-size: 0.85rem !important;
+  }
+
+  .continueButton {
+    padding: 0.875rem 1.5rem !important;
+    font-size: 0.9rem !important;
+    min-width: 160px !important;
+  }
+}

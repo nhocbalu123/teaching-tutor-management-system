@@ -7,6 +7,7 @@ import {
     ID,
     Int,
     Mutation,
+    Arg,
 } from "type-graphql";
 import {
     pubsub,
@@ -43,6 +44,30 @@ export class CandidateBlockedEvent {
 
     @Field(() => [Int], { nullable: true })
     affectedLecturerIds?: number[];
+}
+
+@ObjectType()
+export class UserAccountEvent {
+    @Field(() => ID)
+    userId: number;
+
+    @Field()
+    userEmail: string;
+
+    @Field()
+    userName: string;
+
+    @Field()
+    userType: string;
+
+    @Field()
+    action: string; // "blocked" or "deleted"
+
+    @Field()
+    timestamp: string;
+
+    @Field(() => User, { nullable: true })
+    user?: User;
 }
 
 @Resolver()
@@ -83,6 +108,40 @@ export class SubscriptionResolver {
         }
 
         return eventData;
+    }
+
+    @Subscription(() => UserAccountEvent, {
+        description:
+            "Subscribe to user account status changes (blocking/deletion)",
+        subscribe: () =>
+            createAsyncIterator([
+                SUBSCRIPTION_TOPICS.USER_ACCOUNT_BLOCKED,
+                SUBSCRIPTION_TOPICS.USER_ACCOUNT_DELETED,
+            ]),
+    })
+    userAccountUpdates(
+        @Root() payload: any,
+        @Arg("userId", () => Int) userId: number
+    ): UserAccountEvent {
+        console.log("📡 User account subscription resolver received event:", {
+            rawPayload: payload,
+            requestedUserId: userId,
+        });
+
+        const eventData = payload?.userAccountUpdates || payload;
+
+        // Only return events for the specific user who subscribed
+        if (eventData && eventData.userId === userId) {
+            console.log(
+                `✅ Returning account event for user ${userId}:`,
+                eventData
+            );
+            return eventData;
+        } else {
+            console.log(`🚫 Event not for user ${userId}, skipping`);
+            // Return a dummy event that won't match - GraphQL subscriptions filter these out
+            throw new Error("Event not for this user");
+        }
     }
 
     @Mutation(() => String)
