@@ -619,7 +619,7 @@ export default function CoursesManagement() {
                                             })
                                         }
                                         className={styles.formInput}
-                                        placeholder="e.g., CS101"
+                                        placeholder="e.g., COSC2758"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
@@ -773,7 +773,7 @@ export default function CoursesManagement() {
                                             })
                                         }
                                         className={styles.formInput}
-                                        placeholder="e.g., CS101"
+                                        placeholder="e.g., COSC2758"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
