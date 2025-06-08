@@ -46,9 +46,13 @@ export default function Dashboard() {
         },
         {
             name: "Selection Rate",
-            value: userStats?.getUserStats?.blockedUsers ? 
-                `${Math.round((userStats.getUserStats.totalCandidates / userStats.getUserStats.totalUsers * 100) || 0)}%` :
-                "0%",
+            value: userStats?.getUserStats?.blockedUsers
+                ? `${Math.round(
+                      (userStats.getUserStats.totalCandidates /
+                          userStats.getUserStats.totalUsers) *
+                          100 || 0
+                  )}%`
+                : "0%",
             icon: ExclamationTriangleIcon,
             color: "rate",
             trend: "-2%",
@@ -56,8 +60,6 @@ export default function Dashboard() {
     ];
 
     const courses = coursesData?.getAllCourses || [];
-
-
 
     return (
         <div className={styles.adminDashboard}>
@@ -143,7 +145,7 @@ export default function Dashboard() {
                                 </div>
                             ) : (
                                 <div className={styles.coursesList}>
-                                    {courses.slice(0, 5).map((course: any) => (
+                                    {courses.map((course: any) => (
                                         <div
                                             key={course.id}
                                             className={styles.courseItem}
