@@ -30,9 +30,6 @@ export interface CandidateBlockedEvent {
   candidateEmail: string;
   isBlocked: boolean;
   timestamp: string;
-  unselectedApplicationsCount?: number;
-  unrankedApplicationsCount?: number;
-  affectedLecturerIds?: number[];
   candidate: {
     id: number;
     fullName: string;
@@ -40,5 +37,26 @@ export interface CandidateBlockedEvent {
     userType: string;
     isBlocked: boolean;
     createdAt: string;
+  };
+  unselectedApplicationsCount?: number;
+  unrankedApplicationsCount?: number;
+  affectedLecturerIds?: number[];
+}
+
+export interface UserAccountEvent {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  userType: string;
+  action: string; // "blocked" or "deleted"
+  timestamp: string;
+  user?: {
+    id: number;
+    email: string;
+    fullName: string;
+    userType: string;
+    isBlocked: boolean;
+    createdAt: string;
+    updatedAt: string;
   };
 }
