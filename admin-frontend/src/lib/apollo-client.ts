@@ -1,11 +1,25 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import {
+    ApolloClient,
+    InMemoryCache,
+    createHttpLink,
+    split,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+import { getMainDefinition } from "@apollo/client/utilities";
+
+// HTTP and WebSocket URLs
+const httpUrl =
+    process.env.NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT ||
+    process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+    "http://localhost:4002/graphql";
+
+const wsUrl =
+    process.env.NEXT_PUBLIC_ADMIN_WS_ENDPOINT || "ws://localhost:4002/graphql";
 
 const httpLink = createHttpLink({
-    uri:
-        process.env.NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT ||
-        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
-        "http://localhost:4002/graphql",
+    uri: httpUrl,
     credentials: "include",
 });
 
@@ -25,17 +39,98 @@ const authLink = setContext((_, { headers }) => {
     };
 });
 
+// Create WebSocket client for subscriptions
+const wsClient = createClient({
+    url: wsUrl,
+    lazy: true,
+    keepAlive: 30000,
+    retryAttempts: 5,
+    retryWait: async (attempt) => {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+    },
+    shouldRetry: (errOrCloseEvent) => {
+        if (
+            typeof errOrCloseEvent === "object" &&
+            errOrCloseEvent &&
+            "code" in errOrCloseEvent
+        ) {
+            const code = errOrCloseEvent.code as number;
+            return code < 4000 || code >= 5000;
+        }
+        return true;
+    },
+    connectionParams: () => {
+        const token =
+            typeof window !== "undefined"
+                ? localStorage.getItem("admin-token")
+                : null;
+        return {
+            authorization: token ? `Bearer ${token}` : "",
+        };
+    },
+    on: {
+        error: (error: unknown) => {
+            if (process.env.NODE_ENV === "development") {
+                console.warn(
+                    "WebSocket connection issue (admin-backend may not be running):",
+                    error
+                );
+            }
+        },
+        closed: (event) => {
+            if (process.env.NODE_ENV === "development") {
+                const closeEvent = event as { code?: number; reason?: string };
+                if (closeEvent?.code !== 1000) {
+                    console.warn(
+                        "WebSocket connection closed unexpectedly:",
+                        closeEvent?.code,
+                        closeEvent?.reason
+                    );
+                }
+            }
+        },
+    },
+});
+
+// WebSocket link for subscriptions
+const wsLink = new GraphQLWsLink(wsClient);
+
+// Split link - use WebSocket for subscriptions, HTTP for queries/mutations
+const splitLink = split(
+    ({ query }) => {
+        const definition = getMainDefinition(query);
+        return (
+            definition.kind === "OperationDefinition" &&
+            definition.operation === "subscription"
+        );
+    },
+    wsLink,
+    authLink.concat(httpLink)
+);
+
 const client = new ApolloClient({
-    link: authLink.concat(httpLink),
-    cache: new InMemoryCache(),
+    link: splitLink,
+    cache: new InMemoryCache({
+        typePolicies: {
+            CourseEvent: {
+                keyFields: false, // Don't cache individual events
+            },
+        },
+    }),
     defaultOptions: {
         watchQuery: {
             errorPolicy: "all",
+            notifyOnNetworkStatusChange: true,
         },
         query: {
             errorPolicy: "all",
         },
+        mutate: {
+            errorPolicy: "all",
+        },
     },
+    connectToDevTools: process.env.NODE_ENV === "development",
 });
 
 export default client;

@@ -13,6 +13,8 @@ import { CourseAssignment } from "../types/CourseAssignment";
 import { User, UserType } from "../types/User";
 import { ApplicationStatus } from "../types/Application";
 import { AppDataSource } from "../config/database";
+import { pubsub, SUBSCRIPTION_TOPICS } from "../config/pubsub";
+import { CourseEvent } from "./SubscriptionResolver";
 
 @InputType()
 class CourseInput {
@@ -199,6 +201,19 @@ export class CourseResolver {
             const course = courseRepository.create(input);
             await courseRepository.save(course);
 
+            // Publish real-time event for course creation
+            const courseEvent: CourseEvent = {
+                courseId: course.id,
+                action: "created",
+                timestamp: new Date().toISOString(),
+                message: `Course created: ${course.courseCode} - ${course.courseName}`,
+            };
+
+            console.log("📡 Publishing COURSE_CREATED event:", courseEvent);
+            await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_CREATED, {
+                courseUpdates: courseEvent,
+            });
+
             return {
                 success: true,
                 message: "Course created successfully",
@@ -243,6 +258,19 @@ export class CourseResolver {
 
             Object.assign(course, input);
             await courseRepository.save(course);
+
+            // Publish real-time event for course update
+            const courseEvent: CourseEvent = {
+                courseId: course.id,
+                action: "updated",
+                timestamp: new Date().toISOString(),
+                message: `Course updated: ${course.courseCode} - ${course.courseName}`,
+            };
+
+            console.log("📡 Publishing COURSE_UPDATED event:", courseEvent);
+            await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_UPDATED, {
+                courseUpdates: courseEvent,
+            });
 
             return {
                 success: true,
@@ -291,10 +319,30 @@ export class CourseResolver {
                 };
             }
 
+            // Store course info before deletion for the event message
+            const courseInfo = {
+                id: course.id,
+                courseCode: course.courseCode,
+                courseName: course.courseName,
+            };
+
             // The database cascade rules will handle the deletion of:
             // - Course assignments (due to onDelete: "CASCADE" in CourseAssignment entity)
             // - Applications (due to onDelete: "CASCADE" in Application entity)
             await courseRepository.remove(course);
+
+            // Publish real-time event for course deletion
+            const courseEvent: CourseEvent = {
+                courseId: courseInfo.id,
+                action: "deleted",
+                timestamp: new Date().toISOString(),
+                message: `Course deleted: ${courseInfo.courseCode} - ${courseInfo.courseName}`,
+            };
+
+            console.log("📡 Publishing COURSE_DELETED event:", courseEvent);
+            await pubsub.publish(SUBSCRIPTION_TOPICS.COURSE_DELETED, {
+                courseUpdates: courseEvent,
+            });
 
             return {
                 success: true,

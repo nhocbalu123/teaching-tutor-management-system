@@ -450,3 +450,15 @@ export const REMOVE_LECTURER_FROM_COURSE = gql`
         }
     }
 `;
+
+// Course Subscriptions
+export const COURSE_UPDATES_SUBSCRIPTION = gql`
+    subscription CourseUpdates {
+        courseUpdates {
+            courseId
+            action
+            timestamp
+            message
+        }
+    }
+`;

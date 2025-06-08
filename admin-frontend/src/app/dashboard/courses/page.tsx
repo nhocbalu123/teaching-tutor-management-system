@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
+import { useState, useEffect } from "react";
+import {
+    useQuery,
+    useMutation,
+    useLazyQuery,
+    useSubscription,
+} from "@apollo/client";
 import Toast from "@/shared/components/common/Toast/Toast";
 import { useToast } from "@/shared/hooks/useToast";
 import {
@@ -12,6 +17,7 @@ import {
     DELETE_COURSE,
     ASSIGN_LECTURER_TO_COURSE,
     REMOVE_LECTURER_FROM_COURSE,
+    COURSE_UPDATES_SUBSCRIPTION,
 } from "@/lib/graphql/queries";
 import {
     AcademicCapIcon,
@@ -94,6 +100,52 @@ export default function CoursesManagement() {
         error: coursesError,
         refetch: refetchCourses,
     } = useQuery(GET_ALL_COURSES);
+
+    // Real-time course updates subscription
+    const { data: courseUpdateData } = useSubscription(
+        COURSE_UPDATES_SUBSCRIPTION,
+        {
+            onSubscriptionData: ({ subscriptionData }) => {
+                if (subscriptionData.data?.courseUpdates) {
+                    const { action, message } =
+                        subscriptionData.data.courseUpdates;
+
+                    console.log("📡 Received course update:", {
+                        action,
+                        message,
+                    });
+
+                    // Refresh course data to get latest state
+                    refetchCourses();
+
+                    // Show appropriate toast notification based on action type
+                    switch (action) {
+                        case "created":
+                            showSuccess(
+                                message || "New course created successfully"
+                            );
+                            break;
+                        case "updated":
+                            showSuccess(
+                                message || "Course updated successfully"
+                            );
+                            break;
+                        case "deleted":
+                            showSuccess(
+                                message || "Course deleted successfully"
+                            );
+                            break;
+                        default:
+                            showSuccess(message || "Course updated");
+                    }
+                }
+            },
+            onError: (error) => {
+                console.error("Course subscription error:", error);
+                // Don't show error toast for subscription failures to avoid spam
+            },
+        }
+    );
     const [
         getLecturers,
         {
@@ -1034,7 +1086,6 @@ export default function CoursesManagement() {
                 visible={toast.visible}
                 type={toast.type}
                 onClose={hideToast}
-                title={toast.title}
                 position="bottom-left"
             />
         </div>

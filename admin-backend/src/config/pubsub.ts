@@ -9,6 +9,9 @@ export const SUBSCRIPTION_TOPICS = {
     CANDIDATE_UNBLOCKED: "CANDIDATE_UNBLOCKED",
     USER_ACCOUNT_BLOCKED: "USER_ACCOUNT_BLOCKED",
     USER_ACCOUNT_DELETED: "USER_ACCOUNT_DELETED",
+    COURSE_CREATED: "COURSE_CREATED",
+    COURSE_UPDATED: "COURSE_UPDATED",
+    COURSE_DELETED: "COURSE_DELETED",
 } as const;
 
 // Simplified async iterator implementation that uses PubSub's built-in asyncIterableIterator

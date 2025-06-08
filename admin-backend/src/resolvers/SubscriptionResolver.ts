@@ -15,6 +15,7 @@ import {
     createAsyncIterator,
 } from "../config/pubsub";
 import { User, UserType } from "../types/User";
+import { Course } from "../types/Course";
 
 @ObjectType()
 export class CandidateBlockedEvent {
@@ -68,6 +69,24 @@ export class UserAccountEvent {
 
     @Field(() => User, { nullable: true })
     user?: User;
+}
+
+@ObjectType()
+export class CourseEvent {
+    @Field(() => ID)
+    courseId: number;
+
+    @Field()
+    action: string; // "created", "updated", or "deleted"
+
+    @Field()
+    timestamp: string;
+
+    @Field(() => Course, { nullable: true })
+    course?: Course;
+
+    @Field({ nullable: true })
+    message?: string;
 }
 
 @Resolver()
@@ -142,6 +161,40 @@ export class SubscriptionResolver {
             // Return a dummy event that won't match - GraphQL subscriptions filter these out
             throw new Error("Event not for this user");
         }
+    }
+
+    @Subscription(() => CourseEvent, {
+        description: "Subscribe to course changes (create/update/delete)",
+        subscribe: () =>
+            createAsyncIterator([
+                SUBSCRIPTION_TOPICS.COURSE_CREATED,
+                SUBSCRIPTION_TOPICS.COURSE_UPDATED,
+                SUBSCRIPTION_TOPICS.COURSE_DELETED,
+            ]),
+    })
+    courseUpdates(@Root() payload: any): CourseEvent {
+        console.log("📡 Course subscription resolver received event:", {
+            rawPayload: payload,
+            courseUpdates: payload?.courseUpdates,
+        });
+
+        const eventData = payload?.courseUpdates || payload;
+
+        console.log("📡 Processing course event data:", {
+            eventData,
+            courseId: eventData?.courseId,
+            action: eventData?.action,
+            timestamp: eventData?.timestamp,
+        });
+
+        if (!eventData) {
+            console.error(
+                "❌ Course subscription resolver received undefined event data"
+            );
+            throw new Error("No course subscription data available");
+        }
+
+        return eventData;
     }
 
     @Mutation(() => String)
