@@ -12,6 +12,7 @@ import { User, UserType } from "../types/User";
 import { AppDataSource } from "../config/database";
 import { pubsub, SUBSCRIPTION_TOPICS } from "../config/pubsub";
 import { CandidateBlockedEvent } from "./SubscriptionResolver";
+import { ApplicationService } from "../services/ApplicationService";
 
 @ObjectType()
 class UserStats {
@@ -136,6 +137,26 @@ export class UserResolver {
             user.isBlocked = true;
             await userRepository.save(user);
 
+            // If blocking a candidate, automatically unselect and unrank their applications
+            let applicationResult = null;
+            if (user.userType === UserType.CANDIDATE) {
+                console.log(
+                    `🔄 Automatically unselecting and unranking applications for blocked candidate ${user.id}`
+                );
+                applicationResult =
+                    await ApplicationService.unselectAndUnrankCandidateApplications(
+                        user.id
+                    );
+
+                if (applicationResult.success) {
+                    console.log(`✅ ${applicationResult.message}`);
+                } else {
+                    console.error(
+                        `❌ Failed to unselect/unrank applications: ${applicationResult.message}`
+                    );
+                }
+            }
+
             // Publish subscription event if user is a candidate
             if (user.userType === UserType.CANDIDATE) {
                 const event: CandidateBlockedEvent = {
@@ -145,6 +166,10 @@ export class UserResolver {
                     isBlocked: true,
                     timestamp: new Date().toISOString(),
                     candidate: user,
+                    unselectedApplicationsCount:
+                        applicationResult?.unselectedCount || 0,
+                    unrankedApplicationsCount:
+                        applicationResult?.unrankedCount || 0,
                 };
 
                 console.log("📡 Publishing CANDIDATE_BLOCKED event:", event);

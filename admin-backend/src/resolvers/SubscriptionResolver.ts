@@ -5,6 +5,7 @@ import {
     ObjectType,
     Field,
     ID,
+    Int,
     Mutation,
 } from "type-graphql";
 import {
@@ -33,6 +34,12 @@ export class CandidateBlockedEvent {
 
     @Field(() => User)
     candidate: User;
+
+    @Field(() => Int, { nullable: true })
+    unselectedApplicationsCount?: number;
+
+    @Field(() => Int, { nullable: true })
+    unrankedApplicationsCount?: number;
 }
 
 @Resolver()

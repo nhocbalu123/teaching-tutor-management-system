@@ -150,22 +150,6 @@ const LecturerDashboardInner: React.FC = () => {
     showToast("Test notification: Candidate unblocked", "success");
   }, [showToast]);
 
-  // Test course validation endpoint
-  const testCourseValidation = useCallback(async () => {
-    console.log("🧪 Testing course validation...");
-
-    try {
-      const response = await ApplicationService.testCourseValidation([
-        "COSC2758",
-      ]);
-      console.log("✅ Course validation test response:", response);
-      showToast("Course validation test completed", "success");
-    } catch (error) {
-      console.error("❌ Course validation test error:", error);
-      showToast("Course validation test failed", "error");
-    }
-  }, [showToast]);
-
   // Test backend connectivity first
   const testBackendConnectivity = useCallback(async () => {
     console.log("🧪 Testing backend connectivity...");
@@ -249,6 +233,35 @@ const LecturerDashboardInner: React.FC = () => {
   const onCandidateBlocked = useCallback(
     (event: CandidateBlockedEvent) => {
       console.log("🔔 Candidate blocking event received:", event);
+
+      if (event.isBlocked) {
+        console.log(
+          `🚫 Candidate ${event.candidateName} has been blocked - automatically unselecting and unranking their applications`
+        );
+
+        const unselectedCount = event.unselectedApplicationsCount || 0;
+        const unrankedCount = event.unrankedApplicationsCount || 0;
+
+        let message = `${event.candidateName} blocked`;
+        if (unselectedCount > 0 || unrankedCount > 0) {
+          const details = [];
+          if (unselectedCount > 0)
+            details.push(
+              `${unselectedCount} application${unselectedCount === 1 ? "" : "s"} unselected`
+            );
+          if (unrankedCount > 0)
+            details.push(
+              `${unrankedCount} ranking${unrankedCount === 1 ? "" : "s"} removed`
+            );
+          message += ` - ${details.join(", ")}`;
+        }
+
+        showToast(message, "info");
+      } else {
+        console.log(`✅ Candidate ${event.candidateName} has been unblocked`);
+        showToast(`${event.candidateName} unblocked`, "success");
+      }
+
       console.log("🔄 Refreshing applications after blocking event...");
 
       // Check if the currently selected application is affected by this blocking event
@@ -263,6 +276,14 @@ const LecturerDashboardInner: React.FC = () => {
         console.log("🔄 Clearing selected application state to force refresh");
         // Clear the selected application to force a proper refresh
         setRawSelectedApplication(null);
+
+        if (event.isBlocked) {
+          // Show specific message when the currently selected candidate is blocked
+          showToast(
+            `Currently selected candidate ${event.candidateName} has been blocked and unselected`,
+            "error"
+          );
+        }
       }
 
       // Refresh applications to get updated data
@@ -298,6 +319,7 @@ const LecturerDashboardInner: React.FC = () => {
       setRawSelectedApplication,
       rawHandleSelectApplication,
       rawApplications,
+      showToast,
     ]
   );
 

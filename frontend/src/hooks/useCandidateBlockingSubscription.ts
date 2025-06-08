@@ -121,6 +121,8 @@ export function useCandidateBlockingSubscription({
                       candidateEmail
                       isBlocked
                       timestamp
+                      unselectedApplicationsCount
+                      unrankedApplicationsCount
                       candidate {
                         id
                         fullName
