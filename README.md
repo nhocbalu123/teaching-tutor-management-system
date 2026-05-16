@@ -282,6 +282,7 @@ Important deployment details:
 -   Start/deploy `backend` before `admin-backend` on a fresh database. The normal backend creates tables; the admin backend expects them to exist.
 -   Aiven MySQL uses TLS. For local development, use `DB_CA_CERT_PATH` pointing at a local `aiven-ca.pem`. For Render, upload `aiven-ca.pem` as a secret file and set `DB_CA_CERT_PATH=/etc/secrets/aiven-ca.pem`.
 -   Do not set `PORT` manually on Render. Render supplies it.
+-   Use `npm ci --include=dev && npm run build` for Render backend build commands so TypeScript and `@types/*` packages are installed during the build.
 -   For the demo admin login to be `admin / admin`, set `ADMIN_EMAIL=admin` and `ADMIN_PASSWORD=admin` before `admin-backend` creates the admin user.
 -   After both Vercel frontends are deployed, set `FRONTEND_URL` and `ADMIN_FRONTEND_URL` on the Render `admin-backend` service and redeploy it so CORS allows the hosted frontends.
 -   Before a demo, open both Render health URLs first to wake the free services.

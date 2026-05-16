@@ -181,7 +181,7 @@ In Render:
 | Runtime | `Node` |
 | Branch | `main` |
 | Root Directory | `backend` |
-| Build Command | `npm ci && npm run build` |
+| Build Command | `npm ci --include=dev && npm run build` |
 | Start Command | `npm start` |
 | Instance Type | `Free` |
 
@@ -201,6 +201,8 @@ BACKEND_JWT_SECRET=replace-with-long-random-string
 ```
 
 Do not manually set `PORT` on Render. Render provides it.
+
+The `--include=dev` flag is required because `NODE_ENV=production` can make npm skip TypeScript and `@types/*` packages during the Render build.
 
 Add a Render secret file:
 
@@ -237,7 +239,7 @@ Create another Render Web Service from the same repo.
 | Runtime | `Node` |
 | Branch | `main` |
 | Root Directory | `admin-backend` |
-| Build Command | `npm ci && npm run build` |
+| Build Command | `npm ci --include=dev && npm run build` |
 | Start Command | `npm start` |
 | Instance Type | `Free` |
 
