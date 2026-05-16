@@ -7,15 +7,26 @@ import { CourseAssignment } from "../entities/CourseAssignment";
 import { Application, ApplicationStatus } from "../entities/Application";
 import { SelectedCandidate } from "../entities/SelectedCandidate";
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import path from "path";
 
 // Load environment variables from root .env file
 config({ path: path.resolve(__dirname, "../../../.env") });
 
+const getDatabaseCaCertificate = () => {
+    if (process.env.DB_CA_CERT_PATH) {
+        return fs.readFileSync(process.env.DB_CA_CERT_PATH, "utf8");
+    }
+
+    return process.env.DB_CA_CERT?.replace(/\\n/g, "\n");
+};
+
+const databaseCaCertificate = getDatabaseCaCertificate();
+
 const sslConfig =
     process.env.DB_SSL === "true"
-        ? process.env.DB_CA_CERT
-            ? { ca: process.env.DB_CA_CERT.replace(/\\n/g, "\n") }
+        ? databaseCaCertificate
+            ? { ca: databaseCaCertificate }
             : {}
         : undefined;
 
