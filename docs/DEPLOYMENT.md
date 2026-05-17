@@ -75,23 +75,25 @@ Before deployment, confirm the copied Aiven password matches the password curren
 
 Create a root `.env` from `.env.example`, then fill in your real values.
 
+The examples below use `E:\GitHub\teaching-tutor-management-system` as the local clone path. Adjust paths if your clone lives elsewhere.
+
 For local development, download the Aiven CA certificate to:
 
 ```text
-E:/GitHub/s3959931-s3978302-a2/aiven-ca.pem
+E:/GitHub/teaching-tutor-management-system/aiven-ca.pem
 ```
 
 Use forward slashes in `.env`:
 
 ```env
 DB_SSL=true
-DB_CA_CERT_PATH=E:/GitHub/s3959931-s3978302-a2/aiven-ca.pem
+DB_CA_CERT_PATH=E:/GitHub/teaching-tutor-management-system/aiven-ca.pem
 ```
 
 Test the database connection from the backend folder:
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\backend
+cd E:\GitHub\teaching-tutor-management-system\backend
 
 node -e "require('dotenv').config({path:'../.env'}); const fs=require('fs'); const mysql=require('mysql2/promise'); const ca=process.env.DB_CA_CERT_PATH ? fs.readFileSync(process.env.DB_CA_CERT_PATH,'utf8') : process.env.DB_CA_CERT?.replace(/\\n/g,'\n'); mysql.createConnection({host:process.env.DB_HOST,port:Number(process.env.DB_PORT),user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME,ssl:process.env.DB_SSL==='true'?(ca?{ca}:{}):undefined,connectTimeout:10000}).then(async c=>{console.log('DB OK'); await c.end();}).catch(e=>{console.error(e.code, e.message); process.exit(1);})"
 ```
@@ -113,7 +115,7 @@ If you see `ETIMEDOUT`, the database host is not reachable from your machine or 
 Start the normal backend first:
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\backend
+cd E:\GitHub\teaching-tutor-management-system\backend
 npm run dev
 ```
 
@@ -132,7 +134,7 @@ Invoke-RestMethod -Method Post http://localhost:5000/api/database/seed
 Then start the admin backend:
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\admin-backend
+cd E:\GitHub\teaching-tutor-management-system\admin-backend
 npm run dev
 ```
 
@@ -143,12 +145,12 @@ Check:
 Then start both frontends:
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\frontend
+cd E:\GitHub\teaching-tutor-management-system\frontend
 npm run dev
 ```
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\admin-frontend
+cd E:\GitHub\teaching-tutor-management-system\admin-frontend
 npm run dev
 ```
 
@@ -279,6 +281,13 @@ FRONTEND_URL=https://your-frontend.vercel.app
 ADMIN_FRONTEND_URL=https://your-admin-frontend.vercel.app
 ```
 
+Use exact origins only: no trailing slash and no quotes. For example:
+
+```env
+FRONTEND_URL=https://teaching-tutor-management-system.vercel.app
+ADMIN_FRONTEND_URL=https://teaching-tutor-admin-frontend.vercel.app
+```
+
 Then choose `Save, rebuild, and deploy`.
 
 ## 7. Deploy `frontend` on Vercel
@@ -295,6 +304,10 @@ In Vercel:
 | Framework Preset | `Next.js` |
 | Root Directory | `frontend` |
 | Build Command | Default or `npm run build` |
+| Output Directory | Leave empty/default |
+| Install Command | Leave empty/default |
+
+For Vercel + Next.js, do not set Output Directory to `public` or `.next`. Leave it blank so Vercel can use its Next.js adapter. If the build succeeds but the deployed URL shows `404: NOT_FOUND`, recheck this setting, clear it, then redeploy without the build cache.
 
 Add environment variables:
 
@@ -315,6 +328,10 @@ Create another Vercel project from the same GitHub repo.
 | Framework Preset | `Next.js` |
 | Root Directory | `admin-frontend` |
 | Build Command | Default or `npm run build` |
+| Output Directory | Leave empty/default |
+| Install Command | Leave empty/default |
+
+For Vercel + Next.js, keep Output Directory blank here too. Setting it to `public` can produce a successful deployment that serves Vercel `404: NOT_FOUND` for `/`.
 
 Add environment variables:
 
@@ -361,14 +378,14 @@ If a stale backend process keeps serving old `.env` values on Windows, stop Node
 
 ```powershell
 Get-CimInstance Win32_Process -Filter "name = 'node.exe'" |
-  Where-Object { $_.CommandLine -like '*s3959931-s3978302-a2*' } |
+  Where-Object { $_.CommandLine -like '*teaching-tutor-management-system*' } |
   ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 ```
 
 If the admin user already exists with the wrong password, reset it locally after `.env` points at the correct database:
 
 ```powershell
-cd E:\GitHub\s3959931-s3978302-a2\admin-backend
+cd E:\GitHub\teaching-tutor-management-system\admin-backend
 
 node -e "require('dotenv').config({path:'../.env'}); const fs=require('fs'); const bcrypt=require('bcryptjs'); const mysql=require('mysql2/promise'); const ssl=process.env.DB_SSL==='true' ? (process.env.DB_CA_CERT_PATH ? {ca:fs.readFileSync(process.env.DB_CA_CERT_PATH,'utf8')} : process.env.DB_CA_CERT ? {ca:process.env.DB_CA_CERT.replace(/\\n/g,'\n')} : {}) : undefined; (async()=>{const hash=await bcrypt.hash('admin',10); const c=await mysql.createConnection({host:process.env.DB_HOST,port:Number(process.env.DB_PORT),user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME,ssl}); await c.query('UPDATE users SET password=? WHERE email=? AND userType=?',[hash,'admin','admin']); await c.end(); console.log('Admin password reset to admin');})().catch(e=>{console.error(e); process.exit(1);})"
 ```
@@ -384,8 +401,9 @@ node -e "require('dotenv').config({path:'../.env'}); const fs=require('fs'); con
 | `/db-test` shows `connected:false` | Backend process is using stale or wrong env values | Stop and restart backend after editing `.env` |
 | `/db-test` shows `isEmpty:true` | The database needs seed/demo data | POST `/api/database/seed` |
 | Admin login does not accept `admin / admin` | Admin user was created with a different password | Set `ADMIN_PASSWORD=admin` before first admin-backend start, or reset the existing admin password |
+| Vercel URL shows `404: NOT_FOUND` after a successful Next.js build | Output Directory is wrong, or the URL is not attached to the deployment | In Vercel project settings, set Root Directory to the app folder and leave Output Directory empty/default, then redeploy without cache |
 | Vercel frontend cannot call API | URL env vars are wrong or missing | Use `https://` for HTTP endpoints, `/api` for REST, `/graphql` for GraphQL, and `wss://` for WebSocket |
-| Admin frontend blocked by CORS | `admin-backend` does not know deployed frontend URLs | Set `FRONTEND_URL` and `ADMIN_FRONTEND_URL` on Render admin-backend and redeploy |
+| Admin frontend blocked by CORS | `admin-backend` does not know deployed frontend URLs, or a URL was saved with a trailing slash | Set exact `FRONTEND_URL` and `ADMIN_FRONTEND_URL` origins on Render admin-backend with no trailing slash, then redeploy |
 | WebSocket disconnects during demo | Render Free service slept or restarted | Open the Render health URLs before presenting |
 
 ## Official Platform References

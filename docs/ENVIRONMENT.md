@@ -1,20 +1,24 @@
 # Environment and Secret Handling
 
-The backends read server configuration from the root `.env` file during local development. The frontends read their own `NEXT_PUBLIC_*` values from each frontend's environment at build time.
+Both backends load configuration from the repository root `.env` file. The two Next.js frontends read `NEXT_PUBLIC_*` values from their own project environment at build/runtime.
 
-Never commit real `.env` files, passwords, JWT secrets, or Aiven CA files.
+Never commit real `.env` files, passwords, JWT secrets, or `.pem` certificate files.
 
-## Local Root `.env`
+## Local Setup
 
-Create this file at the repository root:
+Create `.env` at the repository root:
 
-```text
-E:/GitHub/s3959931-s3978302-a2/.env
+```powershell
+Copy-Item .env.example .env
 ```
 
-Use `.env.example` as the template.
+On macOS/Linux:
 
-Required database values:
+```bash
+cp .env.example .env
+```
+
+For Aiven MySQL, use TLS and point `DB_CA_CERT_PATH` at an absolute path to your local CA file:
 
 ```env
 DB_HOST=your-aiven-host
@@ -23,10 +27,10 @@ DB_USERNAME=avnadmin
 DB_PASSWORD=your-aiven-password
 DB_NAME=defaultdb
 DB_SSL=true
-DB_CA_CERT_PATH=E:/GitHub/s3959931-s3978302-a2/aiven-ca.pem
+DB_CA_CERT_PATH=C:/path/to/this-repo/aiven-ca.pem
 ```
 
-Required auth/admin values:
+Required auth and admin values:
 
 ```env
 JWT_SECRET=replace-with-long-random-string
@@ -37,14 +41,14 @@ ADMIN_EMAIL=admin
 ADMIN_PASSWORD=admin
 ```
 
-Local service ports:
+Default local ports:
 
 ```env
 BACKEND_PORT=5000
 ADMIN_BACKEND_PORT=4002
 ```
 
-Local frontend values are optional because the code defaults to local URLs. If you need to override them locally, put them in `frontend/.env.local` and `admin-frontend/.env.local`, not only in the root `.env`.
+Local frontend values are optional because the code defaults to local URLs. If you override them locally, put them in `frontend/.env.local` and `admin-frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_ENDPOINT=http://localhost:5000/api
@@ -52,9 +56,9 @@ NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT=http://localhost:4002/graphql
 NEXT_PUBLIC_ADMIN_WS_ENDPOINT=ws://localhost:4002/graphql
 ```
 
-For Vercel, add the same `NEXT_PUBLIC_*` values in each Vercel project's Environment Variables screen.
+For Vercel, set the same `NEXT_PUBLIC_*` values in each project.
 
-## Hosted Environment Values
+## Hosted Values
 
 Use the same Aiven database values for both Render backend services.
 
@@ -65,63 +69,65 @@ DB_SSL=true
 DB_CA_CERT_PATH=/etc/secrets/aiven-ca.pem
 ```
 
-Add a Render secret file named:
+Add a Render secret file named `aiven-ca.pem`. Render exposes it at `/etc/secrets/aiven-ca.pem`.
 
-```text
-aiven-ca.pem
-```
-
-Render makes it available at:
-
-```text
-/etc/secrets/aiven-ca.pem
-```
-
-If a platform cannot use secret files, use `DB_CA_CERT` and paste the full certificate with newline escapes:
+If a host cannot mount secret files, use an inline certificate:
 
 ```env
 DB_CA_CERT="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
 ```
 
+After Vercel deploys both frontends, set exact frontend origins on `admin-backend` for CORS:
+
+```env
+FRONTEND_URL=https://your-frontend.vercel.app
+ADMIN_FRONTEND_URL=https://your-admin-frontend.vercel.app
+```
+
+Use exact origins only: no trailing slash and no quotes.
+
 ## Variable Ownership
 
 | Variable | Used by | Purpose |
 | --- | --- | --- |
+| `NODE_ENV` | all services | Runtime/build mode |
 | `DB_HOST` | `backend`, `admin-backend` | MySQL hostname |
 | `DB_PORT` | `backend`, `admin-backend` | MySQL port |
 | `DB_USERNAME` | `backend`, `admin-backend` | MySQL username |
 | `DB_PASSWORD` | `backend`, `admin-backend` | MySQL password |
 | `DB_NAME` | `backend`, `admin-backend` | MySQL database name |
 | `DB_SSL` | `backend`, `admin-backend` | Enables TLS when set to `true` |
-| `DB_CA_CERT_PATH` | `backend`, `admin-backend` | Path to CA certificate file |
+| `DB_CA_CERT_PATH` | `backend`, `admin-backend` | CA certificate file path |
 | `DB_CA_CERT` | `backend`, `admin-backend` | Inline CA certificate alternative |
 | `JWT_SECRET` | both backends | Shared fallback JWT secret |
-| `BACKEND_JWT_SECRET` | `backend` | JWT secret for normal user auth |
-| `ADMIN_JWT_SECRET` | `admin-backend` | JWT secret for admin auth |
+| `BACKEND_JWT_SECRET` | `backend` | Normal user JWT secret |
+| `ADMIN_JWT_SECRET` | `admin-backend` | Admin JWT secret |
 | `ADMIN_SESSION_SECRET` | `admin-backend` | Express session secret |
-| `ADMIN_EMAIL` | `admin-backend` | Seed admin email/login |
+| `ADMIN_EMAIL` | `admin-backend` | Seed admin login |
 | `ADMIN_PASSWORD` | `admin-backend` | Seed admin password |
-| `FRONTEND_URL` | `admin-backend` | Deployed user frontend URL for CORS |
-| `ADMIN_FRONTEND_URL` | `admin-backend` | Deployed admin frontend URL for CORS |
 | `BACKEND_PORT` | `backend` | Local backend port override |
 | `ADMIN_BACKEND_PORT` | `admin-backend` | Local admin backend port override |
+| `FRONTEND_URL` | `admin-backend` | Deployed user frontend origin for CORS |
+| `ADMIN_FRONTEND_URL` | `admin-backend` | Deployed admin frontend origin for CORS |
 | `NEXT_PUBLIC_API_ENDPOINT` | `frontend` | User REST API base URL |
 | `NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT` | both frontends | Admin GraphQL HTTP URL |
 | `NEXT_PUBLIC_ADMIN_WS_ENDPOINT` | both frontends | Admin GraphQL WebSocket URL |
 
-## Generating Local Secrets
+Legacy fallbacks still exist in code for older setups: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GRAPHQL_ENDPOINT`, and `SESSION_SECRET`. Prefer the variables listed above for new configuration.
 
-Run this command multiple times and use a different value for each secret:
+## Generating Secrets
+
+Run this command once per secret and use a different value each time:
 
 ```powershell
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-For demo admin login, `ADMIN_EMAIL=admin` and `ADMIN_PASSWORD=admin` are intentionally simple. Do not use `admin / admin` for a real deployment.
+For the demo admin login, `ADMIN_EMAIL=admin` and `ADMIN_PASSWORD=admin` are intentionally simple. Do not use `admin / admin` for a real deployment.
 
-## Files That Must Stay Private
+## Private Files
 
-The following files must not be committed:
+These files must stay out of Git:
 
 - `.env`
 - `.env.local`
