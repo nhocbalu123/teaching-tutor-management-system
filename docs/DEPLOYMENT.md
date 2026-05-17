@@ -10,12 +10,12 @@ This is suitable for a university demo, not production reliability. Render Free 
 
 ## Project Services
 
-| Service | Folder | Runtime | Local URL | Hosted on |
+| Service | Folder | Runtime | Local URL | Hosted URL |
 | --- | --- | --- | --- | --- |
-| User frontend | `frontend` | Next.js | `http://localhost:3000` | Vercel |
-| User REST API | `backend` | Express + TypeORM | `http://localhost:5000` | Render |
-| Admin frontend | `admin-frontend` | Next.js | `http://localhost:3001` | Vercel |
-| Admin API | `admin-backend` | Express + Apollo GraphQL + WebSocket | `http://localhost:4002/graphql` | Render |
+| User frontend | `frontend` | Next.js | `http://localhost:3000` | `https://teaching-tutor-management-system.vercel.app/` |
+| User REST API | `backend` | Express + TypeORM | `http://localhost:5000` | Render deployment |
+| Admin frontend | `admin-frontend` | Next.js | `http://localhost:3001` | `https://teaching-tutor-admin-frontend.vercel.app/` |
+| Admin API | `admin-backend` | Express + Apollo GraphQL + WebSocket | `http://localhost:4002/graphql` | Render deployment |
 | Database | external | MySQL | Aiven host/port | Aiven |
 
 ## Important Database Notes
@@ -277,16 +277,11 @@ Deploy, then test:
 After both Vercel frontends are deployed, come back to this Render service and add:
 
 ```env
-FRONTEND_URL=https://your-frontend.vercel.app
-ADMIN_FRONTEND_URL=https://your-admin-frontend.vercel.app
-```
-
-Use exact origins only: no trailing slash and no quotes. For example:
-
-```env
 FRONTEND_URL=https://teaching-tutor-management-system.vercel.app
 ADMIN_FRONTEND_URL=https://teaching-tutor-admin-frontend.vercel.app
 ```
+
+Use exact origins only: no trailing slash and no quotes.
 
 Then choose `Save, rebuild, and deploy`.
 
@@ -317,7 +312,11 @@ NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT=https://your-admin-backend.onrender.com/graph
 NEXT_PUBLIC_ADMIN_WS_ENDPOINT=wss://your-admin-backend.onrender.com/graphql
 ```
 
-Deploy and save the Vercel URL.
+Deploy and use the Vercel URL:
+
+```text
+https://teaching-tutor-management-system.vercel.app/
+```
 
 ## 8. Deploy `admin-frontend` on Vercel
 
@@ -340,7 +339,11 @@ NEXT_PUBLIC_ADMIN_GRAPHQL_ENDPOINT=https://your-admin-backend.onrender.com/graph
 NEXT_PUBLIC_ADMIN_WS_ENDPOINT=wss://your-admin-backend.onrender.com/graphql
 ```
 
-Deploy and save the admin Vercel URL.
+Deploy and use the admin Vercel URL:
+
+```text
+https://teaching-tutor-admin-frontend.vercel.app/
+```
 
 ## 9. Final Demo Checklist
 
@@ -351,11 +354,11 @@ Before presenting, wake both Render services:
 
 Then test:
 
-- User frontend loads from Vercel.
+- User frontend loads from `https://teaching-tutor-management-system.vercel.app/`.
 - Courses load on the user frontend.
 - Candidate signup works with an email ending in `@candidate.edu.au`.
 - Lecturer login works with seeded lecturer data if you need lecturer workflows.
-- Admin frontend loads from Vercel.
+- Admin frontend loads from `https://teaching-tutor-admin-frontend.vercel.app/`.
 - Admin login works with `admin / admin`.
 - Admin dashboard can read users, courses, and reports.
 

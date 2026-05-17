@@ -1,17 +1,17 @@
 # Teaching Tutor Management System
 
-GitHub repository: https://github.com/rmit-fsd-2025-s1/s3959931-s3978302-a2
+GitHub repository: https://github.com/nhocbalu123/teaching-tutor-management-system
 
 Full-stack monorepo for managing teaching tutor and lab assistant applications. The system has a candidate/lecturer app, an admin dashboard, a REST backend, and an admin GraphQL backend that share one MySQL database.
 
 ## Services
 
-| Service | Folder | Stack | Default URL |
-| --- | --- | --- | --- |
-| User frontend | `frontend` | Next.js 15, React 19 | `http://localhost:3000` |
-| User REST API | `backend` | Express, TypeORM, MySQL | `http://localhost:5000` |
-| Admin frontend | `admin-frontend` | Next.js 15, React 19, Apollo Client | `http://localhost:3001` |
-| Admin API | `admin-backend` | Express, Apollo Server, TypeGraphQL, WebSocket | `http://localhost:4002/graphql` |
+| Service | Folder | Stack | Local URL | Deployed URL |
+| --- | --- | --- | --- | --- |
+| User frontend | `frontend` | Next.js 15, React 19 | `http://localhost:3000` | `https://teaching-tutor-management-system.vercel.app/` |
+| User REST API | `backend` | Express, TypeORM, MySQL | `http://localhost:5000` | Render deployment |
+| Admin frontend | `admin-frontend` | Next.js 15, React 19, Apollo Client | `http://localhost:3001` | `https://teaching-tutor-admin-frontend.vercel.app/` |
+| Admin API | `admin-backend` | Express, Apollo Server, TypeGraphQL, WebSocket | `http://localhost:4002/graphql` | Render deployment |
 
 ## Core Features
 
@@ -179,6 +179,11 @@ Use [Free Demo Deployment Guide](docs/DEPLOYMENT.md) for the current demo deploy
 - Aiven MySQL for the shared database.
 - Render Web Services for `backend` and `admin-backend`.
 - Vercel projects for `frontend` and `admin-frontend`.
+
+Current deployed frontend URLs:
+
+- User frontend: https://teaching-tutor-management-system.vercel.app/
+- Admin frontend: https://teaching-tutor-admin-frontend.vercel.app/
 
 Important notes:
 

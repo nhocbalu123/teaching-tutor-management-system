@@ -80,11 +80,16 @@ DB_CA_CERT="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
 After Vercel deploys both frontends, set exact frontend origins on `admin-backend` for CORS:
 
 ```env
-FRONTEND_URL=https://your-frontend.vercel.app
-ADMIN_FRONTEND_URL=https://your-admin-frontend.vercel.app
+FRONTEND_URL=https://teaching-tutor-management-system.vercel.app
+ADMIN_FRONTEND_URL=https://teaching-tutor-admin-frontend.vercel.app
 ```
 
 Use exact origins only: no trailing slash and no quotes.
+
+The deployed frontend URLs users can open in a browser are:
+
+- User frontend: https://teaching-tutor-management-system.vercel.app/
+- Admin frontend: https://teaching-tutor-admin-frontend.vercel.app/
 
 ## Variable Ownership
 
